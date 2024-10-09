@@ -1,0 +1,14 @@
+paper,id,title
+wk_paper_1,11,SWIFT-Review: a text-mining workbench for systematic review
+wk_paper_2,12,Using a neural network-based feature extraction method to facilitate citation screening for systematic reviews
+wk_paper_3,13,A Multi-Channel Convolutional Neural Network approach to automate the citation screening process
+an_paper_1,21,Medical concept normalization in social media posts with recurrent neural networks
+an_paper_2,22,Deep Contextualized Medical Concept Normalization in Social Media Text
+yg_paper_1,41,Predicting Users’ Domain Knowledge in Information Retrieval Using Multiple Regression Analysis of Search Behaviors
+yg_paper_2,42,Predicting User Knowledge Gain in Informational Search Sessions
+yg_paper_3,43,Analyzing Knowledge Gain of Users in Informational Search Sessions on the Web
+yg_paper_4,44,Topic‐independent modeling of user knowledge in informational search sessions
+ae_paper_1,51,Discourse-driven argument mining in scientific abstracts
+ae_paper_2,52,Transferring knowledge from discourse to arguments: A case study with scientific abstracts
+ae_paper_3,53,Mining arguments in scientific abstracts with discourse-level embeddings
+ae_paper_4,54,Argumentation mining in scientific literature: From computational linguistics to biomedicine
