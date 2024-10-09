@@ -38,6 +38,8 @@ Project Organization
     │   ├── data           <- Scripts to download or generate data
     │   │   └── make_dataset.py
     │   │
+    │   ├── prompts           <- Prompts text used in the experiments
+    │   │
     │   ├── features       <- Scripts to turn raw data into features for modeling
     │   │   └── build_features.py
     │   │

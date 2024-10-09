@@ -1,0 +1,56 @@
+Task Overview:
+=============
+You are a Computer Science researcher conducting a literature review. You will be provided with a pair of articles that address the same research problem (i.e., task) but differ in their approaches. Your task is to summarize the differences between the two articles by specifying the following elements: the research problem, the datasets and the approach in each article.
+
+Input Structure:
+================
+You are given the text of each article in a JSON object, which contains the following fields:
+{
+  "title": "string", // The title of the article,
+  "sections": [ // A list of JSON objects, each containing:
+    {
+      "section_title": "string", // The title of the section,
+      "paragraphs": ["string", "string"] // A list of paragraphs in that section
+    }
+  ]
+}
+
+Output Structure:
+=================
+Your response should be in the form of a JSON object, structured as follows
+{
+  "research_problem": "string", // A key phrase that specifies the research problem/task. Keep this brief (maximum 5 words).
+  "article_1": {
+    "datasets": ["string", "string"], // A summary of the datasets used in article 1. Include names and sizes, formatted as a list of sentences.
+    "approach": ["string", "string"] // A summary of the approaches used in article 1. Include methods or algorithms, formatted as a list of sentences.
+  },
+  "article_2": {
+    "datasets": ["string", "string"], // A summary of the datasets used in article 2. Include names, data source and sizes, formatted as a list of sentences.
+    "approach": ["string", "string"] // A summary of the approaches used in article 2. Include methods or algorithms, formatted as a list of sentences.
+  },
+  "key_differences": ["string", "string"] // A summary of the key differences between the two articles, in terms of datasets and approaches. Use this template to construct each sentence: Article 1 <<Fill here what it does>>, while Article 2 <<Fill what it does different from Article 1 in first sentence>>
+}
+
+Examples of key_differences Sentences:
+- Approach differences:
+  - Article 1 uses FRRN approach for Real-Time Semantic Segmentation, while Article 2 uses Dilation10 for Real-Time Semantic Segmentation.
+  - Article 1 uses Mapillary approach for Semantic Segmentation, while Article 2 uses ParseNet  for Semantic Segmentation.
+- Datasets differences:
+  - Article 1 and Article 2 use Cityscapes dataset.
+  - Article 1 uses multiple datasets:  CamVid, and  ADE20K, while Article 2 uses PASCAL Context dataset.
+  - Article 1 uses multiple datasets:  CamVid,  PASCAL VOC 2012, and  ADE20K, while Article 2 does not use specific datasets for experiments.
+  - Article 1 uses PASCAL VOC 2012 dataset, while Article 2 does not use specific datasets for experiments.
+  - Article 1 uses Cityscapes dataset, while Article 2 uses PASCAL Context dataset.
+
+Here is the two articles:
+<<INPUT>>
+article 1 information:
+======================
+{article_1_input_text}
+
+
+article 2 information:
+======================
+{article_2_input_text}
+
+<<OUTPUT>>

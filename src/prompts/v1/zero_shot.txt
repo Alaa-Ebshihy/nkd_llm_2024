@@ -1,0 +1,45 @@
+Task Overview:
+=============
+You are a Computer Science researcher conducting a literature review. You will be provided with a pair of articles that address the same research problem (i.e., task) but differ in their approaches. Your task is to summarize the differences between the two articles by specifying the following elements: the research problem, the datasets and the approach in each article.
+
+Input Structure:
+================
+You are given the text of each article in a JSON object, which contains the following fields:
+{
+  "title": "string", // The title of the article,
+  "sections": [ // A list of JSON objects, each containing:
+    {
+      "section_title": "string", // The title of the section,
+      "paragraphs": ["string", "string"] // A list of paragraphs in that section
+    }
+  ]
+}
+
+Output Structure:
+=================
+Your response should be in the form of a JSON object, structured as follows
+{
+  "research_problem": "string", // A key phrase that specifies the research problem/task. Keep this brief (maximum 5 words).
+  "article_1": {
+    "datasets": ["string", "string"], // A summary of the datasets used in article 1. Include names and sizes, formatted as a list of sentences.
+    "approach": ["string", "string"] // A summary of the approaches used in article 1. Include methods or algorithms, formatted as a list of sentences.
+  },
+  "article_2": {
+    "datasets": ["string", "string"], // A summary of the datasets used in article 2. Include names, data source and sizes, formatted as a list of sentences.
+    "approach": ["string", "string"] // A summary of the approaches used in article 2. Include methods or algorithms, formatted as a list of sentences.
+  },
+  "key_differences": ["string", "string"] // A summary of the key differences between the two articles, in terms of datasets and approaches. Use this template to construct each sentence: Article 1 <<Fill here what it does>>, while Article 2 <<Fill what it does different from Article 1 in first sentence>>
+}
+
+Here is the two articles:
+<<INPUT>>
+article 1 information:
+======================
+{article_1_input_text}
+
+
+article 2 information:
+======================
+{article_2_input_text}
+
+<<OUTPUT>>
