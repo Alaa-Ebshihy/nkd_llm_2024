@@ -1,0 +1,17 @@
+Here is the leading questions used during the interviews with the PhD Students.
+
+Problem Statement
+=================
+What is the specific problem that each paper tries to solve?
+
+Datasets
+========
+What are the types of datasets used (e.g. scientific text, web text, or images)?
+What are the domains of datasets (e.g. medical,  or computer science)?
+What are the sizes of the datasets?
+List the names of the datasets.
+
+Approach
+=========
+What is the category of the approach used to solve the problem (e.g. deep learning, or classical machine learning)?
+What is the name of the method (e.g. BERT, or SVM)?
