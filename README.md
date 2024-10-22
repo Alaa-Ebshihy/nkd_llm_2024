@@ -1,57 +1,39 @@
-nkd_llm_2024
-==============================
+Narrative Knowledge Delta (NKD) for Scientific Articles
+=================================================
 
-A short description of the project.
+This repository contains the code, data, prompts and evaluation data for the paper **Benchmark Creation for Narrative Knowledge Delta Extraction Tasks: Can LLMs Help?**.
 
-Project Organization
+Structure
 ------------
+The folder structure is based on cookie clutter template, below is the relevant folders for the paper work:
 
     ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
-    ├── README.md          <- The top-level README for developers using this project.
+    ├── README.md          
     ├── data
-    │   ├── interviews       <- Interviews paper pairs.
-    │   ├── survey        <- Survey paper pairs.
-    │   ├── synthetic      <- The automatically generated dataset.
+    │   ├── interviews    <- Contains the _Interviews_ dataset: paper pairs, evaluation data and the corpus used for fact-checking the output from NKD llm.
+    │   ├── survey        <- Contains the _Survey_ dataset: paper pairs, evaluation data and the corpus used for fact-checking the output from NKD llm.
+    │   ├── synthetic     <- Contains the _Synthetic_ dataset paper pairs.
     │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
-    │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
-    │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
-    │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
+    ├── notebooks          <- Contains the notebooks and instructions to run: the Multivers fact-check model, and output evaluation.
     │
     ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
     │   └── figures        <- Generated graphics and figures to be used in reporting
     │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
+    ├── requirements.txt   <- The requirements.
     │
-    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
     ├── src                <- Source code for use in this project.
     │   ├── __init__.py    <- Makes src a Python module
     │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
+    │   ├── prompts        <- Prompts text used in the experiments
     │   │
-    │   ├── prompts           <- Prompts text used in the experiments
+    │   ├── nkd             <- Contains models to generate the NKD
+    │   │   │                
+    │   │   ├── llm          <- Contains the scripts to generate NKD based on the pipeline descriped in the paper
     │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
-
+    │   └── scripts  
+    │       └── nkd
+    |            └── llm     	<- contains the scripts to accept input and generate NKD by executing the functions in the nkd main directory
+    
 
 --------
 
