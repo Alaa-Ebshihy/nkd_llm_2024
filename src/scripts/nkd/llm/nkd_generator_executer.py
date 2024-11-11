@@ -6,9 +6,10 @@ from src.utils.io_util import *
 
 def main(args):
     papers_pairs_info = join(args.papers_base_dir, 'papers_pairs_fewshots.csv')
-    claims_base_path = join(args.papers_base_dir, f'claims/{args.experiment_name}')
+    claims_base_path = join(args.papers_base_dir, 'claims')
     input_text_type = args.input_text_type
     annotation_dir = join(args.papers_base_dir, args.annotation_dir)
+    experiment_name = args.experiment_name
     prompt_template = '\r\n'.join(read_file_into_list(args.prompt_template_path))
     llm_api_type = args.llm_api_type
     llm_model = args.llm_model
@@ -17,7 +18,7 @@ def main(args):
     run_start = int(args.run_start)
     run_end = int(args.run_end)
 
-    generate_claims(papers_pairs_info, claims_base_path, input_text_type, annotation_dir, prompt_template, is_few_shots,
+    generate_claims(papers_pairs_info, claims_base_path, experiment_name, input_text_type, annotation_dir, prompt_template, is_few_shots,
                     llm_api_type, llm_model, llm_api_key, run_start=run_start, run_end=run_end)
 
 

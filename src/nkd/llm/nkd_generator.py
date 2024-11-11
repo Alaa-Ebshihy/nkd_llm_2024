@@ -153,14 +153,14 @@ def construct_claims(papers_pairs_info, input_text_type, annotation_dir, prompt_
     return datasets_claims, approach_claims, split_keydifferences_claims, raw_keydifferences_claims, raw_output
 
 
-def generate_claims(papers_pairs_info, claims_base_path, input_text_type, annotation_dir, prompt_template, is_few_shots,
+def generate_claims(papers_pairs_info, claims_base_path, experiment_name, input_text_type, annotation_dir, prompt_template, is_few_shots,
                     llm_api_type, llm_model, llm_api_key, run_start=1, run_end=2):
     for run in range(run_start, run_end):
         datasets_claims, approach_claims, split_keydifferences_claims, raw_keydifferences_claims, raw_output = construct_claims(
             papers_pairs_info, input_text_type, annotation_dir, prompt_template, is_few_shots, llm_api_type, llm_model,
             llm_api_key)
         merged_claims = datasets_claims + approach_claims + split_keydifferences_claims
-        run_claims_dir = join(claims_base_path, f'{llm_model}/run_{run}')
+        run_claims_dir = join(claims_base_path, f'{llm_model}/{experiment_name}/run_{run}')
         makedirs(run_claims_dir)
 
         write_list_to_file(join(run_claims_dir, 'datasets_claims.jsonl'),
