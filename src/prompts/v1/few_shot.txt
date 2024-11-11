@@ -33,14 +33,9 @@ Your response should be in the form of a JSON object, structured as follows
 
 Examples of key_differences Sentences:
 - Approach differences:
-  - Article 1 uses FRRN approach for Real-Time Semantic Segmentation, while Article 2 uses Dilation10 for Real-Time Semantic Segmentation.
-  - Article 1 uses Mapillary approach for Semantic Segmentation, while Article 2 uses ParseNet  for Semantic Segmentation.
+{approach_few_shots_text}
 - Datasets differences:
-  - Article 1 and Article 2 use Cityscapes dataset.
-  - Article 1 uses multiple datasets:  CamVid, and  ADE20K, while Article 2 uses PASCAL Context dataset.
-  - Article 1 uses multiple datasets:  CamVid,  PASCAL VOC 2012, and  ADE20K, while Article 2 does not use specific datasets for experiments.
-  - Article 1 uses PASCAL VOC 2012 dataset, while Article 2 does not use specific datasets for experiments.
-  - Article 1 uses Cityscapes dataset, while Article 2 uses PASCAL Context dataset.
+{data_few_shots_text}
 
 Here is the two articles:
 <<INPUT>>
