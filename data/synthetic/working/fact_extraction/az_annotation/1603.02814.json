@@ -1,0 +1,882 @@
+{
+  "paper_id": "1603.02814",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Much of the recent progress in Vision-toLanguage problems has been achieved through a combination of Convolutional Neural Networks (CNNs) and Recurrent Neural Networks (RNNs).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This approach does not explicitly represent high-level semantic concepts, but rather seeks to progress directly from image features to text.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper we first propose a method of incorporating high-level concepts into the successful CNNRNN approach, and show that it achieves a significant improvement on the state-of-the-art in both image captioning and visual question answering.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We further show that the same mechanism can be used to incorporate external knowledge, which is critically important for answering high level visual questions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we design a visual question answering model that combines an internal representation of the content of an image with information extracted from a general knowledge base to answer a broad range of image-based questions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It particularly allows questions to be asked where the image alone does not contain the the information required to select the appropriate answer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our final model achieves the best reported results for both image captioning and visual question answering on several of the major benchmark datasets.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "V Ision-toLanguage problems present a particular challenge in Computer Vision because they require translation between two different forms of information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this sense the problem is similar to that of machine translation between languages.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In machine language translation there have been a series of results showing that good performance can be achieved without developing a higher-level model of the state of the world.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [1], [2], [3], for instance, a source sentence is transformed into a fixed-length vector representation by an 'encoder' RNN, which in turn is used as the initial hidden state of a 'decoder' RNN that generates the target sentence.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Despite the supposed equivalence between an image and a thousand words, the manner in which information is represented in each data form could hardly be more different.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Human language is designed specifically so as to communicate information between humans, whereas even the most carefully composed image is the culmination of a complex set of physical processes over which humans have little control.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given the differences between these two forms of information, it seems surprising that methods inspired by machine language translation have been so successful.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These RNN-based methods which translate directly from image features to text, without developing a high-level model of the state of the world, represent the current state of the art for key Vision-toLanguage (V2L) problems, such as image captioning and visual question answering.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Image Caption:",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "External Knowledge:",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Question Answering: Q: Why do they have umbrellas?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This approach is reflected in many recent successful works on image captioning, such as [4], [5], [6], [7], [8], [9], [10].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Current state-of-the-art captioning methods use a CNN as an image 'encoder' to produce a fixed-length vector representation [11], [12], [13], [14], which is then fed into the 'decoder' RNN to generate a caption.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Attributes:",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Visual Question Answering (VQA) is a more recent challenge than image captioning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is distinct from many problems in Computer Vision because the question to be answered is not determined until run time [15].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this V2L problem an image and a free-form, open-ended question about the image are presented to the method which is required to produce a suitable answer [15].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As in image captioning, the current state of the art in VQA [16], [17], [18] relies on passing CNN features to an RNN language model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, visual question answering is a significantly more complex problem than image captioning, not least because it requires accessing information not present in the image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This may be common sense, or specific knowledge about the image subject.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, given an image, such as Figure 1, showing 'a group of people enjoying a sunny day at the beach with umbrellas', if one asks a question 'why do they have umbrellas?', to answer this question, the machine must not only detect the scene 'beach', but must know that 'umbrellas are often used as points of shade on a sunny beach'.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, Antol et al [15] also have suggested that VQA is a more \"AI-complete\" task since it requires multimodal knowledge beyond a single sub-domain.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The contributions of this paper are two-fold.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, we propose a fully trainable attribute-based neural network founded upon the CNN+RNN architecture, that can be applied to multiple V2L problems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We do this by inserting an explicit representation of attributes of the scene which are meaningful to humans.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each semantic attribute corresponds to a word mined from the training image descriptions, and represents higher-level knowledge about the content of the image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A CNN-based classifier is trained for each attribute, and the set of attribute likelihoods for an image form a high-level representation of image content.",
+              "tag": "Method"
+            },
+            {
+              "sent": "An RNN is then trained to generate captions, or question answers, on the basis of the likelihoods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our attribute-based model yields significantly better performance than current state-of-the-art approaches in the task of image captioning.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Based on the proposed attribute-based V2L model, our second contribution is to introduce a method of incorporating knowledge external to the image, including common sense, into the VQA process.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we fuse the automatically generated description of an image with information extracted from an external knowledge base (KB) to provide an answer to a general question about the image (See Figure 5).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The image description takes the form of a set of captions, and the external knowledge is text-based information mined from a Knowledge Base.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, for each of the top-k attributes detected in the image we generate a query which may be applied to a Resource Description Framework (RDF) KB, such as DBpedia.",
+              "tag": "Method"
+            },
+            {
+              "sent": "RDF is the standard format for large KBs, of which there are many.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The queries are specified using Semantic Protocol And RDF Query Language (SPARQL).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We encode the paragraphs extracted from the KB using Doc2Vec [19], which maps paragraphs into a fixed-length feature representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The encoded attributes, captions, and KB information are then input to an LSTM which is trained so as to maximise the likelihood of the ground truth answers in a training set.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We further propose a question-guided knowledge selection scheme to improve the quality of the extracted KB information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The knowledge that is not related to the question is filtered out.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The approach that we propose here combines the generality of information that using a KB allows with the generality of questions that the LSTM allows.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition, it achieves an accuracy of 70.98% on the Toronto COCOQA [18], while the latest state of the art is 61.60%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On the VQA [15] evaluation server (which does not publish ground truth answers for its test set), we also produce the state-ofthe-art result, which is 59.50%.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Attribute-based Representation",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Using attribute-based models as a high-level representation has shown potential in many computer vision tasks such as object recognition, image annotation and image retrieval.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Farhadi et al [22] were among the first to propose to use a set of visual semantic attributes to identify familiar objects, and to describe unfamiliar objects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Vogel and Schiele [23] used visual attributes describing scenes to characterize image regions and combined these local semantics into a global image description.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Su et al [24] defined six groups of attributes to build intermediate-level features for image classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Li et al [25], [26] introduced the concept of an 'object bank' which enables objects to be used as attributes for scene representation.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Image Captioning",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "The problem of annotating images with natural language at the scene level has long been studied in both computer vision and natural language processing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hodosh et al [27] proposed to frame sentence-based image annotation as the task of ranking a given pool of captions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similarly, [28], [29], [30] posed the task as a retrieval problem, but based on coembedding of images and text in the same space.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, Socher et al [31] used neural networks to co-embed image and sentences together and Karpathy et al [6] co-embedded image crops and sub-sentences.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Interestingly, this end-to-end CNNRNN approach ignores the image-to-word mapping which was an essential step in many of the previous image captioning systems detailed above [32], [33], [35], [41].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The CNNRNN approach has the advantage that it is able to generate a wider variety of captions, can be trained end-to-end, and outperforms the previous approach on the benchmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is not clear, however, what the impact of bypassing the intermediate high-level representation is, and particularly to what extent the RNN language model might be compensating.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Donahue et al [5] described an experiment, for example, using tags and CRF models as a mid-layer representation for video to generate descriptions, but it was designed to prove that LSTM outperforms an SMT-based approach [42].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It remains unclear whether the mid-layer representation or the LSTM leads to the success.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our paper provides several welldesigned experiments to answer this question.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Visual Question Answering",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Most recently, inspired by the significant progress achieved using deep neural network models in both computer vision and natural language processing, an architecture which combines a CNN and RNN to learn the mapping from images to sentences has become the dominant trend.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Both Gao et al [16] and Malinowski et al [17] used RNNs to encode the question and output the answer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Whereas Gao et al [16] used two networks, a separate encoder and decoder, Malinowski et al [17] used a single network for both encoding and decoding.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Ren et al [18] focused on questions with a single-word answer and formulated the task as a classification problem using an LSTM.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Antol et al [15] proposed a large-scale open-ended VQA dataset based on COCO, which is called VQA.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Inspired by Xu et al [39] who encode visual attention in the Image Captioning, [46], [47], [48], [49], [50], [51] propose to use the spatial attention to help answering visual questions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "[47], [51], [52] formulate the VQA as a classification problem and restrict the answer only can be drawn from a fixed answer space.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Our framework also exploits both CNN and RNNs, but in contrast to preceding approaches which use only image features extracted from a CNN in answering a question, we employ multiple sources, including image content, generated image captions and mined external knowledge, to feed to an RNN to answer questions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Large-scale Knowledge Bases (KBs), such as Freebase [53] and DBpedia [54], have been used successfully in several natural language Question Answering (QA) systems [55], [56].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, VQA systems exploiting KBs are still relatively rare.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "IMAGE CAPTIONING USING ATTRIBUTES",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "In the baseline model, as in [8], [16], [18] we use a pretrained CNN to extract image features CNN(I) which are fed into the LSTM directly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the sake of completeness a fine-tuned version of this approach is also implemented.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Attribute-based Image Representation",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "Our first task is to describe the image content in terms of a set of attributes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "An attribute vocabulary is first constructed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Unlike [35], [41], that use a vocabulary from separate handlabeled training data, our semantic attributes are extracted from training captions and can be any part of speech, including object names (nouns), motions (verbs) or properties (adjectives).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The direct use of captions guarantees that the most salient attributes for an image set are extracted.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the c (c = 256) most common words in the training captions to determine the attribute vocabulary V att .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similar to [36], the top 15 most frequent closed-class words such as 'a','on','of' are removed since they are in nearly every caption.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In contrast to [36], our vocabulary is not tense or plurality sensitive, for instance, 'ride' and 'riding' are classified as the same semantic attribute, similarly 'bag' and 'bags'.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This significantly decreases the size of our attribute vocabulary.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The full list of attributes can be found in the supplementary material.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our attributes represent a set of high-level semantic constructs, the totality of which the LSTM then attempts to represent in sentence form.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Generating a sentence from a vector of attribute likelihoods exploits a much larger set of candidate words which are learned separately, allowing for greater flexibility in the generated text.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given this attribute vocabulary, we can associate each image with a set of attributes according to its captions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then wish to predict the attributes given a test image.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Caption Generation Model",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "Similar to [7], [8], [38], we propose to train a caption generation model by maximizing the probability of the correct description given the image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, rather than using image features directly as in typically the case, we use the semantic attribute prediction value V att (I) from the previous section as the input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Suppose that {S 1 ,...,S L } is a sequence of words.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The log-likelihood of the words given their context words and the corresponding image can be written as:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training details:",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A VQA MODEL WITH EXTERNAL KNOWLEDGE",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Relating to the Knowledge Base",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Question-guided Knowledge Selection",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "We incrementally implemented a question-guided knowledge selection scheme to rule out the noise information, since we observed that some mined knowledge are not necessary for answering the given question.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, if the question is asking about the 'dog' in the image, it does not make sense to input a piece of 'bird' knowledge into the model, although the image does have a 'bird' inside.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "An Answer Generation Model with Multiple Inputs",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "where p(a t |a 1:t\u22121 ,I,Q) is the probability of generating a t given image information I, question Q and previous words a 1:t\u22121 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We employ an encoder LSTM [67] to take the semantic information from image I and the question Q, while using a decoder LSTM to generate the answer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Weights are shared between the encoder and decoder LSTM.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "State-of-art-Flickr8k",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Dataset",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 61,
+          "sentences": [
+            {
+              "sent": "Results: Table 1 and 2 report image captioning results on Flickr8k, Flickr30k and Microsoft COCO dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is not surprising that AttGT+LSTM model performs best, since ground truth attributes labels are used.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We report these results here just to show the advances of adding an intermediate image-to-word mapping stage.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Ideally, if we could train a perfectly accurate attribute predictor, we could obtain an outstanding improvement compared to both baseline and state-of-the-art methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Indeed, apart from using ground truth attributes, our AttRegionCNN+LSTM models generate the best results on all the three datasets over all evaluation metrics.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Especially comparing with baselines, which do not contain an attributes prediction layer, our final models bring significant improvements, nearly 15% for B-1 and 30% for CIDEr on average.",
+              "tag": "Result"
+            },
+            {
+              "sent": "VggNet+ft+LSTM models perform better than other baselines because of the fine-tuning on the target dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, they do not perform as well as our attributes-based models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "AttSVM+LSTM and AttGlobalCNN+LSTM under-perform AttRegionCNN+LSTM, indicating that region-based attributes prediction provides useful detail beyond whole image classification.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our final model also outperforms the current state-of-the-art listed in the tables.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also evaluated an approach (not shown in table) that combines CNN features and attributes vector together as the input of the LSTM, but we found this approach is not as good  as using attributes vector only in the same setting.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In any case, above experiments show that an intermediate imageto-words stage (ie attributes prediction layer) bring us significant improvements.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We further generated captions for the images in the COCO test set containing 40,775 images and evaluated them on the COCO evaluation server.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These results are shown in Table 3.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We achieve 0.73 on B-1, and surpass human performances on 13 of the 14 metrics reported. stateof-the-art methods are also shown for comparison.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Human Evaluation: We additionally perform a human evaluation on our proposed model, to evaluate the caption generation ability.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We randomly sample 1000 results from the COCO validation dataset, generated by our proposed model AttRegionCNN+LSTM and the baseline model Vg-gNet+LSTM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following the human evaluation protocol of the MS COCO Captioning Challenge 2015, two evaluation metrics are applied.",
+              "tag": "Method"
+            },
+            {
+              "sent": "M1 is the percentage of captions that are evaluated as better or equal to human caption and M2 is the percentage of captions that pass the Turing Test.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 4 summarizes the human evaluation results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can see our model outperforms the baseline model on both metrics.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We did not evaluate on the test split because the human ground truth is not publicly available.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 5 summarizes some properties of recurrent layers employed in some recent RNN-based methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We achieve state-of-the-art using a relatively low dimensional visual input feature and recurrent layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Lower dimension of visual input and RNN normally means less parameters in the RNN training stage, as well as lower computation cost.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Evaluation on Visual Question Answering",
+      "selected_sentences": [
+        {
+          "par_id": 63,
+          "sentences": [
+            {
+              "sent": "We evaluate our model on four recent publicly available visual question answering datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are TABLE 6: Some statistics about the DAQURA, Toronto COCOQA Dataset [18] and VQA dataset [15].",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results on DAQURA",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "DAQURA-Reduced",
+      "selected_sentences": [
+        {
+          "par_id": 66,
+          "sentences": [
+            {
+              "sent": "GUESS [18] 18.24 29.65 77.59 VIS+BOW [18] 34.17 down versions of our approach for comparison.",
+              "tag": "Method"
+            },
+            {
+              "sent": "AttLSTM uses only the semantic level attribute representation V att as the LSTM input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To evaluate the contribution of the internal textual representation and external knowledge for the question answering, we feed the image caption representation V cap and knowledge representation V know with the V att separately, producing two models, Att+CapLSTM and Att+KnowLSTM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also tested the Cap+KnowLSTM, for the experiment completeness.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Att+Cap+KnowLSTM combines all the available information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our final model is the A+C+SelectedKLSTM, which uses the selected knowledge information (see section 4.2) as the input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "GUESS [18] simply selects the modal answer from the training set for each of 4 question types.",
+              "tag": "Method"
+            },
+            {
+              "sent": "VIS+BOW [18] performs multinomial logistic regression based on image features and a BOW vector obtained by summing all the word vectors of the question.",
+              "tag": "Method"
+            },
+            {
+              "sent": "VIS+LSTM [18] has one LSTM to encode the image and question, while 2VIS+BLSTM [18] has two image feature inputs, at the start and the end.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Malinowskiet al [17] propose a neural-based approach and Ma et al [79] encodes both images and questions with a CNN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Yang et al [51] use a stacked attention networks to infer the answer progressively.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 67,
+          "sentences": [
+            {
+              "sent": "All of our proposed models outperform the BaseToronto COCOQA Acc(%) WUPS@0.9",
+              "tag": "Result"
+            },
+            {
+              "sent": "GUESS [18] 6  suggests that the information extracted from captions is more valuable than that extracted from the KB.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Cap+KnowLSTM also performs better than Att+KnowLSTM.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This is not surprising because the Toronto COCOQA questions were generated automatically from the MS COCO captions, and thus the fact that they can be answered by training on the captions is to be expected.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This generation process also leads to questions which require little external information to answer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The comparison on the Toronto COCOQA thus provides an important benchmark against related methods, but does not really test the ability of our method to incorporate extra information.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "It is thus interesting that the additional external information provides any benefit at all.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 10 shows the per-category accuracy for different models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Surprisingly, the counting ability (see question type 'Number') increases when both captions and external knowledge are included.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This may be because some 'counting' questions are not framed in terms of the labels used in the MS COCO captions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Ren et alalso observed similar cases.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [18] they mentioned that \"there was some observable counting ability in very clean images with a single object type but the ability was fairly weak when different object types are present\".",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We also find there is a slight increase for the 'color' questions when the KB is used.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Indeed, some questions like 'What is the color of the stop sign?' can be answered directly from the KB, without the visual cue.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results on VQA",
+      "selected_sentences": [
+        {
+          "par_id": 68,
+          "sentences": [
+            {
+              "sent": "Antol et al [15] provide the VQA dataset which is intended to support \"free-form and open-ended Visual Question Answering\".",
+              "tag": "Method"
+            },
+            {
+              "sent": "They also provide a metric for measuring performance: min{ # humans that said answer 3 ,1} thus 100% means that at least 3 of the 10 humans who answered the question gave the same answer.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CONCLUSIONS",
+      "selected_sentences": [
+        {
+          "par_id": 75,
+          "sentences": [
+            {
+              "sent": "In this paper, we first examined the importance of introducing an intermediate attribute prediction layer into the predominant CNNLSTM framework, which was neglected by almost all previous work.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We implemented an attributebased model which can be applied to the task of image captioning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We have shown that an explicit representation of image content improves V2L performance, in all cases.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Indeed, at the time of submitting this paper, our image captioning model outperforms the state-of-the-art on several captioning datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Secondly, in this paper we have shown that it is possible to extend the state-of-the-art RNN-based VQA approach so as to incorporate the large volumes of information required to answer general, open-ended, questions about images.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The knowledge bases which are currently available do not contain much of the information which would be beneficial to this process, but nonetheless can still be used to significantly improve performance on questions requiring external knowledge (such as 'Why' questions).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The approach that we propose is very general, however, and will be applicable to more informative knowledge bases should they become available.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We further implement a knowledge selection scheme which reflects both of the content of the question and the image, in order to extract more specifically related information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Currently our system is the state-of-the-art on three VQA datasets and produces the best results on the VQA evaluation server.",
+              "tag": "Other"
+            }
+          ]
+        },
+        {
+          "par_id": 76,
+          "sentences": [
+            {
+              "sent": "Further work includes generating knowledge-base queries which reflect the content of the question and the image, in order to extract more specifically related information.",
+              "tag": "Other"
+            },
+            {
+              "sent": "The Knowledge Base itself also can be improved.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For instance, OpenIE provides more general common-sense knowledge such as 'cats eat fish'.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such knowledge will help answer high-level questions.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Image Captioning and Visual Question Answering Based on Attributes and External Knowledge"
+}

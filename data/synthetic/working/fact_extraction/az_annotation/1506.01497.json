@@ -1,0 +1,815 @@
+{
+  "paper_id": "1506.01497",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "State-of-the-art object detection networks depend on region proposal algorithms to hypothesize object locations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Advances like SPPnet [1] and Fast RCNN [2] have reduced the running time of these detection networks, exposing region proposal computation as a bottleneck.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we introduce a Region Proposal Network (RPN) that shares full-image convolutional features with the detection network, thus enabling nearly cost-free region proposals.",
+              "tag": "Method"
+            },
+            {
+              "sent": "An RPN is a fully convolutional network that simultaneously predicts object bounds and objectness scores at each position.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The RPN is trained end-to-end to generate high-quality region proposals, which are used by Fast RCNN for detection.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We further merge RPN and Fast RCNN into a single network by sharing their convolutional features-using the recently popular terminology of neural networks with \"attention\" mechanisms, the RPN component tells the unified network where to look.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the very deep VGG-16 model [3], our detection system has a frame rate of 5fps (including all steps) on a GPU, while achieving state-of-the-art object detection accuracy on PASCAL VOC 2007, 2012, and MS COCO datasets with only 300 proposals per image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In ILSVRC and COCO 2015 competitions, Faster RCNN and RPN are the foundations of the 1st-place winning entries in several tracks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Code has been made publicly available.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "The RCNN method [5] trains CNNs end-to-end to classify the proposal regions into object categories or background.",
+              "tag": "Method"
+            },
+            {
+              "sent": "RCNN mainly plays as a classifier, and it does not predict object bounds (except for refining by bounding box regression).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Its accuracy depends on the performance of the region proposal module (see comparisons in [20]).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Several papers have proposed ways of using deep networks for predicting object bounding boxes [25], [9], [26], [27].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the OverFeat method [9], a fully-connected layer is trained to predict the box coordinates for the localization task that assumes a single object.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The fully-connected layer is then turned into a convolutional layer for detecting multiple classspecific objects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The MultiBox methods [26], [27] generate region proposals from a network whose last fully-connected layer simultaneously predicts multiple class-agnostic boxes, generalizing the \"singlebox\" fashion of OverFeat.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These class-agnostic boxes are used as proposals for RCNN [5].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The MultiBox proposal network is applied on a single image crop or multiple large image crops (eg, 224\u00d7224), in contrast to our fully convolutional scheme.",
+              "tag": "Method"
+            },
+            {
+              "sent": "MultiBox does not share features between the proposal and detection networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We discuss OverFeat and MultiBox in more depth later in context with our method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Concurrent with our work, the DeepMask method [28] is developed for learning segmentation proposals.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Shared computation of convolutions [9], [1], [29], [7], [2] has been attracting increasing attention for efficient, yet accurate, visual recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The OverFeat paper [9] computes convolutional features from an image pyramid for classification, localization, and detection.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Adaptively-sized pooling (SPP) [1] on shared convolutional feature maps is developed for efficient region-based object detection [1], [30] and semantic segmentation [29].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Fast RCNN [2] enables end-to-end detector training on shared convolutional features and shows compelling accuracy and speed.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "FASTER R-CNN",
+      "selected_sentences": [
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Our object detection system, called Faster RCNN, is composed of two modules.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first module is a deep fully convolutional network that proposes regions, and the second module is the Fast RCNN detector [2] that uses the proposed regions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The entire system is a single, unified network for object detection (Figure 2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Using the recently popular terminology of neural networks with 'attention' [31] mechanisms, the RPN module tells the Fast RCNN module where to look.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Section 3.1 we introduce the designs and properties of the network for region proposal.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Section 3.2 we develop algorithms for training both modules with features shared.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Region Proposal Networks",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "A Region Proposal Network (RPN) takes an image (of any size) as input and outputs a set of rectangular object proposals, each with an objectness score. 3",
+              "tag": "Method"
+            },
+            {
+              "sent": "We model this process with a fully convolutional network [7], which we describe in this section.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Because our ultimate goal is to share computation with a Fast RCNN object detection network [2], we assume that both nets share a common set of convolutional layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiments, we investigate the Zeiler and Fergus model [32] (ZF), which has 5 shareable convolutional layers and the Simonyan and Zisserman model [3] (VGG-16), which has 13 shareable convolutional layers.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Anchors",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "At each sliding-window location, we simultaneously predict multiple region proposals, where the number of maximum possible proposals for each location is denoted as k.",
+              "tag": "Method"
+            },
+            {
+              "sent": "So the reg layer has 4k outputs encoding the coordinates of k boxes, and the cls layer outputs 2k scores that estimate probability of object or not object for each proposal 4 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The k proposals are parameterized relative to k reference boxes, which we call 3. \"Region\" is a generic term and in this paper we only consider rectangular regions, as is common for many methods (eg, [27], [4], [6]).",
+              "tag": "Method"
+            },
+            {
+              "sent": "\"Objectness\" measures membership to a set of object classes vs. background.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Translation-Invariant Anchors",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "The translation-invariant property also reduces the model size.",
+              "tag": "Method"
+            },
+            {
+              "sent": "MultiBox has a (4 + 1) \u00d7 800-dimensional fully-connected output layer, whereas our method has a (4 + 2) \u00d7 9-dimensional convolutional output layer in the case of k = 9 anchors.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a result, our output layer has 2.8 \u00d7 10 4 parameters (512 \u00d7 (4 + 2) \u00d7 9 for VGG-16), two orders of magnitude fewer than MultiBox's output layer that has 6.1 \u00d7 10 6 parameters (1536 \u00d7 (4 + 1) \u00d7 800 for GoogleNet [34] in MultiBox [27]).",
+              "tag": "Result"
+            },
+            {
+              "sent": "If considering the feature projection layers, our proposal layers still have an order of magnitude fewer parameters than MultiBox 6 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We expect our method to have less risk of overfitting on small datasets, like PASCAL VOC.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Multi-Scale Anchors as Regression References",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Loss Function",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "The two terms are normalized by N cls and N reg and weighted by a balancing parameter \u03bb.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our current implementation (as in the released code), the cls term in Eqn.( 1) is normalized by the mini-batch size (ie, N cls = 256) and the reg term is normalized by the number of anchor locations (ie, N reg \u223c 2, 400).",
+              "tag": "Method"
+            },
+            {
+              "sent": "By default we set \u03bb = 10, and thus both cls and reg terms are roughly equally weighted.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show by experiments that the results are insensitive to the values of \u03bb in a wide range (Table 9).",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also note that the normalization as above is not required and could be simplified.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training RPNs",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Sharing Features for RPN and Fast R-CNN",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "Thus far we have described how to train a network for region proposal generation, without considering the region-based object detection CNN that will utilize these proposals.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the detection network, we adopt Fast RCNN [2].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Next we describe algorithms that learn a unified network composed of RPN and Fast RCNN with shared convolutional layers (Figure 2).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "Both RPN and Fast RCNN, trained independently, will modify their convolutional layers in different ways.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We therefore need to develop a technique that allows for sharing convolutional layers between the two networks, rather than learning two separate networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We discuss three ways for training networks with features shared: (i) Alternating training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this solution, we first train RPN, and use the proposals to train Fast RCNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network tuned by Fast RCNN is then used to initialize RPN, and this process is iterated.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is the solution that is used in all experiments in this paper.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "In this solution, the RPN and Fast RCNN networks are merged into one network during training as in Figure 2. In each SGD iteration, the forward pass generates region proposals which are treated just like fixed, pre-computed proposals when training a Fast RCNN detector.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The backward propagation takes place as usual, where for the shared layers the backward propagated signals from both the RPN loss and the Fast RCNN loss are combined.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This solution is easy to implement.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But this solution ignores the derivative w.r.t. the proposal boxes' coordinates that are also network responses, so is approximate.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In our experiments, we have empirically found this solver produces close results, yet reduces the training time by about 25-50% comparing with alternating training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This solver is included in our released Python code.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "4-Step Alternating Training.",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "In this paper, we adopt a pragmatic 4-step training algorithm to learn shared features via alternating optimization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the first step, we train the RPN as described in Section 3.1.3.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This network is initialized with an ImageNet-pre-trained model and fine-tuned end-to-end for the region proposal task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the second step, we train a separate detection network by Fast RCNN using the proposals generated by the step-1 RPN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This detection network is also initialized by the ImageNet-pre-trained model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At this point the two networks do not share convolutional layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the third step, we use the detector network to initialize RPN training, but we fix the shared convolutional layers and only fine-tune the layers unique to RPN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Now the two networks share convolutional layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, keeping the shared convolutional layers fixed, we fine-tune the unique layers of Fast RCNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As such, both networks share the same convolutional layers and form a unified network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A similar alternating training can be run for more iterations, but we have observed negligible improvements.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Implementation Details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments on PASCAL VOC",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "We comprehensively evaluate our method on the PASCAL VOC 2007 detection benchmark [11].",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset consists of about 5k trainval images and 5k test images over 20 object categories.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also provide results on the PASCAL VOC 2012 benchmark for a few models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the ImageNet pre-trained network, we use the \"fast\" version of ZF net [32] that has 5 convolutional layers and 3 fully-connected layers, and the public VGG-16 model 7 [3] that has 13 convolutional layers and 3 fully-connected layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We primarily evaluate detection mean Average Precision (mAP), because this is the actual metric for object detection (rather than focusing on object proposal proxy metrics).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "Table 2 (top) shows Fast RCNN results when trained and tested using various region proposal methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These results use the ZF net.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For Selective Search (SS) [4], we generate about 2000 proposals by the \"fast\" mode.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For EdgeBoxes (EB) [6], we generate the proposals by the default EB setting tuned for 0.7 7. www.robots.ox.ac.uk/ \u223c vgg/research/very deep/ IoU.",
+              "tag": "Method"
+            },
+            {
+              "sent": "SS has an mAP of 58.7% and EB has an mAP of 58.6% under the Fast RCNN framework.",
+              "tag": "Result"
+            },
+            {
+              "sent": "RPN with Fast RCNN achieves competitive results, with an mAP of 59.9% while using up to 300 proposals 8 .",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using RPN yields a much faster detection system than using either SS or EB because of shared convolutional computations; the fewer proposals also reduce the region-wise fully-connected layers' cost (Table 5).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "To investigate the behavior of RPNs as a proposal method, we conducted several ablation studies.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, we show the effect of sharing convolutional layers between the RPN and Fast RCNN detection network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To do this, we stop after the second step in the 4-step training process.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using separate networks reduces the result slightly to 58.7% (RPN+ZF, unshared, Table 2).",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe that this is because in the third step when the detectortuned features are used to fine-tune the RPN, the proposal quality is improved.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "Next, we disentangle the RPN's influence on training the Fast RCNN detection network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this purpose, we train a Fast RCNN model by using the 2000 SS proposals and ZF net.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We fix this detector and evaluate the detection mAP by changing the proposal regions used at test-time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In these ablation experiments, the RPN does not share features with the detector.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "Table 3 shows the results of VGG-16 for both proposal and detection.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using RPN+VGG, the result is 68.5% for unshared features, slightly higher than the SS baseline.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown above, this is because the proposals generated by RPN+VGG are more accurate than SS.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Unlike SS that is predefined, the RPN is actively trained and benefits from better networks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For the feature-shared variant, the result is 69.9%-better than the strong SS baseline, yet with nearly cost-free proposals.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We further train the RPN and detection network on the union set of PASCAL VOC 2007 trainval and 2012 trainval.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The mAP is 73.2%. Figure 5 shows some results on the PASCAL VOC 2007 test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the PASCAL VOC 2012 test set (Table 4), our method has an mAP of 70.4% trained on the union set of VOC 2007 trainval+test and VOC 2012 trainval.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 6 and Table 7 show the detailed numbers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Table 5 we summarize the running time of the entire object detection system.",
+              "tag": "Result"
+            },
+            {
+              "sent": "SS takes 1-2 seconds depending on content (on average about 1.5s), and Fast RCNN with VGG-16 takes 320ms on 2000 SS proposals (or 223ms if using SVD on fully-connected layers [2]).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our system with VGG-16 takes in total 198ms for both proposal and detection.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With the convolutional features shared, the RPN alone only takes 10ms computing the additional layers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our regionwise computation is also lower, thanks to fewer proposals (300 per image).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our system has a frame-rate of 17 fps with the ZF net.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on MS COCO",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "There are a few minor changes of our system made for this dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We train our models on an 8GPU implementation, and the effective mini-batch size becomes 8 for RPN (1 per GPU) and 16 for Fast RCNN (2 per GPU).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The RPN step and Fast RCNN step are both trained for 240k iterations with a learning rate of 0.003 and then for 80k iterations with 0.0003.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We modify the learning rates (starting with 0.003 instead of 0.001) because the mini-batch size is changed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the anchors, we use 3 aspect ratios and 4 scales (adding 64 2 ), mainly motivated by handling small objects on this dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, in our Fast RCNN step, the negative samples are defined as those with a maximum IoU with ground truth in the interval of [0, 0.5), instead of [0.1, 0.5) used in [1], [2].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We note that in the SPPnet system [1], the negative samples in [0.1, 0.5) are used for network fine-tuning, but the negative samples in [0, 0.5) are still visited in the SVM step with hard-negative mining.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But the Fast RCNN system [2] abandons the SVM step, so the negative samples in [0, 0.1) are never visited.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Including these [0, 0.1) samples improves mAP@0.5 on the COCO dataset for both Fast RCNN and Faster RCNN systems (but the impact is negligible on PASCAL VOC).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The rest of the implementation details are the same as on PASCAL VOC.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, we keep using 300 proposals and single-scale (s = 600) testing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The testing time is still about 200ms per image on the COCO dataset.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "Next we evaluate our Faster RCNN system.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using the COCO training set to train, Faster RCNN has 42.1% mAP@0.5 and 21.5% mAP@[.5, .95] on the COCO test-dev set.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is 2.8% higher for mAP@0.5 and 2.2% higher for mAP@[.5, .95] than the Fast RCNN counterpart under the same protocol (Table 11).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This indicates that RPN performs excellent for improving the localization accuracy at higher IoU thresholds.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using the COCO trainval set to train, Faster RCNN has 42.7% mAP@0.5 and 21.9% mAP@[.5, .95] on the COCO test-dev set. Figure 6 shows some results on the MS COCO test-dev set.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Faster R-CNN in ILSVRC & COCO 2015 competitions",
+      "selected_sentences": [
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "We have demonstrated that Faster RCNN benefits more from better features, thanks to the fact that the RPN completely learns to propose regions by neural networks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This observation is still valid even when one increases the depth substantially to over 100 layers [18].",
+              "tag": "Result"
+            },
+            {
+              "sent": "Only by replacing VGG-16 with a 101layer residual net (ResNet-101) [18], the Faster RCNN system increases the mAP from 41.5%/21.2%",
+              "tag": "Method"
+            },
+            {
+              "sent": "(ResNet-101) on the COCO val set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With other improvements orthogonal to Faster RCNN, He et al [18] obtained a single-model result of 55.7%/34.9% and an ensemble result of 59.0%/37.4% on the COCO test-dev set, which won the 1st place in the COCO 2015 object detection competition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The same system [18] also won the 1st place in the ILSVRC 2015 object detection competition, surpassing the second place by absolute 8.5%.",
+              "tag": "Method"
+            },
+            {
+              "sent": "RPN is also a building block of the 1st-place winning entries in ILSVRC 2015 localization and COCO 2015 segmentation competitions, for which the details are available in [18] and [15] respectively.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "From MS COCO to PASCAL VOC",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "Large-scale data is of crucial importance for improving deep neural networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Next, we investigate how the MS COCO dataset can help with the detection performance on PASCAL VOC.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a simple baseline, we directly evaluate the COCO detection model on the PASCAL VOC dataset, without fine-tuning on any PASCAL VOC data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This evaluation is possible because the categories on COCO are a superset of those on PASCAL VOC.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The categories that are exclusive on COCO are ignored in this experiment, and the softmax layer is performed only on the 20 categories plus background.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The mAP under this setting is 76.1% on the PASCAL VOC 2007 test set (Table 12).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This result is better than that trained on VOC07+12 (73.2%) by a good margin, even though the PASCAL VOC data are not exploited.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "Then we fine-tune the COCO detection model on the VOC dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this experiment, the COCO model is in place of the ImageNet-pre-trained model (that is used to initialize the network weights), and the Faster RCNN system is fine-tuned as described in Section 3.2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Doing so leads to 78.8% mAP on the PASCAL VOC 2007 test set.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The extra data from the COCO set increases the mAP by 5.6%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 6 shows that the model trained on COCO+VOC has the best AP for every individual category on PASCAL VOC 2007.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Similar improvements are observed on the PASCAL VOC 2012 test set (Table 12 and Table 7).",
+              "tag": "Result"
+            },
+            {
+              "sent": "We note that the test-time speed of obtaining these strong results is still about 200ms per image.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CONCLUSION",
+      "selected_sentences": [
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "We have presented RPNs for efficient and accurate region proposal generation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By sharing convolutional features with the down-stream detection network, the region proposal step is nearly cost-free.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Our method enables a unified, deep-learning-based object detection system to run at near real-time frame rates.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The learned RPN also improves region proposal quality and thus the overall object detection accuracy.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks"
+}

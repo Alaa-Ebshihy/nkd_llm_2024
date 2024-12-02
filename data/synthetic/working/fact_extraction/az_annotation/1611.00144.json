@@ -1,0 +1,509 @@
+{
+  "paper_id": "1611.00144",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Predicting user responses, such as clicks and conversions, is of great importance and has found its usage in many Web applications including recommender systems, web search and online advertising.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The data in those applications is mostly categorical and contains multiple fields; a typical representation is to transform it into a high-dimensional sparse binary feature representation via one-hot encoding.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Facing with the extreme sparsity, traditional models may limit their capacity of mining shallow patterns from the data, ie low-order feature combinations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Deep models like deep neural networks, on the other hand, cannot be directly applied for the high-dimensional input because of the huge feature space.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose a Product-based Neural Networks (PNN) with an embedding layer to learn a distributed representation of the categorical data, a product layer to capture interactive patterns between interfield categories, and further fully connected layers to explore high-order feature interactions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our experimental results on two large-scale real-world ad click datasets demonstrate that PNNs consistently outperform the state-of-the-art models on various metrics.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "I. INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Learning and predicting user response now plays a crucial role in many personalization tasks in information retrieval (IR), such as recommender systems, web search and online advertising.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The goal of user response prediction is to estimate the probability that the user will provide a predefined positive response, eg clicks, purchases etc, in a given context [1].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This predicted probability indicates the user's interest on the specific item such as a news article, a commercial item or an advertising post, which influences the subsequent decision making such as document ranking [2] and ad bidding [3].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "The data collection in these IR tasks is mostly in a multifield categorical form, for example, [Weekday=Tuesday, Gender=Male, City=London], which is normally transformed into high-dimensional sparse binary features via onehot encoding [4].",
+              "tag": "Method"
+            },
+            {
+              "sent": "For example, the three field vectors with one-hot encoding are concatenated as [0, 1, 0, 0, 0, 0, 0] Weekday=Tuesday [0, 1] Gender=Male [0, 0, 1, 0, . . .",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Many machine learning models, including linear logistic regression [5], non-linear gradient boosting decision trees [4] and factorization machines [6], have been proposed to work on such high-dimensional sparse binary features and produce high quality user response predictions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, these models highly depend on feature engineering in order to capture highorder latent patterns [7].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Recently, deep neural networks (DNNs) [8] have shown great capability in classification and regression tasks, including computer vision [9], speech recognition [10] and natural language processing [11].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is promising to adopt DNNs in user response prediction since DNNs could automatically learn more expressive feature representations and deliver better prediction performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In order to improve the multi-field categorical data interaction, [12] presented an embedding methodology based on pre-training of a factorization machine.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Based on the concatenated embedding vectors, multi-layer perceptrons (MLPs) were built to explore feature interactions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, the quality of embedding initialization is largely limited by the factorization machine.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More importantly, the \"add\" operations of the perceptron layer might not be useful to explore the interactions of categorical data in multiple fields.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Previous work [1], [6] has shown that local dependencies between features from different fields can be effectively explored by feature vector \"product\" operations instead of \"add\" operations.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "To utilize the learning ability of neural networks and mine the latent patterns of data in a more effective way than MLPs, in this paper we propose Product-based Neural Network (PNN) which (i) starts from an embedding layer without pretraining as used in [12], and (ii) builds a product layer based on the embedded feature vectors to model the inter-field feature interactions, and (iii) further distills the high-order feature patterns with fully connected MLPs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We present two types of PNNs, with inner and outer product operations in the product layer, to efficiently model the interactive patterns.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "We take CTR estimation in online advertising as the working example to explore the learning ability of our PNN model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The extensive experimental results on two large-scale realworld datasets demonstrate the consistent superiority of our model over state-of-the-art user response prediction models [6], [13], [12] on various metrics.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "II. RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "The response prediction problem is normally formulated as a binary classification problem with prediction likelihood or cross entropy as the training objective [14].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Area under ROC Curve (AUC) and Relative Information Gain (RIG) are common evaluation metrics for response prediction accuracy",
+              "tag": "Claim"
+            },
+            {
+              "sent": "From the modeling perspective, linear logistic regression (LR) [5], [16] and non-linear gradient boosting decision trees (GBDT) [4] and factorization machines (FM) [6] are widely used in industrial applications.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, these models are limited in mining high-order latent patterns or learning quality feature representations.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Deep learning is able to explore high-order latent patterns as well as generalizing expressive data representations [11].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The input data of DNNs are usually dense real vectors, while the solution of multi-field categorical data has not been well studied.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Factorization-machine supported neural networks (FNN) was proposed in [12] to learn embedding vectors of categorical data via pre-trained FM.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Convolutional Click Prediction Model (CCPM) was proposed in [13] to predict ad click by convolutional neural networks (CNN).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, in CCPM the convolutions are only performed on the neighbor fields in a certain alignment, which fails to model the full interactions among non-neighbor features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recurrent neural networks (RNN) was leveraged to model the user queries as a series of user context to predict the ad click behavior [17].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Product unit neural network (PUNN) [18] was proposed to build high-order combinations of the inputs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, neither can PUNN learn local dependencies, nor produce bounded outputs to fit the response rate.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "III. DEEP LEARNING FOR CTR ESTIMATION",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "We take CTR estimation in online advertising [14] as a working example to formulate our model and explore the performance on various metrics.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The task is to build a prediction model to estimate the probability of a user clicking a specific ad in a given context.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Each data sample consists of multiple fields of categorical data such as user information (City, Hour, etc), publisher information (Domain, Ad slot, etc) and ad information (Ad creative ID, Campaign ID, etc) [19].",
+              "tag": "Method"
+            },
+            {
+              "sent": "All the information is represented as a multi-field categorical feature vector, where each field (eg",
+              "tag": "Method"
+            },
+            {
+              "sent": "City) is one-hot encoded as discussed in Section I.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Such a field-wise one-hot encoding representation results in curse of dimensionality and enormous sparsity [12].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Besides, there exist local dependencies and hierarchical structures among fields [1].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Thus we are seeking a DNN model to capture high-order latent patterns in multi-field categorical data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "And we come up with the idea of product layers to explore feature interactions automatically.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In FM, feature interaction is defined as the inner product of two feature vectors [20].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "The proposed deep learning model is named as Productbased Neural Network (PNN).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section, we present PNN model in detail and discuss two variants of this model, namely Inner Product-based Neural Network (IPNN), which has an inner product layer, and Outer Product-based Neural Network (OPNN) which uses an outer product expression.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A. Product-based Neural Network",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B. Inner Product-based Neural Network",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "C. Outer Product-based Neural Network",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "D. Discussions",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "In general, PNN uses product layers to explore feature interactions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Vector products can be viewed as a series of addition/multiplication operations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Inner product and outer product are just two implementations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In fact, we can define more general or complicated product layers, gaining PNN capability in exploration of feature interactions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Analogous to electronic circuit, addition acts like \"OR\" gate while multiplication acting like \"AND\" gate, and the product layer seems to learn rules other than features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Reviewing the scenario of computer vision, while pixels in images are real-world raw features, categorical data in web applications are artificial features with high levels and rich meanings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Logic is a powerful tool in dealing with concepts, domains and relationships.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus we believe that introducing product operations in neural networks will improve networks' ability for modeling multi-field categorical data.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "IV. EXPERIMENTS",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "In this section, we present our experiments in detail, including datasets, data processing, experimental setup, model comparison, and the corresponding analysis 1 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiments, PNN models outperform major state-of-the-art models in the CTR estimation task on two real-world datasets.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "2) iPinYou: The iPinYou dataset 3 is another real-world dataset for ad click logs over 10 days.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After one-hot encoding, we get a dataset containing 19.50M instances with 937.67K input dimensions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We keep the original train/test splitting scheme, where for each advertiser the last 3-day data are used as the test dataset while the rest as the training dataset.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "B. Model Comparison",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "FM: FM has many successful applications in recommender systems and user response prediction tasks [20].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "FM explores feature interactions, which is effective on sparse data.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "C. Evaluation Metrics",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "D. Performance Comparison",
+      "selected_sentences": [
+        {
+          "par_id": 61,
+          "sentences": [
+            {
+              "sent": "We also conduct t-test between our proposed PNNs and the other compared models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table III shows the calculated p-values under log loss metric on both datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results verify that our models significantly improve the performance of user response prediction against the baseline models.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "E. Ablation Study on Network Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 67,
+          "sentences": [
+            {
+              "sent": "The input units are fully connected with the embedding layer within each field.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare different orders, like 2, 10, 50 and 100.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, when the order grows larger, it is harder to fit the parameters in memory, and the models are much easier to over-fit.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiments, we take 10-order embedding in neural networks.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 69,
+          "sentences": [
+            {
+              "sent": "For convenience, we call convolution layers and product layers as representation layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These layers can capture complex feature patterns using fewer parameters, thus are efficient in training, and generalize better on the test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "3) Activation Function: We compare three mainstream activation functions: sigmoid(x) = 1 1+e \u2212x , tanh(x) = 1\u2212e \u22122x 1+e \u22122x , and relu(x) = max(0, x).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Compared with the sigmoidal family, relu function has the advantages of sparsity and efficient gradient, which is possible to gain more benefits on multi-field categorical data.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "V. CONCLUSION AND FUTURE WORK",
+      "selected_sentences": [
+        {
+          "par_id": 71,
+          "sentences": [
+            {
+              "sent": "In this paper, we proposed a deep neural network model with novel architecture, namely Product-based Neural Network, to improve the prediction performance of DNN working on categorical data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "And we chose CTR estimation as our working example.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By exploration of feature interactions, PNN is promising to learn high-order latent patterns on multi-field categorical data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We designed two types of PNN: IPNN based on inner product and OPNN based on outer product.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We also discussed solutions to reduce complexity, making PNN efficient and scalable.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our experimental results demonstrated that PNN outperformed the other state-of-the-art models in 4 metrics on 2 datasets.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "To sum up, we obtain the following conclusions: (i) By investigating feature interactions, PNN gains better capacity on multi-field categorical data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "(ii) Being both efficient and effective, PNN outperforms major stateof-the-art models.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "(iii) Analogous to \"AND\"/\"OR\" gates, the product/add operations in PNN provide a potential strategy for data representation, more specifically, rule representation.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Product-based Neural Networks for User Response Prediction"
+}

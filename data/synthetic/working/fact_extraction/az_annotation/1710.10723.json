@@ -1,0 +1,545 @@
+{
+  "paper_id": "1710.10723",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We consider the problem of adapting neural paragraph-level question answering models to the case where entire documents are given as input.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our proposed solution trains models to produce well calibrated confidence scores for their results on individual paragraphs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We sample multiple paragraphs from the documents during training, and use a sharednormalization training objective that encourages the model to produce globally correct output.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We combine this method with a stateof-the-art pipeline for training models on document QA data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments demonstrate strong performance on several document QA datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Overall, we are able to achieve a score of 71.3 F1 on the web portion of Triv-iaQA, a large improvement from the 56.7 F1 of the previous best system.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Teaching machines to answer arbitrary usergenerated questions is a long-term goal of natural language processing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For a wide range of questions, existing information retrieval methods are capable of locating documents that are likely to contain the answer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, automatically extracting the answer from those texts remains an open challenge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The recent success of neural models at answering questions given a related paragraph (Wang et al, 2017b;Tan et al, 2017) suggests neural models have the potential to be a key part of a solution to this problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Training and testing neural models that take entire documents as input is extremely computationally expensive, so typically this requires adapting a paragraph-level model to process document-level input.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this paper we start by proposing an improved pipelined method which achieves state-of-the-art results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Then we introduce a method for training models to produce accurate per-paragraph confidence scores, and we show how combining this method with multiple paragraph selection further increases performance.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Our confidence method extends this approach to better handle the multi-paragraph setting.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Previous approaches trained the model on questions paired with paragraphs that are known a priori to contain the answer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This has several downsides: the model is not trained to produce low confidence scores for paragraphs that do not contain an answer, and the training objective does not require confidence scores to be comparable between paragraphs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We resolve these problems by sampling paragraphs from the context documents, including paragraphs that do not contain an answer, to train on.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then use a shared-normalization objective where paragraphs are processed independently, but the probability of an answer candidate is marginalized over all paragraphs sampled from the same document.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This requires the model to produce globally correct output even though each paragraph is processed independently.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "We evaluate our work on TriviaQA web (Joshi et al, 2017), a dataset of questions paired with web documents that contain the answer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We achieve 71.3 F1 on the test set, a 15 point absolute gain over prior work.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We additionally perform an ablation study on our pipelined method, and we show the effectiveness of our multi-paragraph methods on TriviaQA unfiltered and a modified version of SQuAD (Rajpurkar et al, 2016) where only the correct document, not the correct paragraph, is known.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also build a demonstration of our method by combining our model with a reimplementation of the retrieval mechanism used in TriviaQA to build a prototype end-to-end general question answering system 1 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We release our code 2 to facilitate future work in this field.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Pipelined Method",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "In this section we propose an approach to training pipelined question answering systems, where a single paragraph is heuristically extracted from the context document(s) and passed to a paragraphlevel QA model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We suggest using a TFIDF based paragraph selection method and argue that a summed objective function should be used to handle noisy supervision.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We also propose a refined model that incorporates some recent modeling ideas for reading comprehension systems.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Paragraph Selection",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Our paragraph selection method chooses the paragraph that has the smallest TFIDF cosine distance with the question.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Document frequencies are computed using just the paragraphs within the relevant documents, not the entire corpus.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The advantage of this approach is that if a question word is prevalent in the context, for example if the word \"tiger\" is prevalent in the document(s) for the question \"What is the largest living subspecies of the tiger?\", greater weight will be given to question words that are less common, such as \"largest\" or \"sub-species\".",
+              "tag": "Result"
+            },
+            {
+              "sent": "Relative to selecting the first paragraph in the document, this improves the chance of the selected paragraph containing the correct answer from 83.1% to 85.1% on Triv-iaQA web.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also expect this approach to do a better job of selecting paragraphs that relate to the question since it is explicitly selecting paragraphs that contain question words.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Handling Noisy Labels",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "We use the shared-norm approach for evaluation on the TriviaQA test set.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We found that increasing the paragraph size to 800 at test time, and re-training the model on paragraphs of size 600, was slightly beneficial, allowing our model to reach 66.04 EM and 70.98 F1 on the dev set.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We submitted this model to be evaluated on the Triv-iaQA test set and achieved 66.37 EM and 71.32 F1, firmly ahead of prior work, as shown in Table 3.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that human annotators have estimated that only 75.4% of the question-document pairs contain sufficient evidence to answer the question (Joshi et al, 2017), which suggests we are approaching the upper bound for this task.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, the score of 83.7 F1 on the verified set suggests that there is still room for improvement.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Confidence Method",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "We hypothesize that there are two key reasons a model's confidence scores might not be well calibrated.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, for models trained with the softmax objective, the pre-softmax scores for all spans can be arbitrarily increased or decreased by a constant value without changing the resulting softmax probability distribution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a result, nothing prevents models from producing scores that are arbitrarily all larger or all smaller for one paragraph than another.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, if the model only sees paragraphs that contain answers, it might become too confident in heuristics or patterns that are only effective when it is known a priori that an answer exists.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, in Table 1 we observe that the model will assign high confidence values to spans that strongly match the category of the answer, even if the question words do not match the context.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This might work passably well if an answer is present, but can lead to highly over-confident extractions in other cases.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similar kinds of errors have been observed when distractor sentences are added to the context (Jia and Liang, 2017).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "We experiment with four approaches to training models to produce comparable confidence scores, shown in the follow subsections.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In all cases we will sample paragraphs that do not contain an answer as additional training points.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Shared-Normalization",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "where P is the set of paragraphs that are from the same context as p, and s ij is the score given to token i from paragraph j.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We train on this objective by including multiple paragraphs from the same context in each mini-batch.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is similar to simply feeding the model multiple paragraphs from each context concatenated together, except that each paragraph is processed independently until the normalization step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The key idea is that this will force the model to produce scores that are comparable between paragraphs, even though it does not have access to information about the other paragraphs being considered.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Merge",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "No-Answer Option",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "We also experiment with allowing the model to select a special \"no-answer\" option for each paragraph.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, note that the independent-bounds objective can be re-written as:  .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Even if the passage has no correct answer, the model still assigns high confidence to phrases that match the category the question is asking about.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Because the confidence scores are not well-calibrated, this confidence is often higher than the confidence assigned to the correct answer span.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Sigmoid",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "We evaluate our approach on three datasets: Triv-iaQA unfiltered (Joshi et al, 2017), a dataset of questions from trivia databases paired with documents found by completing a web search of the questions; TriviaQA web, a dataset derived from TriviaQA unfiltered by treating each questiondocument pair where the document contains the question answer as an individual training point; and SQuAD (Rajpurkar et al, 2016), a collection of Wikipedia articles and crowdsourced questions.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Preprocessing",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Sampling",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Implementation",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "We train the model with the Adadelta optimizer (Zeiler, 2012) with a batch size 60 for Triv-iaQA and 45 for SQuAD.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At test time we select the most probable answer span of length less than Model EM F1 baseline (Joshi et al, 2017) 2: Results on TriviaQA web using our pipelined method.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We significantly improve upon the baseline by combining the preprocessing procedures, TFIDF paragraph selection, the sum objective, and our model design.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "TriviaQA Web",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "First, we do an ablation study on TriviaQA web to show the effects of our proposed methods for our pipeline model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We start with an implementation of the baseline from (Joshi et al, 2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Their system selects paragraphs by taking the first 400 tokens of each document, uses BiDAF (Seo et al, 2016) as the paragraph model, and selects a random answer span from each paragraph each epoch to be used in BiDAF's cross entropy loss function during training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Paragraphs of size 800 are used at test time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown in Table 2, our implementation of this approach outperforms the results reported by Joshi et al (2017) significantly, likely because we are not subsampling the data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We find both TFIDF ranking and the sum objective to be effective; even without changing the model we achieve state-of-the-art results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using our refined model increases the gain by another 4 points.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "TriviaQA Unfiltered",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "Next we apply our confidence methods to Trivi-aQA unfiltered.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset is of particular interest because the system is not told which document contains the answer, so it provides a plausible simulation of attempting to answer a question using a document retrieval system.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show the same graph as before for this dataset in Figure 4. On this dataset it is more important to train the model to produce well calibrated confidence scores.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note the base model starts to lose performance as more paragraphs are used, showing that errors are being caused by the model being overly confident in incorrect extractions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Here we see a more dramatic difference between these models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The shared-norm approach is the strongest, while the base model starts to lose performance as more paragraphs are used.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "SQuAD",
+      "selected_sentences": [
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "We additionally evaluate our model on SQuAD.",
+              "tag": "Method"
+            },
+            {
+              "sent": "SQuAD questions were not built to be answered independently of their context paragraph, which makes it unclear how effective of an evaluation tool they can be for document-level question answering.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To assess this we manually label 500 random questions from the training set.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 58,
+          "sentences": [
+            {
+              "sent": "We graph the document-level performance in Figure 5.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For SQuAD, we find it crucial to employ one of the suggested confidence training techniques.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The base model starts to drop in performance once more than two paragraphs are used.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, the shared-norm approach is able to reach a peak performance of 72.37 F1 and 64.08 EM given 15 paragraphs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Given our estimate that 10% of the questions are ambiguous if the paragraph is unknown, our approach appears to have adapted to the document-level task very well.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 65,
+          "sentences": [
+            {
+              "sent": "Open question answering with neural models was considered by Chen et al (2017), where researchers trained a model on SQuAD and combined it with a retrieval engine for Wikipedia articles.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our work differs because we focus on explicitly addressing the problem of applying the model to multiple paragraphs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A pipelined approach to QA was recently proposed by Wang et al (2017a), where a ranker model is used to select a paragraph for the reading comprehension model to process.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 66,
+          "sentences": [
+            {
+              "sent": "We have shown that, when using a paragraph-level QA model across multiple paragraphs, our training method of sampling non-answer containing paragraphs while using a shared-norm objective function can be very beneficial.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Combining this with our suggestions for paragraph selection, using the summed training objective, and our model design allows us to advance the state of the art on TriviaQA by a large stride.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "As shown by our demo, this work can be directly applied to building deep learning powered open question answering systems.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Simple and Effective Multi-Paragraph Reading Comprehension"
+}

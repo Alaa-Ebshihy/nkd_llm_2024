@@ -1,0 +1,347 @@
+{
+  "paper_id": "1406.3676",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "This paper presents a system which learns to answer questions on a broad range of topics from a knowledge base using few handcrafted features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model learns low-dimensional embeddings of words and knowledge base constituents; these representations are used to score natural language questions against candidate answers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Training our system using pairs of questions and structured representations of their answers, and pairs of question paraphrases, yields competitive results on a recent benchmark of the literature.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Teaching machines how to automatically answer questions asked in natural language on any topic or in any domain has always been a long standing goal in Artificial Intelligence.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With the rise of large scale structured knowledge bases (KBs), this problem, known as open-domain question answering (or open QA), boils down to being able to query efficiently such databases with natural language.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These KBs, such as Freebase [3] encompass huge ever growing amounts of information and ease open QA by organizing a great variety of answers in a structured format.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the scale and the difficulty for machines to interpret natural language still makes this task a challenging problem.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "The state-of-the-art techniques in open QA can be classified into two main classes, namely, information retrieval based and semantic parsing based.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Information retrieval systems first retrieve a broad set of candidate answers by querying the search API of KBs with a transformation of the question into a valid query and then use fine-grained detection heuristics to identify the exact answer [8,12,14].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On the other hand, semantic parsing methods focus on the correct interpretation of the meaning of a question by a semantic parsing system.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A correct interpretation converts a question into the exact database query that returns the correct answer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Interestingly, recent works [1,9,2,7] have shown that such systems can be efficiently trained under indirect and imperfect supervision and hence scale to large-scale regimes, while bypassing most of the annotation costs.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Yet, even if both kinds of system have shown the ability to handle largescale KBs, they still require experts to hand-craft lexicons, grammars, and KB schema to be effective.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This non-negligible human intervention might not be generic enough to conveniently scale up to new databases with other schema, broader vocabularies or languages other than English.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast, [6] proposed a framework for open QA requiring almost no human annotation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Despite being an interesting approach, this method is outperformed by other competing methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "[5] introduced an embedding model, which learns low-dimensional vector representations of words and symbols (such as KBs constituents) and can be trained with even less supervision than the system of [6] while being able to achieve better prediction performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, this approach is only compared with [6] which operates in a simplified setting and has not been applied in more realistic conditions nor evaluated against the best performing methods.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In this paper, we improve the model of [5] by providing the ability to answer more complicated questions. sThe main contributions of the paper are: (1) a more sophisticated inference procedure that is both efficient and can consider longer paths ( [5] considered only answers directly connected to the question in the graph); and (2) a richer representation of the answers which encodes the question-answer path and surrounding subgraph of the KB.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our approach is competitive with the current state-of-the-art on the recent benchmark We-bQuestions [1] without using any lexicon, rules or additional system for partof-speech tagging, syntactic or dependency parsing during training as most other systems do.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Task Definition",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "WebQuestions This dataset is built using Freebase as the KB and contains 5,810 question-answer pairs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It was created by crawling questions through the Google Suggest API, and then obtaining answers using Amazon Mechanical Turk.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We used the original split (3,778 examples for training and 2,032 for testing), and isolated 1k questions from the training set for validation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We-bQuestions is built on Freebase since all answers are defined as Freebase entities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In each question, we identified one Freebase entity using string matching between words of the question and entity names in Freebase.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When the same string matches multiple entities, only the entity appearing in most triples, ie the most popular in Freebase, was kept.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Example questions (answers) in the dataset include \"Where did Edgar Allan Poe died?\" (baltimore) or \"What degrees did Barack Obama get?\" (bachelor of arts, juris doctor).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Freebase Freebase [3] is a huge and freely available database of general facts; data is organized as triplets (subject, type1.type2.predicate, object), where two entities subject and object (identified by mids) are connected by the relation type type1.type2.predicate.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We used a subset, created by only keeping triples where one of the entities was appearing in either the WebQuestions training/validation set or in ClueWeb extractions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also removed all entities appearing less than 5 times and finally obtained a Freebase set containing 14M triples made of 2.2M entities and 7k relation types. 1 Since the format of triples does not correspond to any structure one could find in language, we decided to transform them into automatically generated questions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, all triples were converted into questions \"What is the predicate of the type2 subject?\" (using the mid of the subject) with the answer being object.",
+              "tag": "Method"
+            },
+            {
+              "sent": "An example is \"What is the nationality of the person barack obama?\" (united states).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More examples and details are given in a longer version of this paper [4].",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "WebQuestions",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "Paraphrases The automatically generated questions that are useful to connect Freebase triples and natural language, do not provide a satisfactory modeling of natural language because of their semi-automatic wording and rigid syntax.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To overcome this issue, we follow [6] and supplement our training data with an indirect supervision signal made of pairs of question paraphrases collected from the WikiAnswers website.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On WikiAnswers, users can tag pairs of questions what is the judicial capital of the in state sikkim ?gangtok (sikkim, location.in capital, gangtok) who influenced the influence node yves saint laurent ?helmut newton (yves saint laurent, influence.influence helmut newton) Freebase who is born in the location brighouse ?edward barber generated questions (brighouse, location.location.people born here, edward barber) and associated triples who is the producer of the recording rhapsody in b minor, op.",
+              "tag": "Method"
+            },
+            {
+              "sent": "79, no.  as rephrasings of each other: [6] harvested a set of 2M distinct questions from WikiAnswers, which were grouped into 350k paraphrase clusters.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Embedding Questions and Answers",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Inspired by [5], our model works by learning low-dimensional vector embeddings of words appearing in questions and of entities and relation types of Freebase, so that representations of questions and of their corresponding answers are close to each other in the joint embedding space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let q denote a question and a a candidate answer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Learning embeddings is achieved by learning a scoring function S(q, a), so that S generates a high score if a is the correct answer to the question q, and a low score otherwise.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that both q and a are represented as a combination of the embeddings of their individual words and/or symbols; hence, learning S essentially involves learning these embeddings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our model, the form of the scoring function is:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Embedding model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Binary encoding of the subgraph \u03c8(a)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Dot product",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "Illustration of the subgraph embedding model scoring a candidate answer: (i) locate entity in the question; (ii) compute path from entity to answer; (iii) represent answer as path plus all connected entities to the answer (the subgraph); (iv) embed both the question and the answer subgraph separately using the learnt embedding vectors, and score the match via their dot product.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Representing Candidate Answers",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Training and Loss Function",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "where m is the margin (fixed to 0.1).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Minimizing Eq. ( 2) learns the embedding matrix W so that the score of a question paired with a correct answer is greater than with any incorrect answer \u0101 by at least m.",
+              "tag": "Method"
+            },
+            {
+              "sent": "\u0101 is sampled from a set of incorrect candidates \u0100.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is achieved by sampling 50% of the time from the set of entities connected to the entity of the question (ie other candidate paths), and by replacing the answer entity by a random one otherwise.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Optimization is accomplished using stochastic gradient descent, multi-threaded with Hogwild! [11], with the constraint that the columns w i of W remain within the unit-ball, ie, \u2200 i , ||w i || 2 \u2264 1.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Multitask Training of Embeddings",
+      "selected_sentences": [
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "Since a large number of questions in our training datasets are synthetically generated, they do not adequately cover the range of syntax used in natural language.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, we also multi-task the training of our model with the task of paraphrase prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We do so by alternating the training of S with that of a scoring function S prp (q 1 , q 2 ) = f (q 1 ) f (q 2 ), which uses the same embedding matrix W and makes the embeddings of a pair of questions (q 1 , q 2 ) similar to each other if they are paraphrases (ie if they belong to the same paraphrase cluster), and make them different otherwise.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Training S prp is similar to that of S except that negative samples are obtained by sampling a question from another paraphrase cluster.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also multitask the training of the embeddings with the mapping of the mids of Freebase entities to the actual words of their names, so that the model learns that the embedding of the mid of an entity should be similar to the embedding of the word(s) that compose its name(s).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Inference",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "This paper presented an embedding model that learns to perform open QA using training data made of questions paired with their answers and of a KB to provide a structure among answers, and can achieve promising performance on the competitive benchmark WebQuestions.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Question Answering with Subgraph Embeddings"
+}

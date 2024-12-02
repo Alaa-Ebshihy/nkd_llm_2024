@@ -1,0 +1,634 @@
+{
+  "paper_id": "1811.11482",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We propose a simple, interpretable framework for solving a wide range of image reconstruction problems such as denoising and deconvolution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given a corrupted input image, the model synthesizes a spatially varying linear filter which, when applied to the input image, reconstructs the desired output.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The model parameters are learned using supervised or self-supervised training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We test this model on three tasks: non-uniform motion blur removal, lossycompression artifact reduction and single image super resolution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We demonstrate that our model substantially outperforms state-of-the-art methods on all these tasks and is significantly faster than optimization-based approaches to deconvolution.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Unlike models that directly predict output pixel values, the predicted filter flow is controllable and interpretable, which we demonstrate by visualizing the space of predicted filters for different tasks. 1",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Such image reconstruction tasks can be viewed mathematically as inverse problems [48,22], which are typically ill-posed and massively under-constrained.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Many contemporary techniques to inverse problems have focused on regularization techniques which are amenable to computational optimization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While such approaches are interpretable as Bayesian estimators with particular choice of priors, they are often computationally expensive in practice [13,43,2].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Alternately, data-driven methods based on training deep convolutional neural networks yield fast inference but lack interpretability and guarantees of robustness [46,59].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose a new framework called Predictive Filter Flow that retains interpretability and control over the resulting reconstruction while allowing fast inference.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The proposed framework is directly applicable to a variety of low-level computer vision problems involving local pixel transformations.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "As the name suggests, our approach is built on the notion of filter flow introduced by Seitz and Baker [42].",
+              "tag": "Method"
+            },
+            {
+              "sent": "In filter flow pixels in a local neighborhood of the input image are linearly combined to reconstruct the pixel centered at the same location in the output image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, unlike convolution, the filter weights are allowed to vary from one spatial location to the next.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Filter flows are a flexible class of image transformations that can model a wide range of imaging effects (including optical flow, lighting changes, non-uniform blur, non-parametric distortion).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The original work on filter flow [42] focused on the problem of estimating an appropriately regularized/constrained flow between a given pair of images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This yielded convex but impractically large optimization problems (eg, hours of computation to compute a single flow).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead of solving for an optimal filter flow, we propose to directly predict a filter flow given an input image using a convolutional neural net (CNN) to regress the filter weights.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Using a CNN to directly predict a well regularized solution is orders of magnitude faster than expensive iterative optimization.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Figure 1 provides an illustration of our overall framework.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead of estimating the flow between a pair of input images, we focus on applications where the model predicts both the flow and the transformed image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This can be Figure 1: Overview of our proposed framework for Predictive Filter Flow which is readily applicable to various low-level vision problems, yielding state-of-the-art performance for non-uniform motion blur removal, compression artifact reduction and single image superresolution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given a corrupted input image, a two-stream CNN analyzes the image and synthesizes the weights of a spatially-varying linear filter.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This filter is then applied to the input to produce a deblurred/denoised prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The whole framework is end-to-end trainable in a self-supervised way for tasks such as super-resolution where corrupted images can be generated automatically.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The predicted filters are easily constrained for different tasks and interpretable (here visualized in the center column by the mean flow displacement, see Figure 6).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "viewed as \"blind\" filter flow estimation, in analogy with blind deconvolution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During training, we use a loss defined over the transformed image (rather than the predicted flow).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is closely related to so-called self-supervised techniques that learn to predict optical flow and depth from unlabeled video data [15,16,21].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, for the reconstruction tasks we consider such as image super-resolution, the forward degradation process can be easily simulated to generate a large quantity of training data without manual collection or annotation.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "To evaluate our model, we carry out extensive experiments on three different low-level vision tasks, non-uniform motion blur removal, JPEG compression artifact reduction and single image super-resolution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show that our model surpasses all the state-of-the-art methods on all the three tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also visualize the predicted filters which reveals filtering operators reminiscent of classic unsharp masking filters and anisotropic diffusion along boundaries.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "To summarize our contribution: (1) we propose a novel, end-to-end trainable, learning framework for solving various low-level image reconstruction tasks;",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "(3) we show experimentally that predictive filter flow outperforms the state-of-theart methods remarkably on the three different tasks, nonuniform motion blur removal, compression artifact reduction and single image super-resolution.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Our work is inspired by filter flow [42], which is an optimization based method for finding a linear transformation relating nearby pixel values in a pair of images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By imposing additional constraints on certain structural properties of these filters, it serves as a general framework for understanding a wide variety of low-level vision problems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, filter flow as originally formulated has some obvious shortcomings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, it requires prior knowledge to specify a set of constraints needed to produce good results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is not always straightforward to model or even come up with such knowledge-based constraints.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, solving for an optimal filter flow is compute intensive; it may take up to 20 hours to compute over a pair of 500\u00d7500 images [42].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We address these by directly predicting flows from image data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We leverage predictive filter flow for targeting three specific image reconstruction tasks which can be framed as performing spatially variant filtering over local image patches.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "NonUniform Blind Motion Blur Removal is an extremely challenging yet practically significant task of removing blur caused by object motion or camera shake on a blurry photo.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The blur kernel is unknown and may vary over the image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent methods estimate blur kernels locally at patch level, and adopt an optimization method for deblurring the patches [46,2].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "[53,18,46] leverage prior information about smooth motion by selecting from a predefine discretized set of linear blur kernels.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These methods are computationally expensive as an iterative solver is required for deconvolution after estimating the blur kernel [9]; and the deep learning approach cannot generalize well to novel motion kernels [54,46,18,41].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compression Artifact Reduction is of significance as lossy image compression is ubiquitous for reducing the size of images transmitted over the web and recorded on data storage media.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, high compression rates come with visual artifacts that degrade the image quality and thus user experience.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among various compression algorithms, JPEG has become the most widely accepted standard in lossy image compression with several (noninvertible) transforms [51], ie, downsampling and DCT quantization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Removing artifacts from jpeg compression can be viewed as a practical variant of natural image denoising problems [6,20].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent methods based on deep convolutional neural networks trained to take as input the compressed image and output the denoised image directly achieve good performance [10,47,7].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Single Image SuperResolution aims at recovering a highresolution image from a single low-resolution image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This problem is inherently ill-posed as a multiplicity of solutions exists for any given low-resolution input.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Many methods adopt an example-based strategy [56] requiring an optimization solver, others are based on deep convolutional neural nets [11,30] which achieve the state-of-the-art and real-time performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The deep learning methods take as input the low-resolution image (usually 4\u00d7 upsampled one using bicubic interpolation), and output the high-resolution image directly.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Predictive Filter Flow",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Filter flow models image transformations I 1 \u2192 I 2 as a linear mapping where each output pixel only depends on a local neighborhood of the input.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Find such a flow can be framed as solving a constrained linear system",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Learning to predict flows",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Filter locality In principle, each pixel output I 2 in Eq. 3 can depend on all input pixels I 2 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We introduce the structural constraint that each output pixel only depends on a corresponding local neighborhood of the input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The size of this neighborhood is thus a hyper-parameter of the model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We note that while the predicted filter flow T acts locally, the estimation of the correct local flow within a patch can depend on global context captured by large receptive fields in the predictor f w (\u2022).",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "SelfSupervision Though the proposed framework for training Predictive Filter Flow requires paired inputs and target outputs, we note that generating training data for many reconstruction tasks can be accomplished automatically without manual labeling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given a pool of high quality images, we can automatically generate low-resolution, blurred or JPEG degraded counterparts to use in training (see Section 4).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This can also be generalized to so-called self-supervised training for predicting flows between video frames or stereo pairs.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model Architecture and Training",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "Our basic framework is largely agnostic to the choice of architectures, learning method, and loss functions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiments, we utilize to a two-stream architecture as shown in Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first stream is a simple 18-layer network with 3\u00d73 convolutional layers, skip connections [17], pooling layers and upsampling layers; the second stream is a shallow but full-resolution network with no pooling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first stream has larger receptive fields for estimating per-pixel filters by considering long-range contextual information, while the second stream keeps original resolution as input image without inducing spatial information loss.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Batch normalization [19] is also inserted between a convolution layer and ReLU layer [38].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The Predictive Filter Flow is self-supervised so we could generate an unlimited amount of image pairs for training very large models.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "However, we find a light-weight architecture trained over moderate-scale training set performs quite well.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Since our architecture is different from other feed-forward image-toimage regression CNNs, we also report the baseline per-formance of the two-stream architecture trained to directly predict the reconstructed image rather than the filter coefficients.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "We evaluate the proposed Predictive Filter Flow framework (PFF) on three low-level vision tasks: non-uniform motion blur removal, JPEG compression artifact reduction and single image super-resolution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first describe the datasets and evaluation metrics, and then compare with state-of-the-art methods on the three tasks in separate subsections, respectively.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Datasets and Metrics",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "We use the high-resolution images in DIV2K dataset [1] and BSDS500 training set [37] for training all our models on the three tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This results into a total of 1,200 training images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate each model over different datasets specific to the task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Concretely, we test our model for nonuniform motion blur removal over the dataset introduced in [2], which contains large motion blur up to 38 pixels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate over the classic LIVE1 dataset [52] for JPEG compression artifacts reduction, and Set5 [5] and Set14 [58] for single image super-resolution.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Non-Uniform Motion Blur Removal",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "In Table 1, we list the comparison with the state-of-theart methods over the released test set by [2].",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are two subsets in the dataset, one with moderate motion blur and the other with large blur.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also report our CNN models based on the proposed two-stream architecture that outputs the quality images directly by taking as input the blurry ones.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our CNN model outperforms the one in [46] which trains a CNN for predicting the blur kernel over a patch, but carries out non-blind deconvolution with the estimated kernel for the final quality image.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We attribute our better performance to two reasons.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "First, our CNN model learns a direct inverse mapping from blurry patch to its clear counterpart based on the learned image distribution, whereas [46] only estimates the blur kernel for the patch and uses an offline optimization for non-blind deblurring, resulting in some artifacts such as ringing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, our CNN architecture is higher fidelity than the one used in [46], as ours outputs full-resolution result and learns internally to minimize artifacts, eg, aliasing and ringing effect.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "where ij is a particular output pixel and xy indexes the input pixels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This can be interpreted as the optical flow (delta filter) which most closely approximates the predicted filter flow.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the the color legend shown in top-left of Figure 6.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "JPEG Compression Artifact Reduction",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "In Table 2, we list the performance of our model and compare to the state-of-the-art methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We note that our final PFF achieves the best among all the methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our CNN baseline model also achieves on-par performance with state-of-the-art, though we do not show in the table, we draw the performance under the ablation study in Figure 4. Specifically, we study how our model trained with single or a mixed QFs affect the performance when tested on image compressed with a range of different QFs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We plot the detailed performances of our CNN and PFF in terms of absolute measurements by PSNR and SSIM, and the increase in PSNR between the reconstructed and JPEG compressed image.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Single Image Super-Resolution",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "In this work, we only generate pairs to super-resolve images 4\u00d7 larger.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To generate training pairs, for each original image, we downsample 1 4 \u00d7 and upsample 4\u00d7 again using bicubic interpolation (with anti-aliasing).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The 4\u00d7 upsampled image from the low-resolution is the input to our model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, a super-resolution model is expected to be learned for sharpening the input image.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Visualization and Analysis",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Finally, in order to summarize the spatially varying structure of the filters, we use the 2D tSNE embedding to assign a color to each centroid (as given by the reference color chart shown top-left), and visualize the nearest centroid for the filter at each filter location in the third row grid in Figure 6.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This visualization demonstrates the filters as output by our model generally vary smoothly over the image with discontinuities along salient edges and textured regions reminiscent of anisotropic diffusion or bilateral filtering.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion and Future Work",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "We propose a general, elegant and simple framework called Predictive Filter Flow, which has direct applications to a broad range of image reconstruction tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our framework generates space-variant per-pixel filters which are easy to interpret and fast to compute at test time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Through extensive experiments over three different low-level vision tasks, we demonstrate this approach outperforms the stateof-the-art methods.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Visualization of Per-Pixel Loading Factors",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Iteratively Removing Motion Blur",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "More Qualitative Results",
+      "selected_sentences": [
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "In Figure 9, 10 and 11, we show more qualitative results for non-uniform motion blur removal, JPEG compression artifact reduction and single image super-resolution, respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "From these comparisons and with the guide of filter   8: We show deblurring results over some random testing images from the dataset released by [2].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first feed the blurry images to PFF model, and obtain deblurred images; then we feed such deblurred images into the same PFF model again to see if this iterative practice refines the output.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, through the visualization that iteratively running the model changes very little as seen from the second filter flow maps.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This helps qualitatively explain why iteratively running the model does not improve deblurring performance further.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Image Reconstruction with Predictive Filter Flow"
+}

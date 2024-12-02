@@ -1,0 +1,414 @@
+{
+  "paper_id": "1603.05027",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Deep residual networks [1] have emerged as a family of extremely deep architectures showing compelling accuracy and nice convergence behaviors.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we analyze the propagation formulations behind the residual building blocks, which suggest that the forward and backward signals can be directly propagated from one block to any other block, when using identity mappings as the skip connections and after-addition activation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A series of ablation experiments support the importance of these identity mappings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This motivates us to propose a new residual unit, which makes training easier and improves generalization.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We report improved results using a 1001-layer ResNet on CIFAR-10 (4.62% error) and CIFAR-100, and a 200-layer ResNet on ImageNet.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "x l+1 = f (y l ), where x l and x l+1 are input and output of the l-th unit, and F is a residual function.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [1], h(x l ) = x l is an identity mapping and f is a ReLU [2] function.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "ResNets that are over 100-layer deep have shown state-of-the-art accuracy for several challenging recognition tasks on ImageNet [3] and MS COCO [4] competitions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The central idea of ResNets is to learn the additive residual function F with respect to h(x l ), with a key choice of using an identity mapping h(x l ) = x l .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is realized by attaching an identity skip connection (\"shortcut\").",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In this paper, we analyze deep residual networks by focusing on creating a \"direct\" path for propagating information -not only within a residual unit, but through the entire network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our derivations reveal that if both h(x l ) and f (y l ) are identity mappings, the signal could be directly propagated from one unit to any other units, in both forward and backward passes.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our experiments empirically show that training in general becomes easier when the architecture is closer to the above two conditions.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "To understand the role of skip connections, we analyze and compare various types of h(x l ).",
+              "tag": "Result"
+            },
+            {
+              "sent": "We find that the identity mapping h(x l ) = x l chosen in  achieves the fastest error reduction and lowest training loss among all variants we investigated, whereas skip connections of scaling, gating [5,6,7], and 1\u00d71 convolutions all lead to higher training loss and error.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These experiments suggest that keeping a \"clean\" information path (indicated by the grey arrows in Figure 1, 2, and 4) is helpful for easing optimization.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Analysis of Deep Residual Networks",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "The ResNets developed in [1] are modularized architectures that stack building blocks of the same connecting shape.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper we call these blocks \"Residual Units\".",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The original Residual Unit in [1] performs the following computation:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussions",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "(5) suggest that the signal can be directly propagated from any unit to another, both forward and backward.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The foundation of Eqn.( 4) is two identity mappings: (i) the identity skip connection h(x l ) = x l , and (ii) the condition that f is an identity mapping.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "On the Importance of Identity Skip Connections",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "(8) the first additive term is modulated by a factor L\u22121 i=l \u03bb i .",
+              "tag": "Method"
+            },
+            {
+              "sent": "For an extremely deep network (L is large), if \u03bb i > 1 for all i, this factor can be exponentially large; if \u03bb i < 1 for all i, this factor can be exponentially small and vanish, which blocks the backpropagated signal from the shortcut and forces it to flow through the weight layers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This results in optimization difficulties as we show by experiments.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on Skip Connections",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "We experiment with the 110-layer ResNet as presented in [1] on .",
+              "tag": "Method"
+            },
+            {
+              "sent": "This extremely deep ResNet-110 has 54 two-layer Residual Units (consisting of 3\u00d73 convolutional layers) and is challenging for optimization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our implementation details (see appendix) are the same as [1].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Throughout this paper we report the median accuracy of 5 runs for each architecture on CIFAR, reducing the impacts of random variations.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Classification error on the CIFAR-10 test set using ResNet-110 [1], with different types of shortcut connections applied to all Residual Units.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We report \"fail\" when the test error is higher than 20%.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following the Highway Networks [6,7] that adopt a gating mechanism [5], we consider a gating function g(x) = \u03c3(W g x + b g ) where a transform is represented by weights W g and biases b g followed by the sigmoid function \u03c3(x) = 1 1+e \u2212x .",
+              "tag": "Method"
+            },
+            {
+              "sent": "In a convolutional network g(x) is realized by a 1\u00d71 convolutional layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The gating function modulates the signal by element-wise multiplication.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "On the Usage of Activation Functions",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments on Activation",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "In this section we experiment with ResNet-110 and a 164-layer Bottleneck [1] architecture (denoted as ResNet-164).",
+              "tag": "Method"
+            },
+            {
+              "sent": "A bottleneck Residual Unit consist of a 1\u00d71 layer for reducing dimension, a 3\u00d73 layer, and a 1\u00d71 layer for restoring dimension.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As designed in [1], its computational complexity is similar to the two-3\u00d73 Residual Unit.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More details are in the appendix.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The baseline ResNet-164 has a competitive result of 5.93% on CIFAR-10 (Table 2).",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "It is easy to see that Eqn.( 9) is similar to Eqn.( 4), and can enable a backward formulation similar to Eqn. (5).",
+              "tag": "Result"
+            },
+            {
+              "sent": "For this new Residual Unit as in Eqn.( 9), the new after-addition activation becomes an identity mapping.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This design means that if a new after-addition activation f is asymmetrically adopted, it is equivalent to recasting f as the pre-activation of the next Residual Unit.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is illustrated in Figure 5.  ...  The distinction between post-activation/pre-activation is caused by the presence of the element-wise addition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For a plain network that has N layers, there are N \u2212 1 activations (BN/ReLU), and it does not matter whether we think of them as post-or pre-activations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But for branched layers merged by addition, the position of activation matters.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "(c)",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "Somehow surprisingly, when BN and ReLU are both used as pre-activation, the results are improved by healthy margins (Table 2 and Table 3).",
+              "tag": "Result"
+            },
+            {
+              "sent": "In Table 3 we report results using various architectures: (i) ResNet-110, (ii) ResNet-164, (iii) a 110-layer ResNet architecture in which each shortcut skips only 1 layer (ie, a Residual Unit has only 1 layer), denoted as \"ResNet-110(1layer)\", and (iv) a 1001-layer bottleneck architecture that has 333 Residual Units (111 on each feature map size), denoted as \"ResNet-1001\".",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 3 shows that our \"pre-activation\" models are consistently better than the baseline counterparts.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We analyze these results in the following.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Analysis",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "We find the impact of pre-activation is twofold.",
+              "tag": "Result"
+            },
+            {
+              "sent": "First, the optimization is further eased (comparing with the baseline ResNet) because f is an identity mapping.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Second, using BN as pre-activation improves regularization of the models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This effect is particularly obvious when training the 1001-layer ResNet.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using the original design in [1], the training error is reduced very slowly at the beginning of training.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For f = ReLU, the signal is impacted if it is negative, and when there are many Residual Units, this effect becomes prominent and Eqn.(3) (so Eqn.( 5)) is not a good approximation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On the other hand, when f is an identity mapping, the signal can be propagated directly between any two units.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our 1001-layer network reduces the training loss very quickly (Figure 1).",
+              "tag": "Result"
+            },
+            {
+              "sent": "It also achieves the lowest loss among all models we investigated, suggesting the success of optimization.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "Our models' computational complexity is linear on depth (so a 1001-layer net is \u223c10\u00d7 complex of a 100-layer net).",
+              "tag": "Method"
+            },
+            {
+              "sent": "On CIFAR, ResNet-1001 takes about 27 hours to train on 2 GPUs; on ImageNet, ResNet-200 takes about 3 weeks to train on 8 GPUs (on par with VGG nets [22]).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "This paper investigates the propagation formulations behind the connection mechanisms of deep residual networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our derivations imply that identity shortcut connections and identity after-addition activation are essential for making information propagation smooth.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Ablation experiments demonstrate phenomena that are consistent with our derivations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also present 1000-layer deep networks that can be easily trained and achieve improved accuracy.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "When using the pre-activation Residual Units (Figure 4(d)(e) and Figure 5), we pay special attention to the first and the last Residual Units of the entire network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the first Residual Unit (that follows a stand-alone convolutional layer, conv 1 ), we adopt the first activation right after conv 1 and before splitting into two paths; for the last Residual Unit (followed by average pooling and a fullyconnected classifier), we adopt an extra activation right after its element-wise addition.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These two special cases are the natural outcome when we obtain the pre-activation network via the modification procedure as shown in Figure 5.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Identity Mappings in Deep Residual Networks"
+}

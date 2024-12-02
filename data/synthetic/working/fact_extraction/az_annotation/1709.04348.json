@@ -1,0 +1,395 @@
+{
+  "paper_id": "1709.04348",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Natural Language Inference (NLI) task requires an agent to determine the logical relationship between a natural language premise and a natural language hypothesis.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce Interactive Inference Network (IIN), a novel class of neural network architectures that is able to achieve high-level understanding of the sentence pair by hierarchically extracting semantic features from interaction space.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We show that an interaction tensor (attention weight) contains semantic information to solve natural language inference, and a denser interaction tensor contains richer semantic information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "One instance of such architecture, Densely Interactive Inference Network (DIIN), demonstrates the state-of-the-art performance on large scale NLI copora and large-scale NLI alike corpus.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It's noteworthy that DIIN achieve a greater than 20% error reduction on the challenging MultiGenre NLI (MultiNLI; Williams et al 2017) dataset with respect to the strongest published system.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Natural Language Inference (NLI also known as recognizing textual entiailment, or RTE) task requires one to determine whether the logical relationship between two sentences is among entailment (if the premise is true, then the hypothesis must be true), contradiction (if the premise is true, then the hypothesis must be false) and neutral (neither entailment nor contradiction).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "NLI is known as a fundamental and yet challenging task for natural language understanding , not only because it requires one to identify the language pattern, but also to understand certain common sense knowledge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In Table 1, three samples from MultiNLI corpus show solving the task requires one to handle the full complexity of lexical and compositional semantics.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The previous work on NLI (or RTE) has extensively researched on conventional approaches (Fyodorov et al, 2000;Bos & Markert, 2005;MacCartney & Manning, 2009).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent progress on NLI is enabled by the availability of 570k human annotated dataset  and the advancement of representation learning technique.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "A regular attention weight, the core component of the attention mechanism, encodes the crosssentence word relationship into a alignment matrix.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, a multi-head attention weightVaswani et al ( 2017) can encode such interaction into multiple alignment matrices, which shows a more powerful alignment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we push the multi-head attention to a extreme by building a wordTable 1: Samples from MultiNLI datasets. by-word dimension-wise alignment tensor which we call interaction tensor.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The interaction tensor encodes the high-order alignment relationship between sentences pair.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our experiments demonstrate that by capturing the rich semantic features in the interaction tensor, we are able to solve natural language inference task well, especially in cases with paraphrase, antonyms and overlapping words.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "We dub the general framework as Interactive Inference Network(IIN).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To the best of our knowledge, it is the first attempt to solve natural language inference task in the interaction space.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We further explore one instance of Interactive Inference Network, Densely Interactive Inference Network (DIIN), which achieves new state-of-the-art performance on both SNLI and MultiNLI copora.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To test the generality of the architecture, we interpret the paraphrase identification task as natural language inference task where matching as entailment, not-matching as neutral.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We test the model on Quora Question Pair dataset, which contains over 400k real world question pair, and achieves new state-of-the-art performance.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "After neural attention mechanism is successfully applied on the machine translation task, such technique has became widely used in both natural language process and computer vision domains.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Many variants of attention technique such as hard-attention , self-attention , multi-hop attention (Gong & Bowman, 2017), bidirectional attention (Seo et al, 2016) and multi-head attention (Vaswani et al, 2017) are also introduced to tackle more complicated tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Before this work, neural attention mechanism is mainly used to make alignment, focusing on specific part of the representation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we want to show that attention weight contains rich semantic information required for understanding the logical relationship between sentence pair.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTERACTIVE INFERENCE NETWORK",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "The Interactive Inference Network (IIN) is a hierarchical multi-stage process and consists of five components.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Each of the components is compatible with different type of implementations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Potentially all exiting approaches in machine learning, such as decision tree, support vector machine and neural network approach, can be transfer to replace certain component in this architecture.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We focus on neural network approaches below.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 1 provides a visual illustration of Interactive Inference Network. 1. Embedding Layer converts each word or phrase to a vector representation and construct the representation matrix for sentences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In embedding layer, a model can map tokens to vectors with the pre-trained word representation such as GloVe (Pennington et al, 2014), word2Vec (Mikolov et al, 2013) and fasttext (Joulin et al, 2016).",
+              "tag": "Method"
+            },
+            {
+              "sent": "It can also utilize the preprocessing tool, eg named entity recognizer, part-of-speech recognizer, lexical parser and coreference identifier etc, to incorporate more lexical and syntactical information into the feature vector.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "5.",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "DENSELY INTERACTIVE INFERENCE NETWORK",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Here we introduce Densely Interactive Inference Network (DIIN) 1 , which is a relatively simple instantiation of IIN but produces state-of-the-art performance on multiple datasets.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "EXPERIMENTS",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "SNLI Stanford Natural Language Inference (SNLI; Bowman et al 2015) has 570k human annotated sentence pairs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The premise data is draw from the captions of the Flickr30k corpus, and the hypothesis data is manually composed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The labels provided in are \"entailment\", \"neutral', \"contradiction\" and \"-\".",
+              "tag": "Claim"
+            },
+            {
+              "sent": "\"-\" shows that annotators cannot reach consensus with each other, thus removed during training and testing as in other works.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the same data split as in .",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "MultiNLI MultiGenre NLI Corpus (MultiNLI; ) has 433k sentence pairs, whose collection process and task detail are modeled closely to SNLI.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The premise data is collected from maximally broad range of genre of American English such as written non-fiction genres (SLATE, OUP, GOVERNMENT, VERBATIM, TRAVEL), spoken genres (TELEPHONE, FACETOFACE), less formal written genres (FICTION, LETTERS) and a specialized one for 9/11.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Half of these selected genres appear in training set while the rest are not, creating in-domain (matched) and cross-domain (mismatched) development/test sets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the same data split as provided by .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since test set labels are not provided, the test performance is obtained through submission on Kaggle.com 2 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each team is limited to two submissions per day.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "EXPERIMENTS SETTING",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "EXPERIMENT ON MULTINLI",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "EXPERIMENT ON SNLI",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "aligns each sentence word-by-word with attention on top of LSTMs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Wang & Jiang (2015) enforces cross sentence attention word-by-word matching with the proprosed mLSTM model. proposes long short-term memory-network(LSTMN) with deep attention fusion that links the current word to previous word stored in memory. decomposes the task into sub-problems and conquer them respectively. proposes neural tree indexer, a full n-ary tree whose subtrees can be overlapped.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Re-read LSTM proposed by  considers the attention vector of one sentence as the inner-state of LSTM for another sentence. propose a sequential model that infers locally, and a ensemble with tree-like inference module that further improves performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show our model, DIIN, achieves state-of-the-art performance on the competitive leaderboard.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this subsection, we evaluate the effectiveness of our model for paraphrase identification as natural language inference task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Other than our baselines, we compare with Tomar et al (2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "BIMPM models different perspective of matching between sentence pair on both direction, then aggregates matching vector with LSTM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DECATT word and DECATT char uses automatically collected in-domain paraphrase data to noisy pretrain n-gram word embedding and ngram subword embedding correspondingly on decomposable attention model proposed by .",
+              "tag": "Result"
+            },
+            {
+              "sent": "In Table 4, our experiment shows DIIN has better performance than all other models and an ensemble score is higher than the former best result for more than 1 percent.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Ablation Study",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "We conduct a ablation study on our base model to examine the effectiveness of each component.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We study our model on MultiNLI dataset and we use Matched validation score as the standard for model selection.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The result is shown in Table 5.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We studies how EM feature  , when we only remove fuse gate, to our surprise, the performance degrade to 73.5 for matched score and 73.8 for mismatched.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the other hand, if we use the addition of the representation after highway network and the representation after self-attention as skip connection as in experiment 7, the performance increase to 77.3 and 76.3.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The comparison indicates self-attention layer makes the training harder to converge while a skip connection could ease the gradient flow for both highway layer and self-attention layer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "By comparing the base model and the model the in experiment 6, we show that the fuse gate not only well serves as a skip connection, but also makes good decision upon which information the fuse for both representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To show that dense interaction tensor contains more semantic information, we replace the dense interaction tensor with dot product similarity matrix between the encoded representation of premise and hypothesis.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The result shows that the dot product similarity matrix has an inferior capacity of semantic information.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Another dimensionality study is provided in supplementary material.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In experiment 9, we share the encoding layer weight, and the result decrease from the baseline.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The result shows that the two set of encoding weights learn the subtle difference between premise and hypothesis.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "AND FUTURE WORK",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "We show the interaction tensor (or attention weight) contains semantic information to understand the natural language.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce Interactive Inference Network, a novel class of architecture that allows the model to solve NLI or NLI alike tasks via extracting semantic feature from interaction tensor end-to-end.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One instance of such architecture, Densely Interactive Inference Network (DIIN), achieves state-of-the-art performance on multiple datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By ablating each component in DIIN and changing the dimensionality, we show the effectiveness of each component in DIIN.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "NATURAL LANGUAGE INFERENCE OVER INTERACTION SPACE"
+}

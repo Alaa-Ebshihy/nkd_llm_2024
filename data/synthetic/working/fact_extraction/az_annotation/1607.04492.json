@@ -1,0 +1,484 @@
+{
+  "paper_id": "1607.04492",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Recurrent neural networks (RNNs) process input text sequentially and model the conditional transition between word tokens.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast, the advantages of recursive networks include that they explicitly model the compositionality and the recursive structure of natural language.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the current recursive architecture is limited by its dependence on syntactic tree.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we introduce a robust syntactic parsing-independent tree structured model, Neural Tree Indexers (NTI) that provides a middle ground between the sequential RNNs and the syntactic treebased recursive models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "NTI constructs a full n-ary tree by processing the input text with its node function in a bottom-up fashion.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Attention mechanism can then be applied to both structure and node function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We implemented and evaluated a binarytree model of NTI, showing the model achieved the state-of-the-art performance on three different NLP tasks: natural language inference, answer sentence selection, and sentence classification, outperforming state-of-the-art recurrent and recursive neural networks 1 .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recurrent neural networks (RNNs) have been successful for modeling sequence data (Elman, 1990).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "RNNs equipped with gated hidden units and internal short-term memories, such as long shortterm memories (LSTM) (Hochreiter and Schmidhuber, 1997) have achieved a notable success in several NLP tasks including named entity recognition (Lample et al, 2016), constituency parsing (Vinyals et al, 2015), textual entailment recognition (Rockt\u00e4schel et al, 2016), question answering (Hermann et al, 2015), and machine translation (Bahdanau et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, most LSTM models explored so far are sequential.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It encodes text sequentially from left to right or vice versa and do not naturally support compositionality of language.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Sequential LSTM models seem to learn syntactic structure from the natural language however their generalization on unseen text is relatively poor comparing with models that exploit syntactic tree structure (Bowman et al, 2015b).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Unlike sequential models, recursive neural networks compose word phrases over syntactic tree structure and have shown improved performance in sentiment analysis (Socher et al, 2013).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However its dependence on a syntactic tree architecture limits practical NLP applications.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this study, we introduce Neural Tree Indexers (NTI), a class of tree structured models for NLP tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "NTI takes a sequence of tokens and produces its representation by constructing a full n-ary tree in a bottom-up fashion.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each node in NTI is associated with one of the node transformation functions: leaf node mapping and non-leaf node composition functions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Unlike previous recursive models, the tree structure for NTI is relaxed, ie, NTI does not require the input sequences to be parsed syntactically; and therefore it is flexible and can be directly applied to a wide range of NLP tasks beyond sentence modeling.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Furthermore, we propose different variants of node composition function and attention over tree for our NTI models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When a sequential leaf node transformer such as LSTM is chosen, the NTI network forms a sequence-tree hybrid model taking advantage of both conditional and compositional powers of sequential and recursive models.  1 shows a binary-tree model of NTI.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Although the model does not follow the syntactic tree structure, we empirically show that it achieved the state-ofthe-art performance on three different NLP applications: natural language inference, answer sentence selection, and sentence classification.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Recurrent Neural Networks and Attention Mechanism",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "RNNs model input text sequentially by taking a single token at each time step and producing a corresponding hidden state.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The hidden state is then passed along through the next time step to provide historical sequence information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although a great success in a variety of tasks, RNNs have limitations (Bengio et al, 1994;Hochreiter, 1998).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among them, it is not efficient at memorizing long or distant sequence (Sutskever et al, 2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is frequently called as information flow bottleneck.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Approaches have therefore been developed to overcome the limitations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, to mitigate the information flow bottleneck, Bahdanau et al ( 2015) extended RNNs with a soft attention mechanism in the context of neural machine translation, leading to improved the results in translating longer sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "RNNs are linear chain-structured; this limits its potential for natural language which can be represented by complex structures including syntactic structure.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this study, we propose models to mitigate this limitation.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Recursive Neural Networks",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Unlike RNNs, recursive neural networks explicitly model the compositionality and the recursive structure of natural language over tree.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The tree structure can be predefined by a syntactic parser (Socher et al, 2013).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each non-leaf tree node is associated with a node composition function which combines its children nodes and produces its own representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The model is then trained by back-propagating error through structures (Goller and Kuchler, 1996).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "The node composition function can be varied.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A single layer network with tanh non-linearity was adopted in recursive auto-associate memories (Pollack, 1990) and recursive autoencoders (Socher et al, 2011).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Socher et al (2012) extended this network with an additional matrix representation for each node to augment the expressive power of the model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Tensor networks have also been used as composition function for sentencelevel sentiment analysis task (Socher et al, 2013).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, Zhu et al (2015) introduced SLSTM which extends LSTM units to compose tree nodes in a recursive fashion.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "In this paper, we introduce a novel attentive node composition function that is based on SLSTM.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our NTI model does not rely on either a parser output or a fine-grained supervision of nonleaf nodes, both required in previous work.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In NTI, the supervision from the target labels is provided at the root node.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As such, our NTI model is robust and applicable to a wide range of NLP tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce attention over tree in NTI to overcome the vanishing/explode gradients challenges as shown in RNNs.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Methods",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "NTI is a full n-ary tree (and the sub-trees can be overlapped).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "NTI can be implemented with different tree structures.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this study we implemented and evaluated a binary tree form of NTI: a non-leaf node can take in only two direct child nodes (ie, c = 2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, the function f node (h l , h r ) composes its left child node h l and right child node h r .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 1 illustrates our NTI model that is applied to question answering (a) and natural language inference tasks (b).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that the node and leaf node functions are neural networks and are the only training parameters in NTI.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Non-Leaf Node Composition Functions",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Attention Over Tree",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "where W GA 1 and W GA 2 \u2208 R k\u00d7k are training parameters and \u03b1 \u2208 R 2n\u22121 the attention weight vector for each node.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This attention mechanism is robust as it globally normalizes the attention score m with sof tmax to obtain the weights \u03b1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, it does not consider the tree structure when producing the final representation h tree .",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "We describe in this section experiments on three different NLP tasks, natural language inference, question answering and sentence classification to demonstrate the flexibility and the effectiveness of NTI in the different settings.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Natural Language Inference",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "model.",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "Tree matching NTISLSTMLSTM global attention: this model first constructs the premise and hypothesis trees simultaneously with the NTISLSTMLSTM model and then computes their matching vector by using the global attention and an additional LSTM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The attention vectors are produced at each hypothesis tree node and then are given to the LSTM model sequentially.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The LSTM model compress the attention vectors and outputs a single matching vector, which is passed to an MLP for classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The MLP for this tree matching setting has an input layer with 1024 units with ReLU activation and a sof tmax output layer.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Answer Sentence Selection",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Sentence Classification",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Attention and Compositionality",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Learned Representations of Phrases and Sentences",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Effects of Padding Size",
+      "selected_sentences": [
+        {
+          "par_id": 65,
+          "sentences": [
+            {
+              "sent": "We introduced a special padding character in order to construct full binary tree.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Does this padding character influence the performance of the NTI models?",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Figure 3, we show relationship between the padding size and the accuracy on Stanford sentiment analysis data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each sentence was padded to form a full binary tree.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The x-axis represents the number of padding characters introduced.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When the padding size is less (up to 10), the NTISLSTMLSTM model performs better.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, this model tends to perform poorly or equally when the padding size is large.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Overall we do not observe any significant performance drop for both models as the padding size increases.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This suggests that NTI learns to ignore the special padding character while processing padded sentences.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The same scenario was also observed while analyzing attention weights.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The attention over the padded nodes was nearly zero.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion and Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 66,
+          "sentences": [
+            {
+              "sent": "We introduced Neural Tree Indexers, a class of tree structured recursive neural network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The NTI models achieved state-of-the-art performance on different NLP tasks.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Most of the NTI models form deep neural networks and we think this is one reason that NTI works well even if it lacks direct linguistic motivations followed by other syntactictree-structured recursive models (Socher et al, 2013).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 67,
+          "sentences": [
+            {
+              "sent": "CNN and NTI are topologically related (Kalchbrenner and Blunsom, 2013).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Both NTI and CNNs are hierarchical.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, current implementation of NTI only operates on non-overlapping subtrees while CNNs can slide over the input to produce higher-level representations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "NTI is flexible in selecting the node function and the attention mechanism.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Like CNN, the computation in the same tree-depth can be parallelized effectively; and therefore NTI is scalable and suitable for large-scale sequence processing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Note that NTI can be seen as a generalization of LSTM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "If we construct left-branching trees in a bottom-up fashion, the model acts just like sequential LSTM.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Different branching factors for the underlying tree structure have yet to be explored.",
+              "tag": "Other"
+            },
+            {
+              "sent": "NTI can be extended so it learns to select and compose dynamic number of nodes for efficiency, essentially discovering intrinsic hierarchical structure in the input.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Neural Tree Indexers for Text Understanding"
+}

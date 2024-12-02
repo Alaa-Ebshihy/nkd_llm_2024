@@ -1,0 +1,431 @@
+{
+  "paper_id": "1505.04597",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "There is large consent that successful training of deep networks requires many thousand annotated training samples.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we present a network and training strategy that relies on the strong use of data augmentation to use the available annotated samples more efficiently.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The architecture consists of a contracting path to capture context and a symmetric expanding path that enables precise localization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show that such a network can be trained end-to-end from very few images and outperforms the prior best method (a sliding-window convolutional network) on the ISBI challenge for segmentation of neuronal structures in electron microscopic stacks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Using the same network trained on transmitted light microscopy images (phase contrast and DIC) we won the ISBI cell tracking challenge 2015 in these categories by a large margin.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Segmentation of a 512x512 image takes less than a second on a recent GPU.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The full implementation (based on Caffe) and the trained networks are available at http://lmb.informatik.uni-freiburg.de/people/ronneber/u-net.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "In the last two years, deep convolutional networks have outperformed the state of the art in many visual recognition tasks, eg",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While convolutional networks have already existed for a long time [8], their success was limited due to the size of the available training sets and the size of the considered networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The breakthrough by Krizhevsky et al [7] was due to supervised training of a large network with 8 layers and millions of parameters on the ImageNet dataset with 1 million training images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since then, even larger and deeper networks have been trained [12].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "The typical use of convolutional networks is on classification tasks, where the output to an image is a single class label.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, in many visual tasks, especially in biomedical image processing, the desired output should include localization, ie, a class label is supposed to be assigned to each pixel.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, thousands of training images are usually beyond reach in biomedical tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, Ciresan et al [1] trained a network in a sliding-window setup to predict the class label of each pixel by providing a local region (patch)   as input.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Secondly, the training data in terms of patches is much larger than the number of training images.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The resulting network won the EM segmentation challenge at ISBI 2012 by a large margin.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In this paper, we build upon a more elegant architecture, the so-called \"fully convolutional network\" [9].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We modify and extend this architecture such that it works with very few training images and yields more precise segmentations; see Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The main idea in [9] is to supplement a usual contracting network by successive layers, where pooling operators are replaced by upsampling operators.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hence, these layers increase the resolution of the output.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In order to localize, high resolution features from the contracting path are combined with the upsampled Figure 2. Overlap-tile strategy for seamless segmentation of arbitrary large images (here segmentation of neuronal structures in EM stacks).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Prediction of the segmentation in the yellow area, requires image data within the blue area as input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Missing input data is extrapolated by mirroring output.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A successive convolution layer can then learn to assemble a more precise output based on this information.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "One important modification in our architecture is that in the upsampling part we have also a large number of feature channels, which allow the network to propagate context information to higher resolution layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a consequence, the expansive path is more or less symmetric to the contracting path, and yields a u-shaped architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network does not have any fully connected layers and only uses the valid part of each convolution, ie, the segmentation map only contains the pixels, for which the full context is available in the input image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This strategy allows the seamless segmentation of arbitrarily large images by an overlap-tile strategy (see Figure 2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "To predict the pixels in the border region of the image, the missing context is extrapolated by mirroring the input image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This tiling strategy is important to apply the network to large images, since otherwise the resolution would be limited by the GPU memory.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "As for our tasks there is very little training data available, we use excessive data augmentation by applying elastic deformations to the available training images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This allows the network to learn invariance to such deformations, without the need to see these transformations in the annotated image corpus.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is particularly important in biomedical segmentation, since deformation used to be the most common variation in tissue and realistic deformations can be simulated efficiently.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The value of data augmentation for learning invariance has been shown in Dosovitskiy et al [2] in the scope of unsupervised feature learning.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Another challenge in many cell segmentation tasks is the separation of touching objects of the same class; see Figure 3.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To this end, we propose the use of a weighted loss, where the separating background labels between touching cells obtain a large weight in the loss function.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "The resulting network is applicable to various biomedical segmentation problems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we show results on the segmentation of neuronal structures in EM stacks (an ongoing competition started at ISBI 2012), where we out-performed the network of Ciresan et al [1].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, we show results for cell segmentation in light microscopy images from the ISBI cell tracking challenge 2015.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Here we won with a large margin on the two most challenging 2D transmitted light datasets.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Network Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "The network architecture is illustrated in Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It consists of a contracting path (left side) and an expansive path (right side).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The contracting path follows the typical architecture of a convolutional network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It consists of the repeated application of two 3x3 convolutions (unpadded convolutions), each followed by a rectified linear unit (ReLU) and a 2x2 max pooling operation with stride 2 for downsampling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At each downsampling step we double the number of feature channels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Every step in the expansive path consists of an upsampling of the feature map followed by a 2x2 convolution (\"up-convolution\") that halves the number of feature channels, a concatenation with the correspondingly cropped feature map from the contracting path, and two 3x3 convolutions, each followed by a ReLU.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The cropping is necessary due to the loss of border pixels in every convolution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At the final layer a 1x1 convolution is used to map each 64component feature vector to the desired number of classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In total the network has 23 convolutional layers.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "The input images and their corresponding segmentation maps are used to train the network with the stochastic gradient descent implementation of Caffe [6].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Due to the unpadded convolutions, the output image is smaller than the input by a constant border width.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To minimize the overhead and make maximum use of the GPU memory, we favor large input tiles over a large batch size and hence reduce the batch to a single image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Accordingly we use a high momentum (0.99) such that a large number of the previously seen training samples determine the update in the current optimization step.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "In deep networks with many convolutional layers and different paths through the network, a good initialization of the weights is extremely important.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Otherwise, parts of the network might give excessive activations, while other parts never contribute.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Ideally the initial weights should be adapted such that each feature map in the network has approximately unit variance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For a network with our architecture (alternating convolution and ReLU layers) this can be achieved by drawing the initial weights from a Gaussian distribution with a standard deviation of 2/N , where N denotes the number of incoming nodes of one neuron [5].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Eg for a 3x3 convolution and 64 feature channels in the previous layer N = 9 \u2022 64 = 576.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Data Augmentation",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Data augmentation is essential to teach the network the desired invariance and robustness properties, when only few training samples are available.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In case of microscopical images we primarily need shift and rotation invariance as well as robustness to deformations and gray value variations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Especially random elastic deformations of the training samples seem to be the key concept to train a segmentation network with very few annotated images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We generate smooth deformations using random displacement vectors on a coarse 3 by 3 grid.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The displacements are sampled from a Gaussian distribution with 10 pixels standard deviation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Per-pixel displacements are then computed using bicubic interpolation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Drop-out layers at the end of the contracting path perform further implicit data augmentation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "We demonstrate the application of the u-net to three different segmentation tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first task is the segmentation of neuronal structures in electron microscopic recordings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "An example of the data set and our obtained segmentation is displayed in Figure 2. We provide the full result as Supplementary Material.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The data set is provided by the EM segmentation challenge [14] that was started at ISBI 2012 and is still open for new contributions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The training data is a set of 30 images (512x512 pixels) from serial section transmission electron microscopy of the Drosophila first instar larva ventral nerve cord (VNC).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each image comes with a corresponding fully annotated ground truth segmentation map for cells (white) and membranes (black).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The test set is publicly available, but its segmentation maps are kept secret.",
+              "tag": "Method"
+            },
+            {
+              "sent": "An evaluation can be obtained by sending the predicted membrane probability map to the organizers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The evaluation is done by thresholding the map at 10 different levels and computation of the \"warping error\", the \"Rand error\" and the \"pixel error\" [14].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "The u-net architecture achieves very good performance on very different biomedical segmentation applications.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Thanks to data augmentation with elastic defor- 1 The authors of this algorithm have submitted 78 different solutions to achieve this result.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The Netherlands mations, it only needs very few annotated images and has a very reasonable training time of only 10 hours on a NVidia Titan GPU (6 GB).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We provide the full Caffe [6]-based implementation and the trained networks 4 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We are sure that the u-net architecture can be applied easily to many more tasks.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "U-Net: Convolutional Networks for Biomedical Image Segmentation"
+}

@@ -1,0 +1,516 @@
+{
+  "paper_id": "1903.09359",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "3D face reconstruction from a single 2D image is a challenging problem with broad applications.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent methods typically aim to learn a CNN-based 3D face model that regresses coefficients of 3D Morphable Model (3DMM) from 2D images to render 3D face reconstruction or dense face alignment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the shortage of training data with 3D annotations considerably limits performance of those methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To alleviate this issue, we propose a novel 2D-assisted self-supervised learning (2DASL) method that can effectively use \"in-the-wild\" 2D face images with noisy landmark information to substantially improve 3D face model learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, taking the sparse 2D facial landmarks as additional information, 2DSAL introduces four novel self-supervision schemes that view the 2D landmark and 3D landmark prediction as a self-mapping process, including the 2D and 3D landmark self-prediction consistency, cycle-consistency over the 2D landmark prediction and self-critic over the predicted 3DMM coefficients based on landmark predictions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using these four self-supervision schemes, the 2DASL method significantly relieves demands on the the conventional paired 2D-to-3D annotations and gives much higher-quality 3D face models without requiring any additional 3D annotations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Experiments on multiple challenging datasets show that our method outperforms state-of-the-arts for both 3D face reconstruction and dense face alignment by a large margin.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "3D face reconstruction is an important task in the field of computer vision and graphics.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For instance, the recovery of 3D face geometry from a single image can help address many challenges (eg, large pose and occlusion) for 2D face alignment through dense face alignment [30].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Traditional 3D face reconstruction methods [2,34] are mainly based on optimization algorithms, eg, iterative closest point [2], to obtain coefficients for the 3D Morphable Model (3DMM) model and render the corresponding 3D faces from a single face image [49].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, such methods are usually time-consuming due to the high optimization complexity and suffer from local optimal solution and bad initialization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent works thus propose to use CNNs to learn to regress the 3DMM coefficients and significantly improve the reconstruction quality and efficiency.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "CNN-based methods [24,49,29,30,46,45] have achieved remarkable success in 3D face reconstruction and dense face alignment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, obtaining an accurate 3D face CNN regression model (from input 2D images to 3DMM coefficients) requires a large amount of training faces with 3D annotations, which are expensive to collect and even not achievable in some cases.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Even some 3D face datasets, like 300WLP [49], are publicly available, they generally lack diversity in face appearance, expression, occlusions and environment conditions, limiting the generalization performance of resulted 3D face regression models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A model trained on such datasets cannot deal well with various potential cases in-the-wild that are not present in the training examples.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although some recent works bypass the 3DMM parameter regression and use image-to-volume [20] or image-to-image [15] strategy instead, the ground truths are all still needed and generated from 3DMM using 300WLP, still lacking diversity.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In order to overcome the intrinsic limitation of existing 3D face recovery models, we propose a novel learning method that leverages 2D \"in-the-wild\" face images to effectively supervise and facilitate the 3D face model learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With the method, the trained 3D face model can perform 3D face reconstruction and dense face alignment well.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is inspired by the observation that a large number of 2D face datasets [4,31,26,36,40] are available with obtainable 2D landmark annotations, that could provide valuable information for 3D model learning, without requiring new data with 3D annotations.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Since these 2D images do not have any 3D annotations, it is not straightforward to exploit them in 3D face model learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We design a novel self-supervised learning method that is able to train a 3D face model with weak supervision from 2D images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, the proposed method takes the sparse annotated 2D landmarks as input and fully leverage the consistency within the 2Dto-2D and 3D-to-3D self-mapping procedure as supervi-sion.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The model should be able to recover 2D landmarks from predicted 3D ones via direct 3D-to-2D projection.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Meanwhile, the 3D landmarks predicted from the annotated and recovered 2D landmarks via the model should be the same.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Additionally, our proposed method also exploits cycle-consistency over the 2D landmark predictions, ie, taking the recovered 2D landmarks as input, the model should be able to generate 2D landmarks (by projecting its predicted 3D landmarks) that have small difference with the annotated ones.",
+              "tag": "Result"
+            },
+            {
+              "sent": "By leveraging these self-supervision derived from 2D face images without 3D annotations, our method could substantially improve the quality of learned 3D face regression model, even though there is lack of 3D samples and no 3D annotations for the 2D samples.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To facilitate the overall learning procedure, our method also exploits self-critic learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It takes as input both the latent representation and 3DMM coefficients of an face image and learns a critic model to evaluate the intrinsic consistency between the predicted 3DMM coefficients and the corresponding face image, offering another supervision for 3D face model learning.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "\u2022 We propose a new scheme that aims to fully utilize the abundant \"in-the-wild\" 2D face images to assist 3D face model learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is new and different from most common practices that pursues to improve 3D face model by collecting more data with 3D annotations for model training.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "\u2022 We develop a new self-critic learning based approach which could effectively improve the 3D face model learning procedure and give a better model, even though the 2D landmark annotations are noisy.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "\u2022 Comparison on the AFLW2000-3D and AFLWLFPA datasets shows that our method achieves excellent performance on both tasks of 3D face reconstruction and dense face alignment.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related work",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "3D Face Reconstruction Various approaches have been proposed to tackle the inherently ill-posed problem of 3D face reconstruction from a single image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [7], Vetter and Blanz observe that both the geometric structure and the texture of human faces can be approximated by a linear combination of orthogonal basis vectors obtained by PCA over 100 male and 100 female identities.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Based on this, they propose the 3DMM to represent the shape and texture of a 3D face.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "After that, large amount of efforts have been proposed to improve 3DMM modeling mechanism.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most of them devote to regressing the 3DMM coefficients by solving the non-linear optimization problem to establish the correspondences of the points between a single face image and the canonical 3D face model, including facial landmarks [50,27,44,9,21,17] and local features [17,19,39].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, various attempts have been made to estimate the 3DMM coefficients from a single face image using CNN as a regressor, as opposed to non-linear optimization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [24,49,37,38], cascaded CNN structures are used to regress the 3DMM coefficients, which are time-consuming due to multi-stage.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Besides, end-to-end approaches [14,46,23] are also proposed to directly estimate the 3DMM coefficients in a holistic manner.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More recently, works are proposed to use CNN directly obtain the reconstructed 3D face bypassing the 3DMM coefficients regression.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In Face Alignment Traditional 2D face alignment methods aim at locating a sparse set of fiducial facial landmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Initial progresses have been made with the classic Active Appearance Model (AAM) [11,42,47] and Constrained Local Model (CLM) [3,12,43].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, CNN-based methods [28,35,8] have achieved state-of-the-art performance on 2D landmark localization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, 2D face alignment only regresses visible landmarks on faces, which are unable to address large pose or occlusion situations, where partial face regions are invisible.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With the development of this field, 3D face alignment have been proposed, aiming to fit a 3DMM [49,32,16] or register a 3D facial template [41,13] to a 2D face image, which makes it possible to deal with the invisible points.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The original 3DMM fitting method [6] fits the 3D model by minimizing the pixel-wise difference between image and the rendered face model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is the first method that can address arbitrary poses, which, however, suffers from the one-minute-per-image computational cost.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "After that, some methods estimate 3DMM coefficients and then project the estimated 3D landmarks onto 2D space, such methods [23,9,21,25,25] could significantly improve the efficiency.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, the task of dense face alignment starts to attract more and more research attention, aiming to achieve very dense 3D alignment for large pose face images (including invisible parts).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [30], Liu et al use multi-constraints to train a CNN model, jointly estimating the 3DMM coefficient and provides very dense 3D alignment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "[1,48] directly learn the correspondence between a 2D face image and a 3D template via a deep CNN, while only visible face-region is considered.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Overall, CNN-based methods have achieved great success in both 3D face reconstruction and dense face alignment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, they need a huge amount of 3D annotated images for training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unfortunately, currently face datasets with 3D annotations are very limited.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As far as we know, only the 300WLP [49] dataset has been widely used for training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the 300WLP is generated by profiling faces of 300W [40] into larger poses, which is not strictly unconstrained and can not cover all possible scenes in-thewild.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Proposed method",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "In this section we introduce the proposed 2DAided Selfsupervised Learning (2DASL) method for simultaneous 3D face reconstruction and dense face alignment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We first review the popular 3D morphable model that we adopt to render the 3D faces.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we explain our method in details, in particular the novel cycle-consistency based self-supervised learning and the self-critic learning.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "3D morphable model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model overview",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Our proposed 2DSAL method trains the model using two sets of images, ie, the images with 3DMM ground truth annotations and the 2D face images with only 2D facial landmark annotations provided by an off-the-shelf facial landmark detector [8].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The model is trained by minimizing the following one conventional 3D-supervision and four selfsupervision losses.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "The first one is the weighted coefficient prediction loss L 3d over the 3D annotated images that measures how accurate the model can predict 3DMM coefficients.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second one is the 2D landmark consistency loss L 2d-con that measures how well the predicted 3D face shapes can recover the 2D landmark locations for the input 2D images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The third one is the 3D landmark consistency loss L 3d-con .",
+              "tag": "Result"
+            },
+            {
+              "sent": "The fourth one is the cycle consistency loss L cyc .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The last one is the self-critic loss L sc that estimates the realism of the predicted 3DMM coefficients for 3D face reconstruction, conditioned on the face latent representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus the overall training loss is:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Weighted 3DMM coefficient supervision",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "2D assisted self-supervised learning",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "To leverage the 2D face images with only annotation of sparse 2D landmark points offered by detector [8], we develop the following self-supervision scheme that offers three different self-supervision losses, including the 2D landmark consistency loss L 2d-con , the 3D landmark consistency loss L 3d-con and the cycle-consistency loss L cyc .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Self-critic learning",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "We evaluate 2DASL qualitatively and quantitatively under various settings for 3D face reconstruction and dense face alignment.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training details and datasets",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Dense face alignment",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "We first compare the qualitative results from our method and corresponding ground truths in Figure 5.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Although all the state-of-the-art methods of dense face alignment conduct evaluation on AFLW2000-3D, the ground truth of AFLW2000-3D is controversial [8,48], since its annotation pipeline is based on the Landmarks Marching method in [50].",
+              "tag": "Result"
+            },
+            {
+              "sent": "As can be seen, our results are more accurate than the ground truth in some cases.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This is mainly because 2DASL  involves a number of the \"in-the-wild\" images for training, enabling the model to perform well in cases even unseen in the 3D annotated training data.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "For fair comparison, we adopt the normalized mean error (NME) [49] as the metric to evaluate the alignment performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The NME is the mean square error normalized by face bounding box size.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since some images in AFLW2000-3D contains more than 2 faces, and the face detector sometimes gives the wrong face for evaluation (not the test face with ground truth), leading to high NME.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, we discard the worst 20 cases of each method and only 1,980 images from AFLW2000-3D are used for evaluation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate our 2DASL using a sparse set of 68 facial landmarks and also the dense points with both 2D and 3D coordinates, and compare it with other state-of-the-arts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The 68 sparse facial landmarks can be viewed as sampling from the dense facial points.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since PRNet [15] and VRNGuided [20] are not 3DMM based, and the point cloud of these two methods are not corresponding to 3DMM, we only compare with them on the sparse 68 landmarks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results are shown in Figure 6, where we can see our 2DASL achieves the lowest NME (%) on the evaluation of both 2D and 3D coordinates among all the methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For 3DMM-based methods: 3DDFA [49] and DeFA [30], our method outperforms them by a large margin on both the 68 spare landmarks and the dense coordinates.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "3D face reconstruction",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Ablation study",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose a novel 2DAssisted Selfsupervised Learning (2DASL) method for 3D face reconstruction and dense face alignment based on the 3D Morphable face Model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The sparse 2D facial landmarks are taken as input of CNN regressor and learn themselves via 3DMM coefficients regression.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To supervise and facilitate the 3D face model learning, we introduce four selfsupervision losses, including the self-critic which is employed to weakly supervise the training samples that without 3D annotations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our 2DASL make the abundant \"inthe-wild\" face images could be used to aid 3D face analysis without any 2D-to-3D supervision.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments on two challenging face datasets illustrate the effectiveness of 2DASL on both 3D face reconstruction and dense face alignment by comparing with other state-of-the-art meth-ods.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "3D Face Reconstruction from A Single Image Assisted by 2D Face Images in the Wild"
+}

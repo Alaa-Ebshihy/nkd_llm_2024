@@ -1,0 +1,749 @@
+{
+  "paper_id": "1511.06732",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Many natural language processing applications use language models to generate text.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These models are typically trained to predict the next word in a sequence, given the previous words and some context such as an image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, at test time the model is expected to generate the entire sequence from scratch.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This discrepancy makes generation brittle, as errors may accumulate along the way.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We address this issue by proposing a novel sequence level training algorithm that directly optimizes the metric used at test time, such as BLEU or ROUGE.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On three different tasks, our approach outperforms several strong baselines for greedy generation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The method is also competitive when these baselines employ beam search, while being several times faster.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Natural language is the most natural form of communication for humans.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is therefore essential that interactive AI systems are capable of generating text (Reiter & Dale, 2000).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A wide variety of applications rely on text generation, including machine translation, video/text summarization, question answering, among others.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "From a machine learning perspective, text generation is the problem of predicting a syntactically and semantically correct sequence of consecutive words given some context.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For instance, given an image, generate an appropriate caption or given a sentence in English language, translate it into French.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Popular choices for text generation models are language models based on n-grams (Kneser & Ney, 1995), feed-forward neural networks (Morin & Bengio, 2005), and recurrent neural networks (RNNs; Mikolov et al, 2010).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These models when used as is to generate text suffer from two major drawbacks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, they are trained to predict the next word given the previous ground truth words as input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, at test time, the resulting models are used to generate an entire sequence by predicting one word at a time, and by feeding the generated word back as input at the next time step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This process is very brittle because the model was trained on a different distribution of inputs, namely, words drawn from the data distribution, as opposed to words drawn from the model distribution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a result the errors made along the way will quickly accumulate.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We refer to this discrepancy as exposure bias which occurs when a model is only exposed to the training data distribution, instead of its own predictions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, the loss function used to train these models is at the word level.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A popular choice is the cross-entropy loss used to maximize the probability of the next correct word.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the performance of these models is typically evaluated using discrete metrics.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One such metric is called BLEU (Papineni et al, 2002) for instance, which measures the n-gram overlap between the model generation and the reference text.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Training these models to directly optimize metrics like BLEU is hard because a) these are not differentiable (Rosti et al, 2011), and b) combinatorial optimization is required to determine which sub-string maximizes them given some context.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Prior attempts (McAllester et al, 2010;He & Deng, 2012) at optimizing test metrics were restricted to linear models, or required a large number of samples to work well (Auli & Gao, 2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper proposes a novel training algorithm which results in improved text generation compared to standard models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The algorithm addresses the two issues discussed above as follows.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, while training the generative model we avoid the exposure bias by using model predictions at training time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, we directly optimize for our final evaluation metric.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our proposed methodology bor-rows ideas from the reinforcement learning literature (Sutton & Barto, 1988).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, we build on the REINFORCE algorithm proposed by Williams (1992), to achieve the above two objectives.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While sampling from the model during training is quite a natural step for the REINFORCE algorithm, optimizing directly for any test metric can also be achieved by it.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "REINFORCE side steps the issues associated with the discrete nature of the optimization by not requiring rewards (or losses) to be differentiable.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While REINFORCE appears to be well suited to tackle the text generation problem, it suffers from a significant issue.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The problem setting of text generation has a very large action space which makes it extremely difficult to learn with an initial random policy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, the search space for text generation is of size O(W T ), where W is the number of words in the vocabulary (typically around 10 4 or more) and T is the length of the sentence (typically around 10 to 30).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Towards that end, we introduce Mixed Incremental CrossEntropy Reinforce (MIXER), which is our first major contribution of this work.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "MIXER is an easy-to-implement recipe to make REINFORCE work well for text generation applications.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is based on two key ideas: incremental learning and the use of a hybrid loss function which combines both REINFORCE and cross-entropy (see Sec. 3.2.2 for details).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Both ingredients are essential to training with large action spaces.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In MIXER, the model starts from the optimal policy given by cross-entropy training (as opposed to a random one), from which it then slowly deviates, in order to make use of its own predictions, as is done at test time.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Our second contribution is a thorough empirical evaluation on three different tasks, namely, Text Summarization, Machine Translation and Image Captioning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare against several strong baselines, including, RNNs trained with cross-entropy and Data as Demonstrator (DAD) (Bengio et al, 2015;Venkatraman et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also compare MIXER with another simple yet novel model that we propose in this paper.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We call it the End-toEnd BackProp model (see Sec. 3.1.3",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our results show that MIXER with a simple greedy search achieves much better accuracy compared to the baselines on all the three tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition we show that MIXER with greedy search is even more accurate than the cross entropy model augmented with beam search at inference time as a post-processing step.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is particularly remarkable because MIXER with greedy search is at least 10 times faster than the cross entropy model with a beam of size 10.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Lastly, we note that MIXER and beam search are complementary to each other and can be combined to further improve performance, although the extent of the improvement is task dependent. 1",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Sequence models are typically trained to predict the next word using the cross-entropy loss.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "At test time, it is common to use beam search to explore multiple alternative paths (Sutskever et al, 2014;Bahdanau et al, 2015;Rush et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While this improves generation by typically one or two BLEU points (Papineni et al, 2002), it makes the generation at least k times slower, where k is the number of active paths in the beam (see Sec. 3.1.1",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "The idea of improving generation by letting the model use its own predictions at training time (the key proposal of this work) was first advocated by Daume III et al (2009).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In their seminal work, the authors first noticed that structured prediction problems can be cast as a particular instance of reinforcement learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They then proposed SEARN, an algorithm to learn such structured prediction tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The basic idea is to let the model use its own predictions at training time to produce a sequence of actions (eg, the choice of the next word).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then, a search algorithm is run to determine the optimal action at each time step, and a classifier (a.k.a. policy) is trained to predict that action.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A similar idea was later proposed by Ross et al (2011) in an imitation learning framework.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unfortunately, for text generation it is generally intractable to compute an oracle of the optimal target word given the words predicted so far.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The oracle issue was later addressed by an algorithm called Data As Demonstrator (DAD) (Venkatraman et al, 2015) and applied for text generation by Bengio et al (2015), whereby the target action at step k is the k-th action taken by the optimal policy (ground truth sequence) regardless of which input is fed to the system, whether it is ground truth, or the model's prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While DAD usually improves generation, it seems unsatisfactory to force the model to predict a certain word regardless of the preceding words (see sec.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "1: Text generation models can be described across three dimensions: whether they suffer from exposure bias, whether they are trained in an end-to-end manner using back-propagation, and whether they are trained to predict one word ahead or the whole sequence.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MODELS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "WORD-LEVEL TRAINING",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "argmax proposing a simple yet novel baseline which uses its model prediction during training and also has the ability to back propagate the gradients through the entire sequence.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While these extensions tend to make generation more robust, they still lack explicit supervision at the sequence level.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CROSS ENTROPY TRAINING (XENT)",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "Once trained, one can use the model to generate an entire sequence as follows.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let w g t denote the word generated by the model at the t-th time step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then the next word is generated by:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "Notice that, the model is trained to maximize p \u03b8 (w|w t , h t+1 ), where w t is the word in the ground truth sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, during generation the model is used as p \u03b8 (w|w g t , h t+1 ).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In other words, during training the model is only exposed to the ground truth words.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, at test time the model has only access to its own predictions, which may not be correct.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a result, during generation the model can potentially deviate quite far from the actual sequence to be generated.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "The generation described by Eq. ( 7) is a greedy left-to-right process which does not necessarily produce the most likely sequence according to the model, because:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "to reduce the effect of search error is to pursue not only one but k next word candidates at each point.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While still approximate, this strategy can recover higher scoring sequences that are often also better in terms of our final evaluation metric.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This process is commonly know as Beam Search.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "DATA AS DEMONSTRATOR (DAD)",
+      "selected_sentences": [
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "Conventional training with XENT suffers from exposure bias since training uses ground truth words as opposed to model predictions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DAD, proposed in (Venkatraman et al, 2015) and also used in (Bengio et al, 2015) for sequence generation, addresses this issue by mixing the ground truth training data with model predictions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At each time step and with a certain probability, DAD takes as input either the prediction from the model at the previous time step or the ground truth data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Bengio et al (2015) proposed different annealing schedules for the probability of choosing the ground truth word.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The annealing schedules are such that at the beginning, the algorithm always chooses the ground truth words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, as the training progresses the model predictions are selected more often.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This has the effect of making the model somewhat more aware of how it will be used at test time.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "END-TO-END BACKPROP (E2E)",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "where i t+1,j are indexes of the words with k largest probabilities and v t+1,j are their corresponding scores.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At the time step t + 1, we take the k largest scoring previous words as input whose contributions is weighted by their scores v's.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Smoothing the input this way makes the whole process differentiable and trainable using standard back-propagation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Compared to beam search, this can be interpreted as fusing the k possible next hypotheses together into a single path, as illustrated in Figure 3.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In practice we also employ a schedule, whereby we use only the ground truth words at the beginning and gradually let the model use its own top-k predictions as training proceeds.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While this algorithm is a simple way to expose the model to its own predictions, the loss function optimized is still XENT at each time step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There is no explicit supervision at the sequence level while training the model.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "SEQUENCE LEVEL TRAINING",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "We now introduce a novel algorithm for sequence level training, which we call Mixed Incremental CrossEntropy Reinforce (MIXER).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The proposed method avoids the exposure bias problem, and also directly optimizes for the final evaluation metric.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since MIXER is an extension of the REINFORCE algorithm, we first describe REINFORCE from the perspective of sequence generation.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "REINFORCE",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "In order to apply the REINFORCE algorithm (Williams, 1992;Zaremba & Sutskever, 2015) to the problem of sequence generation we cast our problem in the reinforcement learning (RL) framework (Sutton & Barto, 1988).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our generative model (the RNN) can be viewed as an agent, which interacts with the external environment (the words and the context vector it sees as input at every time step).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The parameters of this agent defines a policy, whose execution results in the agent picking an action.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the sequence generation setting, an action refers to predicting the next word in the sequence at each time step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After taking an action the agent updates its internal state (the hidden units of RNN).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Once the agent has reached the end of a sequence, it observes a reward.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We can choose any reward function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Here, we use BLEU (Papineni et al, 2002) and ROUGE-2 (Lin & Hovy, 2003) since these are the metrics we use at test time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "BLEU is essentially a geometric mean over n-gram precision scores as well as a brevity penalty (Liang et al, 2006); in this work, we consider up to 4-grams.",
+              "tag": "Method"
+            },
+            {
+              "sent": "ROUGE-2 is instead recall over bi-grams.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Like in imitation learning, we have a training set of optimal sequences of actions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During training we choose actions according to the current policy and only observe a reward at the end of the sequence (or after maximum sequence length), by comparing the sequence of actions from the current policy against the optimal action sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The goal of training is to find the parameters of the agent that maximize the expected reward.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We define our loss as the negative expected reward:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "REINFORCE is an elegant algorithm to train at the sequence level using any user-defined reward.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this work, we use BLEU and ROUGE-2 as reward, however one could just as easily use any other metric.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When presented as is, one major drawback associated with the algorithm is that it assumes a random policy to start with.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This assumption can make the learning for large action spaces very challenging.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unfortunately, text generation is such a setting where the cardinality of the action set is in the order of 10 4 (the number of words in the vocabulary).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This leads to a very high branching factor where it is extremely hard for a random policy to improve in any reasonable amount of time.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "In the next section we describe the MIXER algorithm which addresses these issues, better targeting text generation applications.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MIXED INCREMENTAL CROSS-ENTROPY REINFORCE (MIXER)",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "The MIXER algorithm borrows ideas both from DAGGER (Ross et al, 2011) and DAD (Venkatraman et al, 2015;Bengio et al, 2015) and modifies the REINFORCE appropriately.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first key idea is to change the initial policy of REINFORCE to make sure the model can effectively deal with the large action space of text generation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead of starting from a poor random policy and training the model to converge towards the optimal policy, we do the exact opposite.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We start from the optimal policy and then slowly deviate from it to let the model explore and make use of its own predictions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first train the RNN with the cross-entropy loss for N XENT epochs using the ground truth sequences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This ensures that we start off with a much better policy than random because now the model can focus on a good part of the search space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This can be better understood by comparing the perplexity of a language model that is randomly initialized versus one that is trained.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Perplexity is a measure of uncertainty of the prediction and, roughly speaking, it corresponds to the average number of words the model is 'hesitating' about when making a prediction.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A good language model trained on one of our data sets has perplexity of 50, whereas a random model is likely to have perplexity close to the size of the vocabulary, which is about 10, 000.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "EXPERIMENTS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "TEXT SUMMARIZATION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "MACHINE TRANSLATION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "IMAGE CAPTIONING",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "RESULTS",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "We observe that MIXER produces the best generations and improves generation over XENT by 1 to 3 points across all the tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Unfortunately the E2E approach did not prove to be very effective.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "Training at the sequence level and directly optimizing for testing score yields better generations than turning a sequence of discrete decisions into a differentiable process amenable to standard back-propagation of the error.",
+              "tag": "Result"
+            },
+            {
+              "sent": "DAD is usually better than the XENT, but not as good as MIXER.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "Overall, these experiments demonstrate the importance of optimizing for the metric used at test time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In summarization for instance, XENT and MIXER trained with ROUGE achieve a poor performance in terms of BLEU (8.16 and 5.80    Next, we experimented with beam search.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results in Figure 6 suggest that all methods, including MIXER, improve the quality of their generation by using beam search.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, the extent of the improvement is very much task dependent.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe that the greedy performance of MIXER (ie, without beam search) cannot be matched by baselines using beam search in two out of the three tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, MIXER is several times faster since it relies only on greedy search.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CONCLUSIONS",
+      "selected_sentences": [
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "Our results show that MIXER outperforms three strong baselines for greedy generation and it is very competitive with beam search.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The approach we propose is agnostic to the underlying model or the form of the reward function.",
+              "tag": "Other"
+            },
+            {
+              "sent": "In future work we would like to design better estimation techniques for the average reward rt , because poor estimates can lead to slow convergence of both REINFORCE and MIXER.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Finally, our training algorithm relies on a single sample while it would be interesting to investigate the effect of more comprehensive search methods at training time.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "SEQUENCE LEVEL TRAINING WITH RECURRENT NEURAL NETWORKS"
+}

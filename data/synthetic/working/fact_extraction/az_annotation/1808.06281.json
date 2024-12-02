@@ -1,0 +1,400 @@
+{
+  "paper_id": "1808.06281",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Person ReIdentification is still a challenging task in Computer Vision due to a variety of reasons.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On the other side, Incremental Learning is still an issue since deep learning models tend to face the problem of over catastrophic forgetting when trained on subsequent tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose a model that can be used for multiple tasks in Person ReIdentification, provide state-of-the-art results on a variety of tasks and still achieve considerable accuracy subsequently.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluated our model on two datasets Market 1501 and Duke MTMC.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Extensive experiments show that this method can achieve Incremental Learning in Person ReID efficiently as well as for other tasks in computer vision as well.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The code for this work can be found here",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Deep neural networks have revolutionized the field of computer vision.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In recent years, a lot of work has been done in Person ReIdentification, we've seen considerable progress but are faced with a lot of challenges in terms of getting accurate predictions in real-life instances.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It plays an important role in many areas, surveillance being one of them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In some sense, it can be compared to other prominent tasks in computer vision like Image classification, where a lot of progress has been made.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, there has been a growing demand for deep learning models that incur the low computational cost.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Deployment of such models can be cumbersome and may not prove to be much efficient especially if the same task can be carried out with a lesser number of parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given a set of images of a person taken from different angles from a different camera, our model is required to generate a higher prediction if those images are of the same person and vice versa.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The problem is composed of multiple reasons some of which may include background clutter, illumination conditions, occlusion, body pose, the orientation of cameras.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Numerous methods have been proposed to address some of these issues.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "So far the models that have been proposed in Person ReID are good in doing well in a particular dataset but when tested on a quite similar dataset, they struggle to get accu-rate predictions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unlike other tasks such as Image Classification or Object Detection, we are required to have our model perform well on a large number of classes and all these images are not as much distinctive as other objects do which makes it difficult for the neural network to generate accurate predictions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We devise a new method that can be used to create robust Person ReID systems at a lower computational cost that can not only perform well on one task but if trained properly using our techniques, it can be well adapted to other tasks as well.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related work",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "For Incremental Learning, much research work has been carried out.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our work is slightly inspired by Learning without forgetting [7], which was used for classification purposes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They made use of CIFAR10 and SVHN as the two tasks and then achieved considerable performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Other closely associated work which builds upon it is SeNACNN [10], wherein they made the architecture a little more complex by introducing more layers in different pipelines instead of just dealing with fully connected layers.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Our work is the first one to our knowledge that tries to tackle the problem of Incremental Learning in Person ReIdentification, unlike image classification where we have a relatively lesser number of classes, the number is way more, and this increases the difficulty level for generating accurate predictions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In defense [3] made use of Triplet Loss to show that it can be used to perform end to end deep metric learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Some work that has been carried out in this incremental learning space also makes use of Distillation [4] loss wherein you train a smaller network to produce close predictions to cumbersome models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "But to carry out this task, we are also required to train our cumbersome model first to be able to train the smaller model which is again a big task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our proposed method doesn't rely on multiple models or older data that has been used to train the network on earlier task, rather we have multiple heads inside one model which aims to resolve this issue.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Our proposed method",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Overall architecture",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Multiple Pipelines",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Optimizer",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "We initially tried Adam [6], which gave an accuracy of 74% on Rank 1 on Market1501 dataset followed by weight decay.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then tried SGD with Cyclical Learning Rate (CLR) [9] scheduler which helped us achieve much higher accuracy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We saw an increment of more than 10% on Rank 1 on Market 1501 to reach 89.3%.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the triangular variant with default values as suggested.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We restricted our batch size to 32 as it provided the best results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Keeping a higher batch size would lead to less frequent weight updates.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Since the learning rate becomes variable with CLR, it can take advantage of its behavior of making learning rate variable wherever necessary in a more effective manner as our experiments have shown.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Using Covariance loss for contrastive feature learning",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "To deal with over catastrophic forgetting, We are proposing a new addition to our loss function whose main aim is to make positive targets (images of the same person, taken with a different camera) closer and negative targets (images of different person) far away in embedding space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We take feature maps that we get from the second convolution block from both the pipelines during the second phase.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is going to optimize embedding space such that data points with the same identity are closer to each other than those with different identities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We are required to take feature maps of positive targets and negative targets, we then have to perform the following operation:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training methodology",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "There are few ways to train these pipelines, we divided the training into two phases.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the first phase, only the base model along with the first pipeline was trained on Market 1501 and predictions were taken from the first pipeline itself.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There can also be slight variation in the first phase, wherein some sections of the model can either be set as nontrainable or be used with discriminative learning rates.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Other pipelines can be trained in a different manner (taskspecific).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the second phase, we freeze the first pipeline and then train the base model along with the second pipeline on Duke MTMC and make predictions accordingly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A similar procedure can be repeated for n pipelines for n tasks.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Objective Function",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Our loss function has two critical components now.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We are using cross entropy as our classification loss along with our covariance loss.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Ensembling",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Ensembling has often given improved results in various computer vision tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This often works well when predictions are being taken from multiple models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Here we tried ensembling amongst these two pipelines.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first phase was performed as usual.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second phase was trained with different ensembling combinations amongst different network modules.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We noted that the model converged faster relatively and accuracy was saturated to a lower max value.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Although it may prove to work better if a specific set of pipelines are used to solve a particular task.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Ensembling method",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Since our main goal is to bring generalization into our model and avoid over catastrophic forgetting, we first train the first pipeline, followed by the evaluation of predictions coming from the last FC layer of the first pipeline.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we train the second pipeline followed by evaluation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the last phase, we don't do any training and just evaluate it on the first task our model was made to perform.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These results are reported after the model converged.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We note state-of-the-art accuracies on both the tasks, and yet achieve considerable accuracy on the first task again.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Effectiveness of proposed method",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Our work indicates that we now have a simple method that can achieve state-of-the-art results when trained on Person ReIdentification tasks and yet achieve considerable accuracy on older tasks without losing much information and doesn't rely on older data after it has been used for training it.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "All of the learned information is distilled inside the model.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This is a big step because we don't have access to older data in real-time instances and this would reduce the robustness of our model otherwise.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Our architecture and discussed methods can be applied to other computer vision tasks as well.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This method is bound to work with tasks that have fewer variations in the domain.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For similar tasks, it seems to outperform other commonly used methods of training.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "In this paper, we have shown that we can achieve incremental learning in Person ReID tasks with simpler methods yet achieving state-of-the-art results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We also propose a new novel loss that can be used to bring positive targets closer and negative targets farther in embedding space which results in improved performance for the desired task.",
+              "tag": "Other"
+            },
+            {
+              "sent": "We hope that our work would be built upon by Person ReID community to build better and robust incremental learning systems that can be further adapted to other domains as well thus increasing real-life usage of such systems.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Incremental Learning in Person Re-Identification"
+}

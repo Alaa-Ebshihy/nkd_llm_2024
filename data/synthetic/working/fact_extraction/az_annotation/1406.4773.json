@@ -1,0 +1,693 @@
+{
+  "paper_id": "1406.4773",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "The key challenge of face recognition is to develop effective feature representations for reducing intra-personal variations while enlarging inter-personal differences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we show that it can be well solved with deep learning and using both face identification and verification signals as supervision.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The Deep IDentification-verification features (DeepID2) are learned with carefully designed deep convolutional networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The face identification task increases the inter-personal variations by drawing DeepID2 extracted from different identities apart, while the face verification task reduces the intra-personal variations by pulling DeepID2 extracted from the same identity together, both of which are essential to face recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The learned DeepID2 features can be well generalized to new identities unseen in the training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the challenging LFW dataset [11], 99.15% face verification accuracy is achieved.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared with the best deep learning result [21] on LFW, the error rate has been significantly reduced by 67%.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Faces of the same identity could look much different when presented in different poses, illuminations, expressions, ages, and occlusions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such variations within the same identity could overwhelm the variations due to identity differences and make face recognition challenging, especially in unconstrained conditions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, reducing the intra-personal variations while enlarging the inter-personal differences is an eternal topic in face recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It can be traced back to early subspace face recognition methods such as LDA [1], Bayesian face [17], and unified subspace [23,24].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, LDA approximates inter-and intra-personal face variations by using two linear subspaces and finds the projection directions to maximize the ratio between them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More recent studies have also targeted the same goal, either explicitly or implicitly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, metric learning [6,9,15] maps faces to some feature representation such that faces of the same identity are close to each other while those of different identities stay apart.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, these models are much limited by their linear nature or shallow structures, while inter-and intra-personal variations are complex, highly nonlinear, and observed in high-dimensional image space.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "In this work, we show that deep learning provides much more powerful tools to handle the two types of variations.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Thanks to its deep architecture and large learning capacity, effective features for face recognition can be learned through hierarchical nonlinear mappings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We argue that it is essential to learn such features by using two supervisory signals simultaneously, ie the face identification and verification signals, and the learned features are referred to as Deep IDentification-verification features (DeepID2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Identification is to classify an input image into a large number of identity classes, while verification is to classify a pair of images as belonging to the same identity or not (ie",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the training stage, given an input face image with the identification signal, its DeepID2 features are extracted in the top hidden layer of the learned hierarchical nonlinear feature representation, and then mapped to one of a large number of identities through another function g(DeepID2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the testing stage, the learned DeepID2 features can be generalized to other tasks (such as face verification) and new identities unseen in the training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The identification supervisory signal tend to pull apart DeepID2 of different identities since they have to be classified into different classes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, the learned features would have rich identity-related or interpersonal variations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the identification signal has a relatively weak constraint on DeepID2 extracted from the same identity, since dissimilar DeepID2 could be mapped to the same identity through function g(\u2022).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This leads to problems when DeepID2 features are generalized to new tasks and new identities in test where g is not applicable anymore.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We solve this by using an additional face verification signal, which requires that every two DeepID2 vectors extracted from the same identity are close to each other while those extracted from different identities are kept away.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The strong per-element constraint on DeepID2 can effectively reduce the intra-personal variations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On the other hand, using the verification signal alone (ie only distinguishing a pair of DeepID2 at a time) is not as effective in extracting identity-related features as using the identification signal (ie distinguishing thousands of identities at a time).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Therefore, the two supervisory signals emphasize different aspects in feature learning and should be employed together.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "To characterize faces from different aspects, complementary DeepID2 features are extracted from various face regions and resolutions, and are concatenated to form the final feature representation after PCA dimension reduction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since the learned DeepID2 features are diverse among different identities while consistent within the same identity, it makes the following face recognition easier.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Using the learned feature representation and a recently proposed face verification model [3], we achieved the highest 99.15% face verification accuracy on the challenging and extensively studied LFW dataset [11].",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is the first time that a machine provided with only the face region achieves an accuracy on par with the 99.20% accuracy of human to whom the entire LFW face image including the face region and large background area are presented to verify.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In recent years, a great deal of efforts have been made for face recognition with deep learning [5,10,20,27,8,22,21].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among the deep learning works, [5,20,8] learned features or deep metrics with the verification signal, while [22,21] learned features with the identification signal and achieved accuracies around 97.45% on LFW.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our approach significantly improves the state-ofthe-art.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The idea of jointly solving the classification and verification tasks was applied to general object recognition [16], with the focus on improving classification accuracy on fixed object classes instead of hidden feature representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our work targets on learning features which can be well generalized to new classes (identities) and the verification task, while the classification accuracy on identities in the training set is not crucial for us.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Identification-verification guided deep feature learning",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "We learn features with variations of deep convolutional neural networks (deep ConvNets) [13].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The convolution and pooling operations in deep ConvNets are specially designed to extract visual features hierarchically, from local low-level features to global high-level ones.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our deep ConvNets take similar structures as in [21].",
+              "tag": "Method"
+            },
+            {
+              "sent": "It contains four convolutional layers, the first three of which are followed by max-pooling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To learn a diverse number of high-level features, we do not require weight-sharing on the entire feature map in higher convolutional layers [10].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, in the third convolutional layer of our deep ConvNets, neuron weights are locally shared in every 2 \u00d7 2 local regions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the fourth convolutional layer, which is more appropriately called a locally-connected layer, weights are totally unshared between neurons.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ConvNet extracts a 160-dimensional DeepID2 vector at its last layer of the feature extraction cascade.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The DeepID2 layer to be learned are fully-connected to both the third and fourth convolutional layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since the fourth convolutional layer extracts more global features than the third one, the DeepID2 layer takes multi-scale features as input, forming the so called multi-scale ConvNets [19].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use rectified linear units (ReLU) [18] for neurons in the convolutional layers and the DeepID2 layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "ReLU has better fitting abilities than the sigmoid units for large training datasets [12].",
+              "tag": "Method"
+            },
+            {
+              "sent": "An illustration of the ConvNet structure used to extract DeepID2 is shown in Figure 1 given an RGB input of size 55 \u00d7 47.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When the size of the input region changes, the map sizes in the following layers will change accordingly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The DeepID2 extraction process is denoted as f = Conv(x, \u03b8 c ), where Conv(\u2022) is the feature extraction function",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "where f is the DeepID2 vector, t is the target class, and \u03b8 id denotes the softmax layer parameters. p i is the target probability distribution, where p i = 0 for all i except p t = 1 for the target class t. pi is the predicted probability distribution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To correctly classify all the classes simultaneously, the DeepID2 layer must form discriminative identity-related features (ie",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second is face verification signal, which encourages DeepID2 extracted from faces of the same identity to be similar.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The verification signal directly regularize DeepID2 and can effectively reduce the intra-personal variations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Commonly used constraints include the L1/L2 norm and cosine similarity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adopt the following loss function based on the L2 norm, which was originally proposed by Hadsell et al [7] for dimensionality reduction,",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Face Verification",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "We learned the Joint Bayesian model [3] for face verification based on the extracted DeepID2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Joint Bayesian has been successfully used to model the joint probability of two faces being the same or different persons [3,4].",
+              "tag": "Method"
+            },
+            {
+              "sent": "It models the feature representation f of a face as the sum of inter-and intra-personal variations, or f = \u00b5 + , where both \u00b5 and are modeled as Gaussian distributions and are estimated from the training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Face verification is achieved through log-likelihood ratio test, log P (f1,f2|Hinter) P (f1,f2|Hintra) , where the numerator and denominator are joint probabilities of two faces given the inter-or intra-personal variation hypothesis, respectively.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "We report face verification results on the LFW dataset [11], which is the de facto standard test set for face verification in unconstrained conditions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It contains 13, 233 face images of 5749 identities collected from the Internet.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For comparison purposes, algorithms typically report the mean face verification accuracy and the ROC curve on 6000 given face pairs in LFW.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Though being sound as a test set, it is inadequate for training, since the majority of identities in LFW have only one face image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, we rely on a larger outside dataset for training, as did by all recent highperformance face verification algorithms [4,2,22,21,14].",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, we use the CelebFaces+ dataset [21] for training, which contains 202, 599 face images of 10, 177 identities (celebrities) collected from the Internet.",
+              "tag": "Method"
+            },
+            {
+              "sent": "People in CelebFaces+ and LFW are mutually exclusive.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DeepID2 features are learned from the face images of 8192 identities randomly sampled from CelebFaces+ (referred to as CelebFaces+A), while the remaining face images of 1985 identities (referred to as CelebFaces+B) are used for the following feature selection and learning the face verification models (Joint Bayesian).",
+              "tag": "Method"
+            },
+            {
+              "sent": "When learning DeepID2 on CelebFaces+A, CelebFaces+B is used as a validation set to decide the learning rate, training epochs, and hyperparameter \u03bb.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After that, CelebFaces+B is separated into a training set of 1485 identities and a validation set of 500 identities for feature selection.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we train the Joint Bayesian model on the entire CelebFaces+B data and test on LFW using the selected DeepID2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first evaluate various aspect of feature learning from Sec. 4.1 to Sec. 4.3 by using a single deep ConvNet to extract DeepID2 from the entire face region.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then the final system is constructed and compared with existing best performing methods in Sec.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Balancing the identification and verification signals",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "We investigates the interactions of identification and verification signals on feature learning, by varying \u03bb from 0 to +\u221e.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "At \u03bb = 0, the verification signal vanishes and only the identification signal takes effect.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When \u03bb increases, the verification signal gradually dominates the training process.",
+              "tag": "Result"
+            },
+            {
+              "sent": "At the other extreme of \u03bb \u2192 +\u221e, only the verification signal remains.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The L2 norm verification loss in Eq. ( 2) is used for training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 3 shows the face verification accuracy on the test set by comparing the learned DeepID2 with L2 norm and the Joint Bayesian model, respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It clearly shows that neither the identification nor the verification signal is the optimal one to learn features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Instead, effective features come from the appropriate combination of the two.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This phenomenon can be explained from the view of inter-and intra-personal variations, which could be approximated by LDA.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "According to LDA, the inter-personal scatter matrix is",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": ", where D i is the set of features of the i-th identity, xi is the corresponding mean, and c is the number of different identities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The inter-and intra-personal variances are the eigenvalues of the corresponding scatter matrices, and are shown in Figure 5.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The corresponding eigenvectors represent different variation patterns.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Both the magnitude and diversity of feature variances matter in recognition.",
+              "tag": "Result"
+            },
+            {
+              "sent": "If all the feature variances concentrate on a small number of eigenvectors, it indicates the diversity of intra-or inter-personal variations is low.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The features are learned with \u03bb = 0, 0.05, and +\u221e, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The feature variances of each given \u03bb are normalized by the corresponding mean feature variance.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "When only the identification signal is used (\u03bb = 0), the learned features contain both diverse interand intra-personal variations, as shown by the long tails of the red curves in both figures.",
+              "tag": "Result"
+            },
+            {
+              "sent": "While diverse inter-personal variations help to distinguish different identities, large and diverse intrapersonal variations are noises and makes face verification difficult.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When both the identification and verification signals are used with appropriate weighting (\u03bb = 0.05), the diversity of the interpersonal variations keeps unchanged while the variations in a few main directions become even larger, as shown by the green curve in the left compared to the red one.",
+              "tag": "Result"
+            },
+            {
+              "sent": "At the same time, the intra-personal variations decrease in both the diversity and magnitude, as shown by the green curve in the right.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Therefore, both the inter-and intra-personal variations changes in a direction that makes face verification easier.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When \u03bb further increases towards infinity, both the inter-and intra-personal variations collapse to the variations in only a few main directions, since without the identification signal, diverse features cannot be formed.",
+              "tag": "Result"
+            },
+            {
+              "sent": "With low diversity on inter-personal   variations, distinguishing different identities becomes difficult.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "Figure 6 shows the first two PCA dimensions of features learned with \u03bb = 0, 0.05, and +\u221e, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These features come from the six identities with the largest numbers of face images in LFW, and are marked by different colors.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The figure further verifies our observations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When \u03bb = 0 (left), different clusters are mixed together due to the large intra-personal variations, although the cluster centers are actually different.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When \u03bb increases to 0.05 (middle), intra-personal variations are significantly reduced and the clusters become distinguishable.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When \u03bb further increases towards infinity (right), although the intra-personal variations further decrease, the cluster centers also begin to collapse and some clusters become significantly overlapped (as the red, blue, and cyan clusters in Figure 6 right), making it hard to distinguish again.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Rich identity information improves feature learning",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "We investigate how would the identity information contained in the identification supervisory signal influence the learned features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, we experiment with an exponentially increasing number of identities used for identification during training from 32 to 8192, while the verification signal is generated from all the 8192 training identities all the time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 4 shows how the verification accuracies of the learned DeepID2 (derived from the L2 norm and Joint Bayesian) vary on the test set with the number of identities used in the identification signal.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It shows that identifying a  large number (eg, 8192) of identities is key to learning effective DeepID2 representation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This observation is consistent with those in Sec.",
+              "tag": "Other"
+            },
+            {
+              "sent": "The increasing number of identities provides richer identity information and helps to form DeepID2 with diverse inter-personal variations, making the class centers of different identities more distinguishable.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Investigating the verification signals",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "4.1, the verification signal with moderate intensity mainly takes the effect of reducing the intra-personal variations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To further verify this, we compare our L2 norm verification signal on all the sample pairs with those only constrain either the positive or negative sample pairs, denoted as L2+ and L2-, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "That is, the L2+ only decreases the distances between DeepID2 of the same identity, while L2-only increases the distances between DeepID2 of different identities if they are smaller than the margin.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The face verification accuracies of the learned DeepID2 on the test set, measured by the L2 norm and Joint Bayesian respectively, are shown in Table 2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It also compares with the L1 norm and cosine verification signals, as well as no verification signal (none).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The identification signal is the same (classifying the 8192 identities) for all the comparisons.",
+              "tag": "Result"
+            },
+            {
+              "sent": "DeepID2 features learned with the L2+ verification signal are only slightly worse than those learned with L2.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In contrast, the L2-verification signal helps little in feature learning and gives almost the same result as no verification signal is used.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is a strong evidence that the effect of the verification signal is mainly reducing the intra-personal variations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Another observation is that the face verification accuracy improves in general whenever the verification signal is added in addition to the identification signal.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, the L2 norm is better than the other compared verification metrics.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This may be due to that all the other constraints are weaker than L2 and less effective in reducing the intra-personal variations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, the cosine similarity only constrains the angle, but not the magnitude.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Final system and comparison with other methods",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "Before learning Joint Bayesian, DeepID2 features are first projected to a low dimensional feature space by PCA.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After PCA, the Joint Bayesian model is trained on the entire CelebFaces+B data and tested on the 6000 given face pairs in LFW, where the log-likelihood ratio given by Joint Bayesian is compared to a threshold optimized on the training data for face verification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Tab. 3 shows the face verification accuracy with an increasing number of face patches to extract DeepID2, as well as the time used to extract those DeepID2 features from each face with a single Titan GPU.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We achieve 98.97% accuracy with all the 25 selected face patches and 180-dimensional DeepID2 features after PCA 1 .",
+              "tag": "Result"
+            },
+            {
+              "sent": "The feature extraction process is also efficient and takes only 35 ms for each face image. high-dim LBP [4] 95.17 \u00b1 1.13 TL Joint Bayesian [2] 96.33 \u00b1 1.08 DeepFace [22] 97.35 \u00b1 0.25 DeepID [21] 97.45 \u00b1 0.26 GaussianFace [14] 98.52 \u00b1 0.66 DeepID2 99.15 \u00b1 0.13 To further exploit the rich pool of DeepID2 features extracted from the large number of patches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We repeat the feature selection algorithm for another six times, each time choosing DeepID2 from the patches that have not been selected by previous feature selection steps.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we learn the Joint Bayesian model on each of the seven groups of selected features, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We fuse the seven Joint Bayesian scores on each pair of compared faces by further learning an SVM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this way, we achieve an even higher 99.15% face verification accuracy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The accuracy and ROC comparison with previous state-of-the-art methods on LFW are shown in Tab. 4 and Figure 7, respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We achieve the best results and improve previous results with a large margin.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "This paper have shown that the effect of the face identification and verification supervisory signals on deep feature representation coincide with the two aspects of constructing ideal features for face recognition, ie, increasing inter-personal variations and reducing intra-personal variations, and the combination of the two supervisory signals lead to significantly better features than either one of them.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When embedding the learned features to the traditional face verification pipeline, we achieved an extremely effective system with 99.15% face verification accuracy on LFW.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Deep Learning Face Representation by Joint Identification-Verification"
+}

@@ -1,0 +1,396 @@
+{
+  "paper_id": "1603.06147",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "The existing machine translation systems, whether phrase-based or neural, have relied almost exclusively on word-level modelling with explicit segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we ask a fundamental question: can neural machine translation generate a character sequence without any explicit segmentation?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To answer this question, we evaluate an attention-based encoderdecoder with a subword-level encoder and a character-level decoder on four language pairsEnCs, EnDe, EnRu and EnFiusing the parallel corpora from WMT'15.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our experiments show that the models with a character-level decoder outperform the ones with a subword-level decoder on all of the four language pairs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, the ensembles of neural models with a character-level decoder outperform the state-of-the-art non-neural machine translation systems on EnCs, EnDe and EnFi and perform comparably on EnRu.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "The existing machine translation systems have relied almost exclusively on word-level modelling with explicit segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is mainly due to the issue of data sparsity which becomes much more severe, especially for n-grams, when a sentence is represented as a sequence of characters rather than words, as the length of the sequence grows significantly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition to data sparsity, we often have a priori belief that a word, or its segmented-out lexeme, is a basic unit of meaning, making it natural to approach translation as mapping from a sequence of source-language words to a sequence of target-language words.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This has continued with the more recently proposed paradigm of neural machine transla-tion, although neural networks do not suffer from character-level modelling and rather suffer from the issues specific to word-level modelling, such as the increased computational complexity from a very large target vocabulary (Jean et al, 2015;Luong et al, 2015b).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, in this paper, we address a question of whether neural machine translation can be done directly on a sequence of characters without any explicit word segmentation.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "To answer this question, we focus on representing the target side as a character sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate neural machine translation models with a character-level decoder on four language pairs from WMT'15 to make our evaluation as convincing as possible.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We represent the source side as a sequence of subwords extracted using byte-pair encoding from , and vary the target side to be either a sequence of subwords or characters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the target side, we further design a novel recurrent neural network (RNN), called biscale recurrent network, that better handles multiple timescales in a sequence, and test it in addition to a naive, stacked recurrent neural network.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "On all of the four language pairsEnCs, EnDe, EnRu and EnFi-, the models with a characterlevel decoder outperformed the ones with a subword-level decoder.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observed a similar trend with the ensemble of each of these configurations, outperforming both the previous best neural and non-neural translation systems on EnCs, EnDe and EnFi, while achieving a comparable result on EnRu.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We find these results to be a strong evidence that neural machine translation can indeed learn to translate at the character-level and that in fact, it benefits from doing so.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Neural Machine Translation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Motivation",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "Based on this observation and analysis, in this paper, we ask ourselves and the readers a question which should have been asked much earlier: Is it possible to do character-level translation without any explicit segmentation?",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "(2) Data Sparsity There is a further technical reason why much of previous research on machine translation has considered words as a basic unit.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is mainly due to the fact that major components in the existing translation systems, such as language models and phrase tables, are a count-based estimator of probabilities.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In other words, a probability of a subsequence of symbols, or pairs of symbols, is estimated by counting the number of its occurrences in a training corpus.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This approach severely suffers from the issue of data sparsity, which is due to a large state space which grows exponentially w.r.t. the length of subsequences while growing only linearly w.r.t. the corpus size.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This poses a great challenge to character-level modelling, as any subsequence will be on average 4-5 times longer when characters, instead of words, are used.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Indeed, Vilar et al (2007) reported worse performance when the character sequence was directly used by a phrase-based machine translation system.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More recently, Neubig et al (2013) proposed a method to improve character-level translation with phrasebased translation systems, however, with only a limited success.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Why Character-Level Translation?",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "The outcome of this naive, sub-optimal segmentation is that the vocabulary is often filled with many similar words that share a lexeme but have different morphology.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For instance, if we apply a simple tokenization script to an English corpus, \"run\", \"runs\", \"ran\" and \"running\" are all separate entries in the vocabulary, while they clearly share the same lexeme \"run\".",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This prevents any machine translation system, in particular neural machine translation, from modelling these morphological variants efficiently.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "These recent approaches, however, still rely on the availability of a good, if not optimal, segmentation algorithm.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Ling et al (2015b) indeed states that \"[m]uch of the prior information regarding morphology, cognates and rare word translation among others, should be incorporated\".",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It however becomes unnecessary to consider these prior information, if we use a neural network, be it recurrent, convolution or their combination, directly on the unsegmented character sequence.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The possibility of using a sequence of unsegmented characters has been studied over many years in the field of deep learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For instance, Mikolov et al (2012) and Sutskever et al (2011) trained a recurrent neural network language model (RNNLM) on character sequences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The latter showed that it is possible to generate sensible text sequences by simply sampling a character at a time from this model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More recently, Zhang et al (2015) and Xiao and Cho (2016) successfully applied a convolutional net and a convolutionalrecurrent net respectively to character-level document classification without any explicit segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Gillick et al (2015) further showed that it is possible to train a recurrent neural network on unicode bytes, instead of characters or words, to perform part-of-speech tagging and named entity recognition.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Challenges and Questions",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Character-Level Translation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Bi-Scale Recurrent Neural Network",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiment Settings",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Corpora and Preprocessing",
+      "selected_sentences": [
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "We use all available parallel corpora for four language pairs from WMT'15: EnCs, EnDe, EnRu and EnFi.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They consist of 12.1M, 4.5M, 2.3M and 2M sentence pairs, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We tokenize each corpus using a tokenization script included in Moses. 4",
+              "tag": "Method"
+            },
+            {
+              "sent": "We only use the sentence pairs, when the source side is up to 50 subword symbols long and the target side is either up to 100 subword symbols or 500 characters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We do not use any monolingual corpus.",
+              "tag": "Method"
+            },
+            {
+              "sent": "(3, 5) Durrani et al (2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "( 7) Rubino et al (2015).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Models and Training",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Decoding and Evaluation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Quantitative Analysis",
+      "selected_sentences": [
+        {
+          "par_id": 61,
+          "sentences": [
+            {
+              "sent": "Slower Layer for Alignment On EnDe, we test which layer of the decoder should be used for computing soft-alignments.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In the case of subword-level decoder, we observed no difference between choosing any of the two layers of the decoder against using the concatenation of all the layers (Table 1 (a-b)) On the other hand, with the character-level decoder, we noticed an improvement when only the slower layer (h 2 ) was used for the soft-alignment mechanism (Table 1 (c-g)).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This suggests that the soft-alignment mechanism benefits by aligning a larger chunk in the target with a subword unit in the source, and we use only the slower layer for all the other language pairs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Single Models In Table 1, we present a comprehensive report of the translation qualities of (1) subword-level decoder, (2) character-level base decoder and (3) character-level bi-scale decoder, for all the language pairs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We see that the both types of character-level decoder outperform the subword-level decoder for EnCs and EnFi quite significantly.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On EnDe, the character-level base decoder outperforms both the subword-level decoder and the character-level bi-scale decoder, validating the effectiveness of the character-level modelling.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On EnRu, among the single models, the character-level decoders outperform the subword-level decoder, but in general, we observe that all the three alternatives work comparable to each other.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "These results clearly suggest that it is indeed possible to do character-level translation without explicit segmentation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In fact, what we observed is that character-level translation often surpasses the translation quality of word-level translation.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Of course, we note once again that our experiment is restricted to using an unsegmented character sequence at the decoder only, and a further exploration toward replacing the source sentence with an unsegmented character sequence is needed.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 63,
+          "sentences": [
+            {
+              "sent": "Ensembles Each ensemble was built using eight independent models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first observation we make is that in all the language pairs, neural machine translation performs comparably to, or often better than, the state-of-the-art non-neural translation system.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, the character-level decoders outperform the subword-level decoder in all the cases.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Qualitative Analysis",
+      "selected_sentences": [
+        {
+          "par_id": 65,
+          "sentences": [
+            {
+              "sent": "(2) Does the character-level decoder help with rare words?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One advantage of character-level modelling is that it can model the composition of any character sequence, thereby better modelling rare morphological variants.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We empirically confirm this by observing the growing gap in the average negative log-probability of words between the subword-level and character-level decoders as the frequency of the words decreases.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is shown in Figure 2 (right) and explains one potential cause behind the success of character-level decoding in our experiments (we define diff(x, y) = x \u2212 y).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 68,
+          "sentences": [
+            {
+              "sent": "In this paper, we addressed a fundamental question on whether a recently proposed neural machine translation system can directly handle translation at the level of characters without any word segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We focused on the target side, in which a decoder was asked to generate one character at a time, while soft-aligning between a target character and a source subword.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our extensive experiments, on four language pairsEnCs, EnDe, EnRu and EnFi-strongly suggest that it is indeed possible for neural machine translation to translate at the level of characters, and that it actually benefits from doing so.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "A Character-Level Decoder without Explicit Segmentation for Neural Machine Translation"
+}

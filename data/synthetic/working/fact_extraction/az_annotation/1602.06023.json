@@ -1,0 +1,405 @@
+{
+  "paper_id": "1602.06023",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "In this work, we model abstractive text summarization using Attentional EncoderDecoder Recurrent Neural Networks, and show that they achieve state-of-the-art performance on two different corpora.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We propose several novel models that address critical problems in summarization that are not adequately modeled by the basic architecture, such as modeling key-words, capturing the hierarchy of sentence-toword structure, and emitting words that are rare or unseen at training time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our work shows that many of our proposed models contribute to further improvement in performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also propose a new dataset consisting of multi-sentence summaries, and establish performance benchmarks for further research.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Abstractive text summarization is the task of generating a headline or a short summary consisting of a few sentences that captures the salient ideas of an article or a passage.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We use the adjective 'abstractive' to denote a summary that is not a mere selection of a few existing passages or sentences extracted from the source, but a compressed paraphrasing of the main contents of the document, potentially using vocabulary unseen in the source document.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "This task can also be naturally cast as mapping an input sequence of words in a source document to a target sequence of words called summary.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the recent past, deep-learning based models that map an input sequence into another output sequence, called sequence-to-sequence models, have been successful in many problems such as machine translation (Bahdanau et al, 2014), speech recognition (Bahdanau et al, 2015) and video captioning (Venugopalan et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the framework of sequence-to-sequence models, a very relevant model to our task is the attentional Recurrent Neural Network (RNN) encoderdecoder model proposed in Bahdanau et al (2014), which has produced state-of-the-art performance in machine translation (MT), which is also a natural language task.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "We make the following main contributions in this work: (i) We apply the off-the-shelf attentional encoder-decoder RNN that was originally developed for machine translation to summarization, and show that it already outperforms stateof-the-art systems on two different English corpora.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "(ii) Motivated by concrete problems in summarization that are not sufficiently addressed by the machine translation based model, we propose novel models and show that they provide additional improvement in performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "(iii) We propose a new dataset for the task of abstractive summarization of a document into multiple sentences and establish benchmarks.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Models",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In this section, we first describe the basic encoderdecoder RNN that serves as our baseline and then propose several novel models for summarization, each addressing a specific weakness in the baseline.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Encoder-Decoder RNN with Attention and Large Vocabulary Trick",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Capturing Keywords using Feature-rich Encoder",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Input Layer",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Modeling Rare/Unseen Words using Switching Generator-Pointer",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Often-times in summarization, the keywords or named-entities in a test document that are central to the summary may actually be unseen or rare with respect to training data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since the vocabulary of the decoder is fixed at training time, it cannot emit these unseen words.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead, a most common way of handling these out-of-vocabulary (OOV) words is to emit an 'UNK' token as a placeholder.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However this does not result in legible summaries.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "The pointer mechanism may be more robust in handling rare words because it uses the encoder's hidden-state representation of rare words to decide which word from the document to point to.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since the hidden state depends on the entire context of the word, the model is able to accurately point to unseen words although they do not appear in the target vocabulary. 1",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Capturing Hierarchical Document Structure with Hierarchical Attention",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "With the emergence of deep learning as a viable alternative for many NLP tasks (Collobert et al, 2011), researchers have started considering this framework as an attractive, fully data-driven alternative to abstractive summarization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Rush et al (2015), the authors use convolutional models to encode the source, and a context-sensitive attentional feed-forward neural network to generate the summary, producing state-of-the-art results on Gigaword and DUC datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In an extension to this work, Chopra et al (2016) used a similar convolutional model for the encoder, but replaced the decoder with an RNN, producing further improvement in performance on both datasets.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Our work starts with the same framework as (Hu et al, 2015), where we use RNNs for both source and target, but we go beyond the standard architecture and propose novel models that address critical problems in summarization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also note that this work is an extended version of .",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "In addition to performing more extensive experiments compared to that work, we also propose a novel dataset for document summarization on which we establish benchmark numbers too.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "Below, we analyze the similarities and differences of our proposed models with related work on summarization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "2.2): Linguistic features such as POS tags, and named-entities as well as TF and IDF information were used in many extractive approaches to summarization (Wong et al, 2008b), but they are novel in the context of deep learning approaches for abstractive summarization, to the best of our knowledge.",
+              "tag": "Method"
+            },
+            {
+              "sent": "2.3): This model combines extractive and abstractive approaches to summarization in a single end-toend framework.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Rush et al (2015) also used a combination of extractive and abstractive approaches, but their extractive model is a separate log-linear classifier with handcrafted features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Pointer networks  have also been used earlier for the problem of rare words in the context of machine translation , but the novel addition of switch in our model allows it to strike a balance between when to be faithful to the original source (eg, for named entities and OOV) and when it is allowed to be creative.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We believe such a process arguably mimics how human produces summaries.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For a more detailed treatment of this model, and experiments on multiple tasks, please refer to the parallel work published by some of the authors of this work (Gulcehre et al, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "2.4): Previously proposed hierarchical encoder-decoder models use attention only at sentence-level (Li et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The novelty of our approach lies in joint modeling of attention at both sentence and word levels, where the word-level attention is further influenced by sentence-level attention, thus captur-ing the notion of important sentences and important words within those sentences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Concatenation of positional embeddings with the hidden state at sentence-level is also new.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Gigaword Corpus",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "The reason we did not evaluate our best validation models here is that this test set consisted of only 1 sentence from the source document, and did not include NLP annotations, which are needed in our best models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The table shows that, despite this fact, our model outperforms the ABS+ model of Rush et al (2015) with statistical significance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition, our models exhibit better abstractive ability as shown by the src. copy rate metric in the last column of the table.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Further, our larger model words-lvt5k-1sent outperforms the state-of-the-art model of (Chopra et al, 2016) with statistically significant improvement on Rouge-1.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "DUC Corpus",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "The DUC corpus 7 comes in two parts: the 2003 corpus consisting of 624 document, summary pairs and the 2004 corpus consisting of 500 pairs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since these corpora are too small to train large neural networks on, Rush et al (2015) trained their models on the Gigaword corpus, but combined it with an additional log-linear extractive summarization model with handcrafted features, that is trained on the DUC 2003 corpus.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They call the original neural attention model the ABS model, and the combined model ABS+.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Chopra et al (2016) also report the performance of their RASElman model on this corpus and is the current state-of-the-art since it outperforms all previously published baselines including non-neural network based extractive and abstractive systems, as measured by the official DUC metric of recall at 75 bytes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In these experiments, we use the same metric to evaluate our models too, but we omit reporting numbers from other systems in the interest of space.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CNN/Daily Mail Corpus",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "The existing abstractive text summarization corpora including Gigaword and DUC consist of only one sentence in each summary.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section, we present a new corpus that comprises multisentence summaries.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To produce this corpus, we modify an existing corpus that has been used for the task of passage-based question answering (Hermann et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this work, the authors used the human generated abstractive summary bullets from new-stories in CNN and Daily Mail websites as questions (with one of the entities hidden), and stories as the corresponding passages from which the system is expected to answer the fill-in-the-blank question.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The authors released the scripts that crawl, extract and generate pairs of passages and questions from these websites.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With a simple modification of the script, we restored all the summary bullets of each story in the original order to obtain a multi-sentence summary, where each bullet is treated as a sentence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In all, this corpus has 286,817 training pairs, 13,368 validation pairs and 11,487 test pairs, as defined by their scripts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The source documents in the training set have 766 words spanning 29.74 sentences on an average while the summaries consist of 53 words and 3.72 sentences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The unique characteristics of this dataset such as long documents, and ordered multi-sentence summaries present interesting challenges, and we hope will attract future  (Rush et al, 2015) 6 ABS+ (Rush et al, 2015) 29 researchers to build and test novel models on it.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The dataset is released in two versions: one consisting of actual entity names, and the other, in which entity occurrences are replaced with document-specific integer-ids beginning from 0. Since the vocabulary size is smaller in the anonymized version, we used it in all our experiments below.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We limited the source vocabulary size to 150K, and the target vocabulary to 60K, the source and target lengths to at most 800 and 100 words respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We used 100-dimensional word2vec embeddings trained on this dataset as input, and we fixed the model hidden state size at 200.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also created explicit pointers in the training data by matching only the anonymized entityids between source and target on similar lines as we did for the OOV words in Gigaword corpus.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Computational costs: We used a single Tesla K-40 GPU to train our models on this dataset as well.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While the flat models (words-lvt2k and words-lvt2k-ptr) took under 5 hours per epoch, the hierarchical attention model was very expensive, consuming nearly 12.5 hours per epoch.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Convergence of all models is also slower on this dataset compared to Gigaword, taking nearly 35 epochs for all models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Thus, the wall-clock time for training until convergence is about 7 days for the flat models, but nearly 18 days for the hierarchical attention model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Decoding is also slower as well, with a throughput of 2 examples per second for flat models and 1.5 examples per second for the hierarchical attention model, when run on a single GPU with a batch size of 1.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Qualitative Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "In this work, we apply the attentional encoderdecoder for the task of abstractive summarization with very promising results, outperforming stateof-the-art results significantly on two different datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Each of our proposed novel models addresses a specific problem in abstractive summarization, yielding further improvement in performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also propose a new dataset for multisentence summarization and establish benchmark numbers on it.",
+              "tag": "Other"
+            },
+            {
+              "sent": "As part of our future work, we plan to focus our efforts on this data and build more robust models for summaries consisting of multiple sentences.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Abstractive Text Summarization using Sequence-to-sequence RNNs and Beyond"
+}

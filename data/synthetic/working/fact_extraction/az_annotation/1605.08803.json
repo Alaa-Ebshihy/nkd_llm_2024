@@ -1,0 +1,405 @@
+{
+  "paper_id": "1605.08803",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Unsupervised learning of probabilistic models is a central yet challenging problem in machine learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, designing models with tractable learning, sampling, inference and evaluation is crucial in solving this task.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We extend the space of such models using real-valued non-volume preserving (real NVP) transformations, a set of powerful, stably invertible, and learnable transformations, resulting in an unsupervised learning algorithm with exact log-likelihood computation, exact and efficient sampling, exact and efficient inference of latent variables, and an interpretable latent space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We demonstrate its ability to model natural images on four datasets through sampling, log-likelihood evaluation, and latent variable manipulations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "The domain of representation learning has undergone tremendous advances due to improved supervised learning techniques.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, unsupervised learning has the potential to leverage large pools of unlabeled data, and extend these advances to modalities that are otherwise impractical or impossible.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "One principled approach to unsupervised learning is generative probabilistic modeling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Not only do generative probabilistic models have the ability to create novel content, they also have a wide range of reconstruction related applications including inpainting [61,46,59], denoising [3], colorization [71], and super-resolution [9].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "As data of interest are generally high-dimensional and highly structured, the challenge in this domain is building models that are powerful enough to capture its complexity yet still trainable.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We address this challenge by introducing real-valued non-volume preserving (real NVP) transformations, a tractable yet expressive approach to modeling high-dimensional data.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related work",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Substantial work on probabilistic generative models has focused on training models using maximum likelihood.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One class of maximum likelihood models are those described by probabilistic undirected graphs, such as Restricted Boltzmann Machines [58] and Deep Boltzmann Machines [53].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These models are trained by taking advantage of the conditional independence property of their bipartite structure to allow efficient exact or approximate posterior inference on latent variables.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, because of the intractability of the associated marginal distribution over latent variables, their training, evaluation, and sampling procedures necessitate the use of approximations like Mean Field inference and Markov Chain Monte Carlo, whose convergence time for such complex models Data space X Latent space Z",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "\u21d0 Figure 1: Real NVP learns an invertible, stable, mapping between a data distribution pX and a latent distribution p Z (typically a Gaussian).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Here we show a mapping that has been learned on a toy 2-d dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The function f (x) maps samples x from the data distribution in the upper left into approximate samples z from the latent distribution, in the upper right.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This corresponds to exact inference of the latent state given the data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The inverse function, f \u22121 (z), maps samples z from the latent distribution in the lower right into approximate samples x from the data distribution in the lower left.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This corresponds to exact generation of samples from the model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The transformation of grid lines in X and Z space is additionally illustrated for both f (x) and f \u22121 (z).",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Directed graphical models are instead defined in terms of an ancestral sampling procedure, which is appealing both for its conceptual and computational simplicity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They lack, however, the conditional independence structure of undirected models, making exact and approximate posterior inference on latent variables cumbersome [56].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent advances in stochastic variational inference [27] and amortized inference [13,43,35,49], allowed efficient approximate inference and learning of deep directed graphical models by maximizing a variational lower bound on the log-likelihood [45].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Such approximations can be avoided altogether by abstaining from using latent variables.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Autoregressive models [18,6,37,20] can implement this strategy while typically retaining a great deal of flexibility.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This class of algorithms tractably models the joint distribution by decomposing it into a product of conditionals using the probability chain rule according to a fixed ordering over dimensions, simplifying log-likelihood evaluation and sampling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent work in this line of research has taken advantage of recent advances in recurrent networks [51], in particular long-short term memory [26], and residual networks [25,24] in order to learn state-of-the-art generative image models [61,46] and language models [32].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The ordering of the dimensions, although often arbitrary, can be critical to the training of the model [66].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The sequential nature of this model limits its computational efficiency.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, its sampling procedure is sequential and non-parallelizable, which can become cumbersome in applications like speech and music synthesis, or real-time rendering.. Additionally, there is no natural latent representation associated with autoregressive models, and they have not yet been shown to be useful for semi-supervised learning.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model definition",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "In this paper, we will tackle the problem of learning highly nonlinear models in high-dimensional continuous spaces through maximum likelihood.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In order to optimize the log-likelihood, we introduce a more flexible class of architectures that enables the computation of log-likelihood on continuous data using the change of variable formula.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Building on our previous work in [17], we define a powerful class of bijective functions which enable exact and tractable density evaluation and exact and tractable inference.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, the resulting cost function does not to rely on a fixed form reconstruction cost such as square error [38,47], and generates sharper samples as a result.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Also, this flexibility helps us leverage recent advances in batch normalization [31] and residual networks [24,25] to define a very deep multi-scale architecture with multiple levels of abstraction.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Change of variable formula",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "where \u2202f (x) \u2202x T is the Jacobian of f at x. Exact samples from the resulting distribution can be generated by using the inverse transform sampling rule [16].",
+              "tag": "Method"
+            },
+            {
+              "sent": "A sample z \u223c p Z is drawn in the latent space, and its inverse image x = f \u22121 (z) = g(z) generates a sample in the original space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Computing the density on a point x is accomplished by computing the density of its image f (x) and multiplying by the associated Jacobian determinant det \u2202f (x) \u2202x T .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Exact and efficient inference enables the accurate and fast evaluation of the model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A coupling layer applies a simple invertible transformation consisting of scaling followed by addition of a constant offset to one part x 2 of the input vector conditioned on the remaining part of the input vector x 1 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Because of its simple nature, this transformation is both easily invertible and possesses a tractable determinant.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the conditional nature of this transformation, captured by the functions s and t, significantly increase the flexibility of this otherwise weak function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The forward and inverse propagation operations have identical computational cost.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Coupling layers",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "As shown however in [17], by careful design of the function f , a bijective model can be learned which is both tractable and extremely flexible.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As computing the Jacobian determinant of the transformation is crucial to effectively train using this principle, this work exploits the simple observation that the determinant of a triangular matrix can be efficiently computed as the product of its diagonal terms.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Properties",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "Another interesting property of these coupling layers in the context of defining probabilistic models is their invertibility.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Indeed, computing the inverse is no more complex than the forward propagation",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Masked convolution",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Combining coupling layers",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Multi-scale architecture",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Batch normalization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Procedure",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Dataset",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Discussion and conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "In this paper, we have defined a class of invertible functions with tractable Jacobian determinant, enabling exact and tractable log-likelihood evaluation, inference, and sampling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We have shown that this class of generative model achieves competitive performances, both in terms of sample quality and log-likelihood.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Many avenues exist to further improve the functional form of the transformations, for instance by exploiting the latest advances in dilated convolutions [69] and residual networks architectures [60].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "This paper presented a technique bridging the gap between auto-regressive models, variational autoencoders, and generative adversarial networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Like auto-regressive models, it allows tractable and exact log-likelihood evaluation for training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It allows however a much more flexible functional form, similar to that in the generative model of variational autoencoders.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This allows for fast and exact sampling from the model distribution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Like GANs, and unlike variational autoencoders, our technique does not require the use of a fixed form reconstruction cost, and instead defines a cost in terms of higher level features, generating sharper images.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, unlike both variational autoencoders and GANs, our technique is able to learn a semantically meaningful latent space which is as high dimensional as the input space.",
+              "tag": "Other"
+            },
+            {
+              "sent": "This may make the algorithm particularly well suited to semi-supervised learning tasks, as we hope to explore in future work.",
+              "tag": "Other"
+            }
+          ]
+        },
+        {
+          "par_id": 57,
+          "sentences": [
+            {
+              "sent": "The definition of powerful and trainable invertible functions can also benefit domains other than generative unsupervised learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, in reinforcement learning, these invertible functions can help extend the set of functions for which an argmax operation is tractable for continuous Qlearning [23] or find representation where local linear Gaussian approximations are more appropriate [67].",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "C Extrapolation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "D Latent variables semantic",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "E Batch normalization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "F Attribute change",
+      "selected_sentences": []
+    }
+  ],
+  "title": "DENSITY ESTIMATION USING REAL NVP"
+}

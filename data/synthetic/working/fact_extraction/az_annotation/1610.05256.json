@@ -1,0 +1,598 @@
+{
+  "paper_id": "1610.05256",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Conversational speech recognition has served as a flagship speech recognition task since the release of the Switchboard corpus in the 1990s.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we measure the human error rate on the widely used NIST 2000 test set, and find that our latest automated system has reached human parity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The error rate of professional transcribers is 5.9% for the Switchboard portion of the data, in which newly acquainted pairs of people discuss an assigned topic, and 11.3% for the CallHome portion where friends and family members have open-ended conversations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In both cases, our automated system establishes a new state of the art, and edges past the human benchmark, achieving error rates of 5.8% and 11.0%, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The key to our system's performance is the use of various convolutional and LSTM acoustic model architectures, combined with a novel spatial smoothing method and lattice-free MMI acoustic training, multiple recurrent neural network language modeling approaches, and a systematic use of system combination.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recent years have seen human performance levels reached or surpassed in tasks ranging from the games of chess and Go [1,2] to simple speech recognition tasks like carefully read newspaper speech [3] and rigidly constrained smallvocabulary tasks in noise [4,5].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the area of speech recognition, much of the pioneering early work was driven by a series of carefully designed tasks with DARPA-funded datasets publicly released by the LDC and NIST [6]: first simple ones like the \"resource management\" task [7] with a small vocabulary and carefully controlled grammar; then read speech recognition in the Wall Street Journal task [8]; then Broadcast News [9]; each progressively more difficult for automatic systems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One of last big initiatives in this area was in conversational telephone speech (CTS), which is especially difficult due to the spontaneous (neither read nor planned) nature of the speech, its informality, and the self-corrections, hesitations and other disfluencies that are pervasive.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The Switchboard [10] and later Fisher [11] data collections of the 1990s and early 2000s provide what is to date the largest and best studied of the conversational corpora.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The history of work in this area includes key contributions by institutions such as IBM [12], BBN [13], SRI [14], AT&T [15], LIMSI [16], Cambridge University [17], Microsoft [18] and numerous others.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the past, human performance on this task has been widely cited as being 4% [19].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the error rate estimate in [19] is attributed to a \"personal communication,\" and the actual source of this number is ephemeral.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To better understand human performance, we have used professional transcribers to transcribe the actual test sets that we are working with, specifically the CallHome and Switchboard portions of the NIST eval 2000 test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We find that the human error rates on these two parts are different almost by a factor of two, so a single number is inappropriate to cite.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The error rate on Switchboard is about 5.9%, and for CallHome 11.3%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We improve on our recently reported conversational speech recognition system [20] by about 0.4%, and now exceed human performance by a small margin.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our progress is a result of the careful engineering and optimization of convolutional and recurrent neural networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While the basic structures have been well known for a long period [21,22,23,24,25,26,27], it is only recently that they have dominated the field as the best models for speech recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Surprisingly, this is the case for both acoustic modeling [28,29,30,31,32,33] and language modeling [34,35,36,37].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In comparison to the standard feed-forward MLPs or DNNs that first demonstrated breakthrough performance on conversational speech recognition [18], these acoustic models have the ability to model a large amount of acoustic context with temporal invariance, and in the case of convolutional models, with frequency invariance as well.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In language modeling, recurrent models appear to improve over classical N-gram models through the use of an unbounded word history, as well as the generalization ability of continuous word representations [38].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the meantime, ensemble learning has become commonly used in several neural models [39,40,35], to improve robustness by reducing bias and variance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper is an expanded version of [20], with the following additional material: The remainder of this paper describes our system in detail.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Section 2 describes our measurement of human performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Section 3 describes the convolutional neural net (CNN) and long-short-term memory (LSTM) models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Section 4 describes our implementation of i-vector adaptation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Section 5 presents out lattice-free MMI training process.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Language model rescoring is a significant part of our system, and described in Section 6.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We describe the CNTK toolkit that forms the basis of our neural network models in Section 7.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "HUMAN PERFORMANCE",
+      "selected_sentences": [
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "One week, we added the NIST 2000 CTS evaluation data to the work-list, without further comment.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The intention was to measure the error rate of professional transcribers going about their normal everyday business.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Aside from the standard twopass checking in place, we did not do a complex multi-party transcription and adjudication process.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The transcribers were given the same audio segments as were provided to the speech recognition system, which results in short sentences or sentence fragments from a single channel.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This makes the task easier since the speakers are more clearly separated, and more difficult since the two sides of the conversation are not interleaved.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, it is the same condition as reported for our automated systems.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The resulting numbers are 5.9% for the Switchboard portion, and 11.3% for the CallHome portion of the NIST 2000 test set, using the NIST scoring protocol.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These numbers should be taken as an indication of the \"error rate\" of a trained professional working in industry-standard speech transcript production.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "(We have submitted the human transcripts thus produced to the Linguistic Data Consortium for publication, so as to facilitate research by other groups.)",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Past work [41] reports inter-transcriber error rates for data taken from the later RT03 test set (which contains Switchboard and Fisher, but no CallHome data).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Error rates of 4.1 to 4.5% are reported for extremely careful multiple transcriptions, and 9.6% for \"quick transcriptions.\"",
+              "tag": "Result"
+            },
+            {
+              "sent": "While this is a different test set, the numbers are in line with our findings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We note that the bulk of the Fisher training data, and the bulk of the data overall, was transcribed with the \"quick transcription\" guidelines.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, the current state of the art is actually far exceeding the noise level in its own training data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Perhaps the most important point is the extreme variability between the two test subsets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The more informal CallHome data has almost double the human error rate of the Switchboard data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Interestingly, the same informality, multiple speakers per channel, and recording conditions that make CallHome hard for computers make it difficult for people as well.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Notably, the performance of our artificial system aligns almost exactly with the performance of people on both sets.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CNNs",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "LSTMs",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Spatial Smoothing",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "SPEAKER ADAPTIVE MODELING",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "LATTICE-FREE SEQUENCE TRAINING",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "LM RESCORING AND SYSTEM COMBINATION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "RNN-LM setup",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "LSTM-LM setup",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "After obtaining good results with RNNLMs we also explored the LSTM recurrent network architecture for language modeling, inspired by recent work showing gains over RNNLMs for conversational speech recognition [37].",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition to applying the lessons learned from our RNNLM experiments, we explored additional alternatives, as described below.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "5.",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Training data",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "RNN-LM and LSTM-LM performance",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "System Combination",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "In one approach, a greedy forward search then adds systems incrementally to the combination, giving each equal weight.",
+              "tag": "Method"
+            },
+            {
+              "sent": "If no improvement is found with any of the unused systems, we try adding each with successively lower relative weights of 0.5, 0.2, and 0.1, and stop if none of these give an improvement.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A second variant of the search procedure that can give lower error (as measured on the devset) estimates the best system weights for each incremental combination candidate.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The weight estimation is done using an expectation-maximization algorithm based on aligning the reference words to the confusion networks, and maximizing the weighted probability of the correct word at each alignment position.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To avoid overfitting, the weights for an N -way combination are smoothed hi-erarchically, ie, interpolated with the weights from the (N \u2212 1)-way system that preceded it.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This tends to give robust weights that are biased toward the early (ie, better) subsystems.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The final system incorporated a variety of BLSTM models with roughly similar performance, but differing in various metaparameters (number of senones, use of spatial smoothing, and choice of pronunciation dictionaries). 2 To further limit the number of free parameters to be estimated in system combination, we performed system selection in two stages.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, we selected the four best BLSTM systems.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then combined these with equal weights and treated them as a single subsystem in searching for a larger combination including other acoustic models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This yielded our best overall combined system, as reported in Section 8.3.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MICROSOFT COGNITIVE TOOLKIT (CNTK)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Flexible, Terse Model Definition",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Multi-Server Training using 1-bit SGD",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Computational performance",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Speech corpora",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "We train with the commonly used English CTS (Switchboard and Fisher) corpora.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Evaluation is carried out on the NIST 2000 CTS test set, which comprises both Switchboard (SWB) and CallHome (CH) subsets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The waveforms were segmented according to the NIST partitioned evaluation map (PEM) file, with 150ms of dithered silence padding added in the case of the CallHome conversations. 3 The Switchboard-1 portion of the NIST 2002 CTS test set was used for tuning and development.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The acoustic training data is comprised by LDC corpora 97S62, 2004S13, 2005S13, 2004S11 and 2004S09; see [12] for a full description.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Acoustic Model Details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Overall Results and Discussion",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "The performance of all our component models is shown in Table 8, along with the BLSTM combination and full system combination results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "(Recall that the four best BLSTM systems are combined with equal weights first, as described in Section 6.5.)",
+              "tag": "Method"
+            },
+            {
+              "sent": "Key benchmarks from the literature, our own best results, and the measured human error rates are compared in Table 9. 4 All models listed in Table 8 are selected for the combined systems for one or more of the three rescoring LMs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The only exception is the VGG+ResNet system, which combines acoustic senone posteriors from the VGG and ResNet networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While this yields our single best acoustic model, only the individual VGG and ResNet models are used in the overall system combination.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also observe that the four model variants chosen for the combined BLSTM subsystem differ incrementally by one hyperparameter (smooth-ing, number of senones, dictionary), and that the BLSTMs alone achieve an error that is within 3% relative of the full system combination.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This validates the rationale that choosing different hyperparameters is an effective way to obtain complementary systems for combination purposes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also assessed the lower bound of performance for our lattice/Nbest rescoring paradigm.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The 500-best lists from the lattices generated with the ResNet CNN system had an oracle (lowest achievable) WER of 2.7% on the Switchboard portion of the NIST 2000 evaluation set, and an oracle WER of 4.9% on the CallHome portion.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The oracle error of the combined system is even lower (though harder to quantify) since (1) N-best output from all systems are combined and (2) confusion network construction generates new possible hypotheses not contained in the original N-best lists.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "With oracle error rates less than half the currently achieved actual error rates, we conclude that search errors are not a major limiting factor to even better accuracy.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "ERROR ANALYSIS",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "In this section, we compare the errors made by our artificial recognizer with those made by human transcribers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We find that the machine errors are substantially the same as human ones, with one large exception: confusions between backchannel words and hesitations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The distinction is that backchannel words like \"uh-huh\" are an acknowledgment of the also signaling that the speaker should keep talking, while hesitations like \"uh\" are used to indicate that the current speaker has more to say and wants to keep his or her turn. 5",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As turn-management devices, these two classes of words therefore have exactly opposite functions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Table 10 shows the ten most common substitutions for both humans and the artificial system.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Tables 11 and 12 do the same for deletions and insertions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Focusing on the substitutions, we see that by far the most common error in the ASR system is the confusion of a hesitation in the reference for a backchannel in the hypothesis.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "People do not seem to have this problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We speculate that this is due to the nature of the Fisher training corpus, where the \"quick transcription\" guidelines were predominately used [41].",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We find that there is inconsistent treatment of backchannel and hesitation in the resulting data; the relatively poor performance of the automatic system here might simply be due to confusions in the training data annotations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For perspective, there are over twenty-one thousand words in each test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus the errors due to hesitation/backchannel substitutions account for an error rate of only about 0.2% absolute.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The most frequent substitution for people on the Switchboard corpus was mistaking a hesitation in the reference for the word \"hmm.\"",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The scoring guidelines treat \"hmm\" as a word distinct from backchannels and hesitations, so this is not a scoring mistake.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Examination of the contexts in which the error is made show that it is most often intended to acknowledge the other speaker, ie as a backchannel.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For both people and our automated system, the insertion and deletion patterns are similar: short function words are by far the most frequent errors.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In particular, the single most common error made by the transcribers was to omit the word \"I.\"",
+              "tag": "Result"
+            },
+            {
+              "sent": "While we believe further improvement in function and content words is possible, the significance of the remaining backchannel/hesitation confusions is unclear.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 13 shows the overall error rates broken down by substitutions, insertions and deletions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We see that the human transcribers have a somewhat lower substitution rate, and a higher deletion rate.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The relatively higher deletion rate might reflect a human bias to avoid outputting uncertain information, or the productivity demands on a professional transcriber.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In all cases, the number of insertions is relatively small.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RELATION TO PRIOR WORK",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "Compared to earlier applications of CNNs to speech recognition [67,68], our networks are much deeper, and use linear bypass connections across convolutional layers.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "They are similar in spirit to those studied more recently by [31,30,51,32,33].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We improve on these architectures with the LACE model [46], which iteratively expands the effective window size, layer-by-layer, and adds an attention mask to differentially weight distant context.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our spatial regularization technique is similar in spirit to stimulated deep neural networks [69].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Whereas stimulated networks use a supervision signal to encourage locality of activations in the model, our technique is automatic.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our use of lattice-free MMI is distinctive, and extends previous work [12,54] by proposing the use of a mixed triphone/phoneme history in the language model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the language modeling side, we achieve a performance boost by combining multiple LSTMLMs in both forward and backward directions, and by using a two-phase training regimen to get best results from out-of-domain data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For our best CNN system, LSTMLM rescoring yields a relative word error reduction of 23%, and a 20% relative gain for the combined recognition system, considerably larger than previously reported for conversational speech recognition [37].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CONCLUSIONS",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "We have measured the human error rate on NIST's 2000 conversational telephone speech recognition task.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We find that there is a great deal of variability between the Switchboard and CallHome subsets, with 5.8% and 11.0% error rates respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For the first time, we report automatic recognition performance on par with human performance on this task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our system's performance can be attributed to the systematic use of LSTMs for both acoustic and language modeling, as well as CNNs in the acoustic model, and extensive combination of complementary system for both acoustic and language modeling.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "ACHIEVING HUMAN PARITY IN CONVERSATIONAL SPEECH RECOGNITION"
+}

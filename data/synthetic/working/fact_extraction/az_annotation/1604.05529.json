@@ -1,0 +1,450 @@
+{
+  "paper_id": "1604.05529",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Bidirectional long short-term memory (biLSTM) networks have recently proven successful for various NLP sequence modeling tasks, but little is known about their reliance to input representations, target languages, data set size, and label noise.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We address these issues and evaluate biLSTMs with word, character, and unicode byte embeddings for POS tagging.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We compare biLSTMs to traditional POS taggers across languages and data sizes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We also present a novel biLSTM model, which combines the POS tagging loss function with an auxiliary loss function that accounts for rare words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The model obtains state-of-the-art performance across 22 languages, and works especially well for morphologically complex languages.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our analysis suggests that biLSTMs are less sensitive to training data size and label corruptions (at small noise levels) than previously assumed.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recently, bidirectional long short-term memory networks (biLSTM) (Graves and Schmidhuber, 2005;Hochreiter and Schmidhuber, 1997) have been used for language modelling (Ling et al, 2015), POS tagging (Ling et al, 2015;Wang et al, 2015), transition-based dependency parsing Kiperwasser and Goldberg, 2016), fine-grained sentiment analysis (Liu et al, 2015), syntactic chunking (Huang et al, 2015), and semantic role labeling (Zhou and Xu, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "LSTMs are recurrent neural networks (RNNs) in which layers are designed to prevent vanishing gradients.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Bidirectional LSTMs make a backward and forward pass through the sequence before passing on to the next layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For further details, see (Goldberg, 2015;Cho, 2015).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "We consider using biLSTMs for POS tagging.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Previous work on using deep learning-based methods for POS tagging has focused either on a single language (Collobert et al, 2011;Wang et al, 2015) or a small set of languages (Ling et al, 2015;Santos and Zadrozny, 2014).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead we evaluate our models across 22 languages.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, we compare performance with representations at different levels of granularity (words, characters, and bytes).",
+              "tag": "Other"
+            },
+            {
+              "sent": "These levels of representation were previously introduced in different efforts (Chrupa\u0142a, 2013;Zhang et al, 2015;Ling et al, 2015;Santos and Zadrozny, 2014;Gillick et al, 2016;Kim et al, 2015), but a comparative evaluation was missing.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Moreover, deep networks are often said to require large volumes of training data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We investigate to what extent biLSTMs are more sensitive to the amount of training data and label noise than standard POS taggers.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Finally, we introduce a novel model, a biLSTM trained with auxiliary loss.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The model jointly predicts the POS and the log frequency of the word.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The intuition behind this model is that the auxiliary loss, being predictive of word frequency, helps to differentiate the representations of rare and common words.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We indeed observe performance gains on rare and out-of-vocabulary words.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These performance gains transfer into general improvements for morphologically rich languages.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Contributions",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "In this paper, we a) evaluate the effectiveness of different representations in biLSTMs, b) compare these models across a large set of languages and under varying conditions (data size, label noise) and c) propose a novel biLSTM model with auxiliary loss (LOGFREQ).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "arXiv:1604.05529v3 [cs.CL] 21 Jul 2016",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "2 Tagging with biLSTMs Recurrent neural networks (RNNs) (Elman, 1990) allow the computation of fixed-size vector representations for word sequences of arbitrary length.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "An RNN is a function that reads in n vectors x 1 , ..., x n and produces an output vector h n , that depends on the entire sequence x 1 , ..., x n .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The vector h n is then fed as an input to some classifier, or higher-level RNNs in stacked/hierarchical models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The entire network is trained jointly such that the hidden representation captures the important information from the sequence for the prediction task.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Our basic biLSTM tagging model is a context biLSTM taking as input word embeddings w.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We incorporate subtoken information using an hierarchical biLSTM architecture (Ling et al, 2015;.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compute subtokenlevel (either characters c or unicode byte b) embeddings of words using a sequence biLSTM at the lower level.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This representation is then concatenated with the (learned) word embeddings vector w which forms the input to the context biLSTM at the next layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This model, illustrated in Figure 1 (lower part in left figure), is inspired by .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also test models in which we only keep sub-token information, eg, either both byte and character embeddings (Figure 1, right) or a single (sub-)token representation alone.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our novel model, cf Figure 1 left, we train the biLSTM tagger to predict both the tags of the sequence, as well as a label that represents the log frequency of the token as estimated from the training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our combined cross-entropy loss is now: L( \u0177t , y t ) + L( \u0177a , y a ), where t stands for a POS tag and a is the log frequency label, ie, a = int(log(f req train (w)).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Combining this log frequency objective with the tagging task can be seen as an instance of multi-task learning in which the labels are predicted jointly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The idea behind this model is to make the representation predictive for frequency, which encourages the model to not share representations between common and rare words, thus benefiting the handling of rare tokens.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "All biLSTM models were implemented in CNN/pycnn, 1 a flexible neural network library.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For all models we use the same hyperparameters, which were set on English dev, ie, SGD training with cross-entropy loss, no mini-batches, 20 epochs, default learning rate (0.1), 128 dimensions for word embeddings, 100 for character and byte embeddings, 100 hidden states and Gaussian noise with \u03c3=0.2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As training is stochastic in nature, we use a fixed seed throughout.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Embeddings are not initialized with pre-trained embeddings, except when reported otherwise.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In that case we use offthe-shelf polyglot embeddings (AlRfou et al, 2013). 2 No further unlabeled data is considered in this paper.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The code is released at: https: //github.com/bplank/bilstm-aux",
+              "tag": "Method"
+            },
+            {
+              "sent": "Taggers We want to compare POS taggers under varying conditions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We hence use three different types of taggers: our implementation of a biLSTM; TNT (Brants, 2000)-a second order HMM with suffix trie handling for OOVs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use TNT as it was among the best performing taggers evaluated in Horsmann et al (2015). 3",
+              "tag": "Method"
+            },
+            {
+              "sent": "We complement the NN-based and HMM-based tagger with a CRF tagger, using a freely available implementation (Plank et al, 2014) based on crfsuite.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Our results are given in Table 2. First of all, notice that TNT performs remarkably well across the 22 languages, closely followed by CRF.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The biLSTM tagger ( w) without lower-level biLSTM for subtokens falls short, outperforms the traditional taggers only on 3 languages. projects/polyglot 3 They found TreeTagger was closely followed by HunPos, a re-implementation of TnT, and Stanford and ClearNLP were lower ranked.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In an initial investigation, we compared Tnt, HunPos and TreeTagger and found Tnt to be consistently better than Treetagger, Hunpos followed closely but crashed on some languages (eg, Arabic).",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, note that these results are not strictly comparable as they use the earlier UD v1.1 version.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The overall best system is the multi-task biLSTM FREQBIN (it uses w + c and POLYGLOT initialization for w).",
+              "tag": "Result"
+            },
+            {
+              "sent": "While on macro average it is on par with biLSTM w + c, it obtains the best results on 12/22 languages, and it is successful in predicting POS for OOV tokens (cf",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 2 OOV ACC columns), especially for languages like Arabic, Farsi, Hebrew, Finnish.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Rare words",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "WSJ Accuracy",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "The biLSTM model performs already surprisingly well after only 500 training sentences.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For nonIndoeuropean languages it is on par and above the other taggers with even less data (100 sentences).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This shows that the biLSTMs often needs more data than the generative markovian model, but this is definitely less than what we expected.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "Label Noise We investigated the susceptibility of the models to noise, by artificially corrupting training labels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our initial results show that at low noise rates, biLSTMs and TNT are affected similarly, their accuracies drop to a similar degree.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Only at higher noise levels (more than 30% corrupted labels), biLSTMs are less robust, showing higher drops in accuracy compared to TNT.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is the case for all investigated language families.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "Character embeddings were first introduced by Sutskever et al (2011) for language modeling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Early applications include text classification (Chrupa\u0142a, 2013;Zhang et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, these representations were successfully applied to a range of structured prediction tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For POS tagging, Santos and Zadrozny (2014) were the first to propose character-based models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They use a convolutional neural network (CNN; or convnet) and evaluated their model on English (PTB) and Portuguese, showing that the model achieves state-of-the-art performance close to taggers using carefully designed feature templates.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Ling et al (2015) extend this line and compare a novel biLSTM model, learning word representations through character embeddings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They evaluate their model on a language modeling and POS tagging setup, and show that biLSTMs outperform the CNN approach of Santos and Zadrozny (2014).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similarly, Labeau et al (2015) evaluate character embeddings for German.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "BiLSTMs for POS tagging are also reported in Wang et al (2015), however, they only explore word embeddings, orthographic information and evaluate on WSJ only.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A related study is Cheng et al (2015) who propose a multi-task RNN for named entity recognition by jointly predicting the next token and current token's name label.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our model is simpler, it uses a very coarse set of labels rather then integrating an entire language modeling task which is computationally more expensive.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "An interesting recent study is Gillick et al (2016), they build a single byte-to-span model for multiple languages based on a sequence-to-sequence RNN (Sutskever et al, 2014) achieving impressive results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We would like to extend this work in their direction.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "We evaluated token and subtoken-level representations for neural network-based part-of-speech tagging across 22 languages and proposed a novel multi-task biLSTM with auxiliary loss.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The auxiliary loss is effective at improving the accuracy of rare words.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Subtoken representations are necessary to obtain a state-of-the-art POS tagger, and character embeddings are particularly helpful for nonIndoeuropean and Slavic languages.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "Combining them with word embeddings in a hierarchical network provides the best representation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The biLSTM tagger is as effective as the CRF and HMM taggers with already as little as 500 training sentences, but is less robust to label noise (at higher noise rates).",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Multilingual Part-of-Speech Tagging with Bidirectional Long Short-Term Memory Models and Auxiliary Loss"
+}

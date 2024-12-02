@@ -1,0 +1,496 @@
+{
+  "paper_id": "1604.04112",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Very deep convolutional neural networks introduced new problems like vanishing gradient and degradation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The recent successful contributions towards solving these problems are Residual and Highway Networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These networks introduce skip connections that allow the information (from the input or those learned in earlier layers) to flow more into the deeper layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These very deep models have lead to a considerable decrease in test errors, on benchmarks like ImageNet and COCO.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose the use of exponential linear unit instead of the combination of ReLU and Batch Normalization in Residual Networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We show that this not only speeds up learning in Residual Networks but also improves the accuracy as the depth increases.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It improves the test error on almost all data sets, like CIFAR-10 and CIFAR-100.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "The Vision Community has been mesmerized by the effectiveness of deep convolutional neural networks (CNNs) [13] that have led to a breakthrough in computer visionrelated problems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hence, there has been a notable shift towards CNNs in many areas of computer vision [12,14,15,16,17].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Convolutional neural networks were popularized through AlexNet [10] in 2009 and their much celebrated victory at the 2012 ImageNet competiton [11,12].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "After that, there have been several attempts at building deeper and deeper CNNs like the VGG network and GoogLeNet in 2014 which have 19 and 22 layers respectively [15,17].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But, very deep models introduce problems like vanishing and exploding gradients [3], which hamper their convergence.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "The vanishing gradient problem is trivial in very deep networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During the backpropagation phase, the gradients are computed by the chain rule.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Multiplication of small numbers in the chain rule leads to an exponential decrease in the gradient.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Due to this, very deep networks learn very slowly.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Sometimes, the gradient in the earlier layer gets larger because derivatives of some activation functions can take larger values.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This leads to the problem of exploding gradient.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These problems have been reduced in practice through normalized initialization [3] and most recently, Batch Normalization [4].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Exponential linear unit (ELU) [9] also reduces the vanishing gradient problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "ELUs introduce negative values which push the mean activation towards zero.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This reduces the bias shift and speeds up learning.",
+              "tag": "Result"
+            },
+            {
+              "sent": "ELUs give better accuracy and learning speed-up compared to the combination of ReLU [8] and Batch Normalization [4].",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "After reducing the vanishing/exploding gradient problem, the networks start converging.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the accuracy degrades in such very deep models [1].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The most recent contributions towards solving this problem are Highway Networks [7] and Residual Networks [1].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These networks introduce skip connections, which allow information flow into the deeper layers and enable us to have deeper networks with better accuracy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The 152-layer ResNet outperforms all other models [1].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose to use exponential linear unit instead of the combination of ReLU and Batch Normalization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since exponential linear units reduce the vanishing gradient problem and give better accuracy compared to the combination of ReLU and Batch Normalization, we use it in our model to further increase the accuracy of Residual Networks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also notice that ELU speeds up learning in very deep networks as well.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that our model increases the accuracy on datasets like CIFAR-10 and CIFAR-100, compared to the original model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is seen that as the depth increases, the difference in accuracy between our model and the original model increases.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Background",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Deeper neural networks are very difficult to train.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The vanishing/exploding gradients problem impedes the convergence of deeper networks [3].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This problem has been solved by normalized initialization [3,5,6].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A notable recent contribution towards reducing the vanishing gradients problem is Batch Normalization [4].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead of normalized initialization and keeping a lower learning rate, Batch Normalization makes normalization a part of the model and performs it for Once the deeper networks start converging, a degradation problem occurs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Due to this, the accuracy degrades rapidly after it is saturated.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The training error increases as we add more layers to a deep model, as mentioned in [2].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To solve this problem, several authors introduced skip connections to improve the information flow across several layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Highway Networks [7] have parameterized skip connections, known as information highways, which allow information to flow unimpeded into deeper layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During the training phase, the skip connection parameters are adjusted to control the amount of information allowed on these highways.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Residual Networks (ResNets) [1] utilize shortcut connections with the help of identity transformation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unlike Highway Networks, these neither introduce extra parameter nor computation complexity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This improves the accuracy of deeper networks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "With increasing depth, ResNets give better function approximation capabilities as they gain more parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The authors' hypothesis is that the plain deeper networks give worse function approximation because the gradients vanish when they are propagated through many layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To fix this problem, they introduce skip connections to the network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Formally, If the output of i th layer is H i and F represents multiple convolutional transformation from layer i \u2212 1 to i, we obtain",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "where id(\u2022) represents the identity function and ReLU [8] is the default activation function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 1 illustrates the basic building block of a Residual Network which consists of multiple convolutional and Batch Normalization layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The identity transformation, id(\u2022) is used to reduce the dimensions of H i\u22121 to match those of F(H i\u22121 ).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Residual Networks, the gradients and features learned in earlier layers are passed back and forth between the layers via the identity transformations id(\u2022).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Exponential Linear Unit (ELU) [9] alleviates the vanishing gradient problem and also speeds up learning in deep neural networks which leads to higher classification accuracies.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The exponential linear unit (ELU) is",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "ResNet Architecture",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "ResNet with ELU",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "In comparison with the ResNet model [1], we use Exponential Linear Unit (ELU) in place of a combination of ReLU with Batch Normalization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 3 illustrates our different experiments with ELUs in ResBlock.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conv-ELU-Conv-ELU",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "ELU-Conv-ELU-Conv",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conv-ELU-Conv-BN and ELU after Addition",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "The Batch Normalization layer reduces the exploding gradient problem found in the previous two models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We found that this model gives better accuracy for 20-layer model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, as we increased the depth of the network, the accuracy degrades for the deeper models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "If the ELU activation function is placed after addtion, then the mean activation of the output pushes towards zero.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, this forces each skip connection to perturb the output.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This has a harmful effect and we found that this leads to degradation of accuracy in very deep ResNets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Figure 4 depicts the effects of including ELU after addition in this ResBlock.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conv-ELU-Conv-BN and No ELU after Addition",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "This is the basic building block for all our experiments on CIFAR-10 and CIFAR-100 datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show that not including ELU after addition does not degrade the accuracy, unlike the previous model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This ResBlock improves the learning behavior and the classification performance of the Residual Network.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "We empirically demonstrate the effectiveness of our model on a series of benchmark data sets: CIFAR-10 and CIFAR-100.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiments, we compare the learning behavior and the classification performance of both the models on the CIFAR-10 and CIFAR-100 datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The experiments prove that our model outperforms the original ResNet model in terms of learning behavior and classification performance on both the datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, we compare the classification performance of our model with other previously published state-of-the-art models.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CIFAR-10 Analysis",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "The first experiment was performed on the CIFAR-10 dataset [10], which consists of 50k training images and 10k test images in 10 classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiments, we performed training on the training set and evaluation on the test set.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Classification Performance",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "Figure 6 illustrates the comparison of classification performance between our model and the original one on CIFAR-10 dataset for 20, 32, 44, 56 and 110 layers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe that for the 20-layer model, the test error is nearly the same for both the models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "But, as the depth increases, our model significantly outperforms the original model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 1 shows the test error for both the models from the epoch with the lowest validation error.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Figure 6 shows that the gap between the test error of the two models increases as the depth is also increased.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CIFAR-100 Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "In this paper, we introduce Residual Networks with exponential linear units which learn faster than the current Residual Networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They also give better accuracy than the original ones when the depth is increased.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On datasets like CIFAR-10 and CIFAR-100, we improve beyond the current state-of-the-art in terms of test error, while also learning faster than these models using ELUs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "ELUs push the mean activations towards zero as they introduce small negative values.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This reduces the bias shift and increases the learning speed.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our experiments show that not only does our model have superior learning behavior, but it also provides better accuracy as compared to the current model on CIFAR-10 and CIFAR-100 datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This enables the researchers to use very deep models and also increase their learning behavior and classification performance at the same time.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Deep Residual Networks with Exponential Linear Unit"
+}

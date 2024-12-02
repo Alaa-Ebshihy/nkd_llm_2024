@@ -1,0 +1,601 @@
+{
+  "paper_id": "1802.05577",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We present a novel deep learning architecture to address the natural language inference (NLI) task.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Existing approaches mostly rely on simple reading mechanisms for independent encoding of the premise and hypothesis.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead, we propose a novel dependent reading bidirectional LSTM network (DRBiLSTM) to efficiently model the relationship between a premise and a hypothesis during encoding and inference.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We also introduce a sophisticated ensemble strategy to combine our proposed models, which noticeably improves final predictions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, we demonstrate how the results can be improved further with an additional preprocessing step.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our evaluation shows that DRBiLSTM obtains the best single model and ensemble model results achieving the new state-of-the-art scores on the Stanford NLI dataset.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recognizing Textual Entailment, or RTE) is an important and challenging task for natural language understanding (MacCartney and Manning, 2008).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The goal of NLI is to identify the logical relationship (entailment, neutral, or contradiction) between a premise and a corresponding hypothesis.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Table 1 shows few example relationships from the Stanford Natural Language Inference (SNLI) dataset (Bowman et al, 2015).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "H b",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Table 1: Examples from the SNLI dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Various deep learning models have been proposed that achieve successful results for this task (Gong et al, 2017;Wang et al, 2017;Chen et al, 2017;Yu and Munkhdalai, 2017a;Parikh et al, 2016;Zhao et al, 2016;Sha et al, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most of these existing NLI models use attention mechanism to jointly interpret and align the premise and hypothesis.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such models use simple reading mechanisms to encode the premise and hypothesis independently.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, such a complex task require explicit modeling of dependency relationships between the premise and the hypothesis during the encoding and inference processes to prevent the network from the loss of relevant, contextual information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we refer to such strategies as dependent reading.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "There are some alternative reading mechanisms available in the literature (Sha et al, 2016;Rockt\u00e4schel et al, 2015) that consider dependency aspects of the premise-hypothesis relationships.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, these mechanisms have two major limitations:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "We propose a dependent reading bidirectional LSTM (DRBiLSTM) model to address these limitations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given a premise u and a hypothesis v, our model first encodes them considering dependency on each other (u|v and v|u).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Next, the model employs a soft attention mechanism to extract relevant information from these encodings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The augmented sentence representations are then passed to the inference stage, which uses a similar dependent reading strategy in both directions, ie u \u2192 v and v \u2192 u.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, a decision is made through a multi-layer perceptron (MLP) based on the aggregated information.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Our experiments on the SNLI dataset show that DRBiLSTM achieves the best single model and ensemble model performance obtaining improvements of a considerable margin of 0.4% and 0.3% over the previous state-of-the-art single and ensemble models, respectively.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Furthermore, we demonstrate the importance of a simple preprocessing step performed on the SNLI dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Evaluation results show that such preprocessing allows our single model to achieve the same accuracy as the state-of-the-art ensemble model and improves our ensemble model to outperform the state-of-the-art ensemble model by a remarkable margin of 0.7%.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we perform an extensive analysis to clarify the strengths and weaknesses of our models.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Early studies use small datasets while leveraging lexical and syntactic features for NLI (MacCartney and Manning, 2008).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The recent availability of large-scale annotated datasets (Bowman et al, 2015;Williams et al, 2017) has enabled researchers to develop various deep learning-based architectures for NLI.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Parikh et al (2016) propose an attention-based model (Bahdanau et al, 2014) that decomposes the NLI task into sub-problems to solve them in parallel.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They further show the benefit of adding intra-sentence attention to input representations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Chen et al (2017) explore sequential inference models based on chain LSTMs with attentional input encoding and demonstrate the effectiveness of syntactic information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also use similar attention mechanisms.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, our model is distinct from these models as they do not benefit from dependent reading strategies.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Rockt\u00e4schel et al (2015) use a word-by-word neural attention mechanism while Sha et al (2016) propose re-read LSTM units by considering the dependency of a hypothesis on the information of its premise (v|u) to achieve promising results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, these models suffer from weak inferencing methods by disregarding the dependency aspects from the opposite direction (u|v).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Intuitively, when a human judges a premise-hypothesis relationship, s/he might consider back-and-forth reading of both sentences before coming to a conclusion.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, it is essential to encode the premise-hypothesis dependency relations from both directions to optimize the understanding of their relationship.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Wang et al (2017) propose a bilateral multiperspective matching (BiMPM) model, which resembles the concept of matching a premise and hypothesis from both directions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Their matching strategy is essentially similar to our attention mechanism that utilizes relevant information from the other sentence for each word sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They use similar methods as Chen et al (2017) for encoding and inference, without any dependent reading mechanism.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Although NLI is well studied in the literature, the potential of dependent reading and interaction between a premise and hypothesis is not rigorously explored.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we address this gap by proposing a novel deep learning model (DRBiLSTM).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Experimental results demonstrate the effectiveness of our model.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Input Encoding",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "The proposed encoding mechanism yields a richer representation for both premise and hypothesis by taking the history of each other into account.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using a max or average pooling over the independent and dependent readings does not further improve our model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This was expected since dependent reading produces more promising and relevant encodings.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Attention",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Inference",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Classification",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Dataset",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experimental Setup",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Ensemble Strategy",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "The main intuition behind this design is that the effectiveness of a model may depend on the complexity of a premise-hypothesis instance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For a simple instance, a simple model could perform better than a complex one, while a complex instance may need further consideration toward disambiguation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Consequently, using models with different rounds of dependent readings in the encoding stage should be beneficial.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Preprocessing",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "We perform a trivial preprocessing step on SNLI to recover some out-of-vocabulary words found in the development set and test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that our vocabulary contains all words that are seen in the training set, so there is no out-of-vocabulary word in it.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The SNLI dataset is not immune to human errors, specifically, misspelled words.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We noticed that misspelling is the main reason for some of the observed out-of-vocabulary words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Consequently, we simply fix the unseen misspelled words using Microsoft spell-checker (other approaches like edit distance can also be used).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, while dealing with an unseen word during evaluation, we try to: 1) replace it with its lower case, or 2) split the word when it contains a \"-\" (eg",
+              "tag": "Claim"
+            },
+            {
+              "sent": "\"marsh-like\") or starts with \"un\" (eg",
+              "tag": "Claim"
+            },
+            {
+              "sent": "If we still could not find the word in our vocabulary, we consider it as an unknown word.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the next subsection, we demonstrate the importance and impact of such trivial preprocessing (see Section B in the Appendix for additional details).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "Table 2 shows the accuracy of the models on training and test sets of SNLI.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first row represents a baseline classifier presented by Bowman et al (2015) that utilizes handcrafted features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All other listed models are deep-learning based.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The gap between the traditional model and deep learning models demonstrates the effectiveness of deep learning methods for this task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also report the estimated human performance on the SNLI dataset, which is the average accuracy of five annotators in comparison to the gold labels (Gong et al, 2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is noteworthy that recent deep learning models surpass the human performance in the NLI task.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "To further enhance the modeling of interaction between the premise and hypothesis for efficient disambiguation of their relationship, we introduce the dependent reading strategy in our proposed DRBiLSTM model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results demonstrate the effectiveness of our model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "DRBiLSTM (Single) achieves 88.5% accuracy on the test set which is noticeably the best reported result among the existing single models for this task.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that the difference between DRBiLSTM and Chen et al ( 2017) is statistically significant with a p-value of  (Bowman et al, 2015) 83.9% 80.6% (Vendrov et al, 2015) 98.8% 81.4% (Mou et al, 2016) 83.3% 82.1% (Bowman et al, 2016) 89.2% 83.2% (Liu et al, 2016b) 84.5% 84.2% (Yu and Munkhdalai, 2017a) 86.2% 84.6% (Rockt\u00e4schel et al, 2015) 85.3% 83.5% (Wang and Jiang, 2016) 92.0% 86.1% (Liu et al, 2016a) 88.5% 86.3% (Parikh et al, 2016) 90.5% 86.8% (Yu and Munkhdalai, 2017b) 88.5% 87.3% (Sha et al, 2016) 90.7% 87.5% (Wang et al, 2017)   achieves the accuracy of 89.3%, the best result observed on SNLI, while DRBiLSTM (Single) obtains the accuracy of 88.5%, which considerably outperforms the previous non-ensemble models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Also, utilizing a trivial preprocessing step yields to further improvements of 0.4% and 0.3% for single and ensemble DRBiLSTM models respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "< 0.001 over the Chi-square test 1 .",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "To further improve the performance of NLI systems, researchers have built ensemble models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Previously, ensemble systems obtained the best performance on SNLI with a huge margin.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 2 shows that our proposed single model achieves competitive results compared to these reported ensemble models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our ensemble model considerably outperforms the current state-of-the-art by obtaining 89.3% accuracy.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Up until this point, we discussed the performance of our models where we have not considered preprocessing for recovering the out-ofvocabulary words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Table 2, \"DRBiLSTM (Single) + Process\", and \"DRBiLSTM (Ensem.)",
+              "tag": "Method"
+            },
+            {
+              "sent": "+ Process\" represent the performance of our models on the preprocessed dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can see that our preprocessing mechanism leads to further improvements of 0.4% and 0.3% on the SNLI test set for our single and ensemble models respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In fact, our single model (\"DRBiLSTM (Single) + Process\") obtains the state-of-the-art performance over both reported single and ensemble models by performing a simple preprocessing step.",
+              "tag": "Result"
+            },
+            {
+              "sent": "+ Process\" outperforms the existing state-of-the-art remarkably (0.7% improvement).",
+              "tag": "Method"
+            },
+            {
+              "sent": "For more comparison and analyses, we use \"DRBiLSTM (Single)\" and \"DRBiLSTM (Ensemble)\" as our single and ensemble models in the rest of the paper.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Ablation and Configuration Study",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Analysis",
+      "selected_sentences": [
+        {
+          "par_id": 61,
+          "sentences": [
+            {
+              "sent": "Table 4 shows the frequency of aforementioned annotation tags in the SNLI test set along with the performance (accuracy) of ESIM (Chen et al, 2017), DRBiLSTM (Single), and DRBiLSTM (Ensemble).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Table 4 can be divided into four major categories: 1) gold label data, 2) word overlap, 3) sentence length, and 4) occurrence of special words.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can see that DRBiLSTM (Ensemble) performs the best in all categories which matches our expectation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, DRBiLSTM (Single) performs noticeably better than ESIM in most of the categories except \"Entailment\", \"High Overlap\", and \"Long Sentence\", for which our model is not far behind (gaps of 0.2%, 0.5%, and 0.9%, respectively).",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is noteworthy that DRBiLSTM   (Single) performs better than ESIM in more frequent categories.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Specifically, the performance of our model in \"Neutral\", \"Negation\", and \"Quantifier\" categories (improvements of 1.4%, 3.5%, and 1.9%, respectively) indicates the superiority of our model in understanding and disambiguating complex samples.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our investigations indicate that ESIM generates somewhat uniform attention for most of the word pairs while our model could effectively attend to specific parts of the given sentences and provide more meaningful attention.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In other words, the dependent reading strategy enables our model to achieve meaningful representations, which leads to better attention to obtain further gains on such categories like Negation and Quantifier sentences (see Section C in the Appendix for additional details).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 63,
+          "sentences": [
+            {
+              "sent": "We propose a novel natural language inference model (DRBiLSTM) that benefits from a dependent reading strategy and achieves the state-of-theart results on the SNLI dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We also introduce a sophisticated ensemble strategy and illustrate its effectiveness through experimentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, we demonstrate the importance of a simple preprocessing step on the performance of our proposed models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Evaluation results show that the preprocessing step allows our DRBiLSTM (single) model to outperform all previous single and ensemble methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Similar superior performance is also observed for our DRBiLSTM (ensemble) model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that our ensemble model outperforms the existing state-of-the-art by a considerable margin of 0.7%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, we perform an extensive analysis to demonstrate the strength and weakness of the proposed model, which would pave the way for further improvements in this domain.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A Ensemble Strategy Study",
+      "selected_sentences": [
+        {
+          "par_id": 67,
+          "sentences": [
+            {
+              "sent": "\u2022 DRBiLSTM (with 1 round of dependent reading): same configuration as DRBiLSTM, but we do not use dependent reading during the inference process.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In other words, we use p = p and q = q instead of Equations 10 and 11 in the paper respectively.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 71,
+          "sentences": [
+            {
+              "sent": "We should note that our weighted averaging ensemble strategy performs better than the majority voting method in both development set and test set of SNLI, which indicates the effectiveness of our approach.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, our method could show more consistent behavior for training and test sets when we increased the number of models (see our observations, averaging the probability distributions fails to improve the development set accuracy using two and three models, so we did not study it further.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "B Preprocessing Study",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "C Category Study",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "D Attention Study",
+      "selected_sentences": []
+    }
+  ],
+  "title": "DR-BiLSTM: Dependent Reading Bidirectional LSTM for Natural Language Inference"
+}

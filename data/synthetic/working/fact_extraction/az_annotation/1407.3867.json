@@ -1,0 +1,443 @@
+{
+  "paper_id": "1407.3867",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Semantic part localization can facilitate fine-grained categorization by explicitly isolating subtle appearance differences associated with specific object parts.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Methods for pose-normalized representations have been proposed, but generally presume bounding box annotations at test time due to the difficulty of object detection.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We propose a model for fine-grained categorization that overcomes these limitations by leveraging deep convolutional features computed on bottom-up region proposals.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our method learns whole-object and part detectors, enforces learned geometric constraints between them, and predicts a fine-grained category from a pose-normalized representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments on the CaltechUCSD bird dataset confirm that our method outperforms state-of-the-art fine-grained categorization methods in an end-to-end evaluation without requiring a bounding box at test time.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "The problem of visual fine-grained categorization can be extremely challenging due to the subtle differences in the appearance of certain parts across related categories.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast to basic-level recognition, fine-grained categorization aims to distinguish between different breeds or species or product models, and often requires distinctions that must be conditioned on the object pose for reliable identification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Facial recognition is the classic case of fine-grained recognition, and it is noteworthy that the best facial recognition methods jointly discover facial landmarks and extract features from those locations.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Localizing the parts in an object is therefore central to establishing correspondence between object instances and discounting object pose variations and camera view position.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Previous work has investigated part-based approaches to this problem [7,16,30,44,47,22].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The bottleneck for many pose-normalized representations is indeed accurate part localization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The Poselet [8] and DPM [17] methods have previously been utilized to obtain part localizations with a modest degree of success; methods generally report adequate part localization only when given a known bounding box at test time [11,20,36,37,43].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By developing a novel deep part detection scheme, we propose an end-to-end fine grained categorization system which requires no knowledge of object bounding box at test time, and can achieve performance rivaling previously reported methods requiring the ground truth bounding box at test time to filter false positive detections.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The recent success of convolutional networks, like [27], on the ImageNet Challenge [23] has inspired further work on applying deep convolutional features to related image classification [14] and detection tasks [21].",
+              "tag": "Method"
+            },
+            {
+              "sent": "In [21], Girshick et al achieved breakthrough performance on object detection by applying the CNN of [27] to a set of bottom-up candidate region proposals [41], boosting PASCAL detection performance by over 30% compared to the previous best methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Independently, OverFeat [38] proposed localization using a CNN to regress to object locations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the progress of leveraging deep convolutional features is not limited to basic-level object detection.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In many applications such as fine-grained recognition, attribute recognition, pose estimation, and others, reasonable predictions demand accurate part localization.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose a part localization model which overcomes the limitations of previous fine-grained recognition systems by leveraging deep convolutional features computed on bottom-up region proposals.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our method learns part appearance models and enforces geometric constraints between parts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "An overview of our method is shown in Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We have investigated different geometric constraints, including a non-parametric model of joint part locations conditioned on nearest neighbors in semantic appearance space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We present state-of-the-art results evaluating our approach on the widely used fine-grained benchmark CaltechUCSD bird dataset [42].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Part-based models for detection and pose localization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Fine-grained categorization",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Several approaches are based on detecting and extracting features from certain parts of objects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Farrell et al [16] proposed a pose-normalized representation using poselets [8].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Deformable part models [17] were used in [37,48] for part localization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Based on the work of localizing fiducial landmarks on faces [6], Liu et al [31] proposed an exemplar-based geometric method to detect dog faces and extract highly localized image features from keypoints to differentiate dog breeds.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, Berg et al [7] learned a set of highly discriminative intermediate features by learning a descriptor for each pair of keypoints.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, in [30], the authors extend the non-parametric exemplar-based method of [6] by enforcing pose and subcategory consistency.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Yao et al [45] and Yang et al [44] have investigated template matching methods to reduce the cost of sliding window approaches.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent work by G\u00f6ring et al [22] transfers part annotations from objects with similar global shape as non-parametric part detections.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "All these part-based methods, however, require the ground truth bounding box at test time for part localization or keypoint prediction.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "Human-in-the-loop methods [9,13,15] ask a human to name attributes of the object, click on certain parts or mark the most discriminative regions to improve classification accuracy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Segmentation-based approaches are also very effective for fine-grained recognition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Approaches such as [11,20,36,37,43] used region-level cues to infer the foreground segmentation mask and to discard the noisy visual information in the background.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Chai et al [10] showed that jointly learning part localization and foreground segmentation together can be beneficial for finegrained categorization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similar to most previous part-based approaches, these efforts require the ground truth bounding box to initialize the segmentation seed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast, the aim of our work is to perform end-to-end fine-grained categorization with no knowledge at test time of the ground truth bounding box.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our part detectors use convolutional features on bottom-up region proposals, together with learned non-parametric geometric constraints to more accurately localize object parts, thus enabling strong fine-grained categorization.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "We first present results on the standard fine-grained categorization task associated with the CaltechUCSD birds dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first set of results in Table 1 are achieved in the setting where the ground truth bounding box for the entire bird is known at test time, as most state-of-art methods assume, making the categorization task somewhat easier.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In this setting, our part-based method with the local non-parametric geometric constraint \u03b4 N P works the best without fine-tuning, achieving 68.1% classification accuracy without fine-tuning.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finetuning improves this result by a large margin, to over 76%.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare our results against three state-of-the-art baseline approaches with results assuming the ground truth bounding box at test time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use deep convolutional features as the authors of [14], but they use a HOG-based DPM as their part localization method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The increase in performance is likely due to better part localization (see Table 4).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Oracle method uses the ground truth bounding box and part annotations for both training and test time.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "The second set of results is in the less artificial setting where the bird bounding box is unknown at test time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Most of the literature on this dataset doesn't report performance in this more difficult, but more realistic setting.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Fine-grained categorization results on CUB200-2011 bird dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "-ft means extracting deep features from finetuned CNN models using each semantic part.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Oracle method uses the ground truth bounding box and part annotations for both training and test time.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Convolutional networks",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Most recently, generic object detection methods have begun to leverage deep CNNs and outperformed any competing approaches based on traditional features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "OverFeat [38] uses a CNN to regress to object locations in a coarse sliding-window detection framework.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Of particular inspiration to our work is the RCNN method [21] which leverages features from a deep CNN in a region proposal framework to achieve unprecedented object detection results on the PASCAL VOC dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our method generalizes RCNN by applying it to model object parts in addition to whole objects, which our empirical results will demonstrate is essential for accurate fine-grained recognition.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Part-based R-CNNs",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "While [21] demonstrated the effectiveness of the RCNN method on a generic object detection task (PASCAL VOC), it did not explore the application of this method to simultaneous localization and fine-grained recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Because our work operates in this regime, we extend RCNN to detect objects and localize their parts under a geometric prior.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With hypotheses for the locations of individual semantic parts of the object of interest (eg, the location of the head for an animal class), it becomes reasonable to model subtle appearance differences which tend to appear in locations that are roughly fixed with respect to these parts.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "In the RCNN method, for a particular object category, a candidate detection x with CNN feature descriptor \u03c6(x) is assigned a score of w 0 \u03c6(x), where w 0 is the learned vector of SVM weights for the object category.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our method, we assume a strongly supervised setting (eg, [3]) in which at training time we have ground truth bounding box annotations not only for full objects, but for a fixed set of semantic parts {p 1 , p 2 , ..., p n } as well.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Given these part annotations, at training time all objects and each of their parts are initially treated as independent object categories: we train a one-versusall linear SVM on feature descriptors extracted over region proposals, where regions with \u2265 0.7 overlap with a ground truth object or part bounding box are labeled as positives for that object or part, and regions with \u2264 0.3 overlap with any ground truth region are labeled as negatives.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence for a single object category we learn whole-object (\"root\") SVM weights w 0 and part SVM weights {w 1 , w 2 , ..., w n } for parts {p 1 , p 2 , ..., p n } respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At test time, for each region proposal window we compute scores from all root and part SVMs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Of course, these scores do not incorporate any knowledge of how objects and their parts are constrained geometrically; for example, without any additional constraints the bird head detector may fire outside of a region where the bird detector fires.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence our final joint object and part hypotheses are computed using the geometric scoring function detailed in the following section, which enforces the intuitively desirable property that pose predictions are consistent with the statistics of poses observed at training time.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Geometric constraints",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "In this section, we present a comparative performance evaluation of our proposed method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we conduct experiments on the widely-used fine-grained benchmark CaltechUCSD birds dataset [42] (CUB200-2011).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The classification task is to discriminate among 200 species of birds, and is challenging for computer vision systems due to the high degree of similarity between categories.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It contains 11,788 images of 200 bird species.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each image is annotated with its bounding box and the image coordinates of fifteen keypoints: the beak, back, breast, belly, forehead, crown, left eye, left leg, left wing, right eye, right leg, right wing, tail, nape and throat.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We train and test on the splits included with the dataset, which contain around 30 training samples for each species.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following the protocol of [48], we use two semantic parts for the bird dataset: head and body.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Part localization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Component Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "We have proposed a system for joint object detection and part localization capable of state-of-the-art fine-grained object recognition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our method learns detectors and part models and enforces learned geometric constraints between parts and with the object frame.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our experimental results demonstrate that even with a very strong feature representation and object detection system, it is highly beneficial to additionally model an object's pose by means of parts for the difficult task of fine-grained discrimination between categories with high semantic similarity.",
+              "tag": "Other"
+            },
+            {
+              "sent": "In future extensions of this work, we will consider methods which jointly model at training time the object category and each of its parts and deformation costs.",
+              "tag": "Other"
+            },
+            {
+              "sent": "We also plan to explore the weakly supervised setting in which we automatically discover and model parts as latent variables from only the object bounding box annotations.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Finally, we will consider relaxing the use of selective search for smaller parts and employing dense window sampling.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Part-based R-CNNs for Fine-grained Category Detection"
+}

@@ -1,0 +1,574 @@
+{
+  "paper_id": "1511.07122",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "State-of-the-art models for semantic segmentation are based on adaptations of convolutional networks that had originally been designed for image classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, dense prediction problems such as semantic segmentation are structurally different from image classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we develop a new convolutional network module that is specifically designed for dense prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The presented module uses dilated convolutions to systematically aggregate multiscale contextual information without losing resolution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The architecture is based on the fact that dilated convolutions support exponential expansion of the receptive field without loss of resolution or coverage.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show that the presented context module increases the accuracy of state-of-the-art semantic segmentation systems.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition, we examine the adaptation of image classification networks to dense prediction and show that simplifying the adapted network can increase accuracy.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Many natural problems in computer vision are instances of dense prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The goal is to compute a discrete or continuous label for each pixel in the image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A prominent example is semantic segmentation, which calls for classifying each pixel into one of a given set of categories (He et al, 2004;Shotton et al, 2009;Kohli et al, 2009;Kr\u00e4henb\u00fchl & Koltun, 2011).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Semantic segmentation is challenging because it requires combining pixel-level accuracy with multi-scale contextual reasoning (He et al, 2004;Galleguillos & Belongie, 2010).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Significant accuracy gains in semantic segmentation have recently been obtained through the use of convolutional networks (LeCun et al, 1989) trained by backpropagation (Rumelhart et al, 1986).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, Long et al (2015) showed that convolutional network architectures that had originally been developed for image classification can be successfully repurposed for dense prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These reporposed networks substantially outperform the prior state of the art on challenging semantic segmentation benchmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This prompts new questions motivated by the structural differences between image classification and dense prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Which aspects of the repurposed networks are truly necessary and which reduce accuracy when operated densely?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Can dedicated modules designed specifically for dense prediction improve accuracy further?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Modern image classification networks integrate multi-scale contextual information via successive pooling and subsampling layers that reduce resolution until a global prediction is obtained (Krizhevsky et al, 2012;Simonyan & Zisserman, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast, dense prediction calls for multiscale contextual reasoning in combination with full-resolution output.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent work has studied two approaches to dealing with the conflicting demands of multi-scale reasoning and full-resolution dense prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One approach involves repeated up-convolutions that aim to recover lost resolution while carrying over the global perspective from downsampled layers (Noh et al, 2015;Fischer et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This leaves open the question of whether severe intermediate downsampling was truly necessary.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another approach involves providing multiple rescaled versions of the image as input to the network and combining the predictions obtained for these multiple inputs (Farabet et al, 2013;Lin et al, 2015;Chen et al, 2015b).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Again, it is not clear whether separate analysis of rescaled input images is truly necessary.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this work, we develop a convolutional network module that aggregates multi-scale contextual information without losing resolution or analyzing rescaled images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The module can be plugged into existing architectures at any resolution.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Unlike pyramid-shaped architectures carried over from image classification, the presented context module is designed specifically for dense prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is a rectangular prism of convolutional layers, with no pooling or subsampling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The module is based on dilated convolutions, which support exponential expansion of the receptive field without loss of resolution or coverage.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "As part of this work, we also re-examine the performance of repurposed image classification networks on semantic segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The performance of the core prediction modules can be unintentionally obscured by increasingly elaborate systems that involve structured prediction, multi-column architectures, multiple training datasets, and other augmentations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We therefore examine the leading adaptations of deep image classification networks in a controlled setting and remove vestigial components that hinder dense prediction performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The result is an initial prediction module that is both simpler and more accurate than prior adaptations.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Using the simplified prediction module, we evaluate the presented context network through controlled experiments on the Pascal VOC 2012 dataset (Everingham et al, 2010).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The experiments demonstrate that plugging the context module into existing semantic segmentation architectures reliably increases their accuracy.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "DILATED CONVOLUTIONS",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Our architecture is motivated by the fact that dilated convolutions support exponentially expanding receptive fields without losing resolution or coverage.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let F 0 , F 1 , . . .",
+              "tag": "Claim"
+            },
+            {
+              "sent": ", F n\u22121 : Z 2 \u2192 R be discrete functions and let k 0 , k 1 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", k n\u22122 : \u2126 1 \u2192 R be discrete 3\u00d73 filters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Consider applying the filters with exponentially increasing dilation:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Define the receptive field of an element p in F i+1 as the set of elements in F 0 that modify the value of F i+1 (p).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let the size of the receptive field of p in F i+1 be the number of these elements.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is 1 Some recent work mistakenly referred to the dilated convolution operator itself as the algorithme \u00e0 trous.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The algorithme \u00e0 trous applies a filter at multiple scales to produce a signal decomposition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The algorithm uses dilated convolutions, but is not equivalent to the dilated convolution operator itself. easy to see that the size of the receptive field of each element in",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MULTI-SCALE CONTEXT AGGREGATION",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "The context module is designed to increase the performance of dense prediction architectures by aggregating multi-scale contextual information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The module takes C feature maps as input and produces C feature maps as output.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The input and output have the same form, thus the module can be plugged into existing dense prediction architectures.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "The basic context module has 7 layers that apply 3\u00d73 convolutions with different dilation factors.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dilations are 1, 1, 2, 4, 8, 16, and 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each convolution operates on all layers: strictly speaking, these are 3\u00d73\u00d7C convolutions with dilation in the first two dimensions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each of these convolutions is followed by a pointwise truncation max(\u2022, 0).",
+              "tag": "Method"
+            },
+            {
+              "sent": "A final layer performs 1\u00d71\u00d7C convolutions and produces the output of the module.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The architecture is summarized in Table 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that the frontend module that provides the input to the context network in our experiments produces feature maps at 64\u00d764 resolution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We therefore stop the exponential expansion of the receptive field after layer 6.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "where a is the index of the input feature map and b is the index of the output map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is a form of identity initialization, which has recently been advocated for recurrent networks (Le et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This initialization sets all filters such that each layer simply passes the input directly to the next.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A natural concern is that this initialization could put the network in a mode where backpropagation cannot significantly improve the default behavior of simply passing information through.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, experiments indicate that this is not the case.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Backpropagation reliably harvests the contextual information provided by the network to increase the accuracy of the processed maps.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This completes the presentation of the basic context network.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our experiments show that even this basic module can increase dense prediction accuracy both quantitatively and qualitatively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is particularly notable given the small number of parameters in the network: \u2248 64C 2 parameters in total.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "FRONT END",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "We implemented and trained a front-end prediction module that takes a color image as input and produces C = 21 feature maps as output.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The front-end module follows the work of Long et al (2015) and Chen et al (2015a), but was implemented separately.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adapted the VGG-16 network (Simonyan & Zisserman, 2015) for dense prediction and removed the last two pooling and striding layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, each of these pooling and striding layers was removed and convolutions in all subsequent layers were dilated by a factor of 2 for each pooling layer that was ablated.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus convolutions in the final layers, which follow both ablated pooling layers, are dilated by a factor of 4. This enables initialization with the parameters of the original classification network, but produces higher-resolution output.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The front-end module takes padded images as input and produces feature maps at resolution 64 \u00d7 64.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use reflection padding: the buffer zone is filled by reflecting the image about each edge.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "Our front-end module is obtained by removing vestiges of the classification network that are counterproductive for dense prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Most significantly, we remove the last two pooling and striding layers entirely, whereas Long et al kept them and Chen et al replaced striding by dilation but kept the pooling layers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We found that simplifying the network by removing the pooling layers made it more accurate.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also remove the padding of the intermediate feature maps.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Intermediate padding was used in the original classification network, but is neither necessary nor justified in dense prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This simplified prediction module was trained on the Pascal VOC 2012 training set, augmented by the annotations created by Hariharan et al (2011).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We did not use images from the VOC-2012 validation set for training and therefore only used a subset of the annotations of Hariharan et al (2011).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Training was performed by stochastic gradient descent (SGD) with mini-batch size 14, learning rate 10 \u22123 , and momentum 0.9.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network was trained for 60K iterations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "EXPERIMENTS",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "Table 3 shows the effect of adding the context module to three different architectures for semantic segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first architecture (top) is the front end described in Section 4. It performs semantic segmentation without structured prediction, akin to the original work of Long et al (2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second architecture (Table 3, middle) uses the dense CRF to perform structured prediction, akin to the system of Chen et al (2015a).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the implementation of Kr\u00e4henb\u00fchl & Koltun (2011) and train the CRF parameters by grid search on the validation set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The third architecture (Table 3, bottom) uses the CRFRNN for structured prediction (Zheng et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the implementation of Zheng et al (2015) and train the CRFRNN in each condition.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "The experimental results demonstrate that the context module improves accuracy in each of the three configurations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The basic context module increases accuracy in each configuration.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The large context module increases accuracy by a larger margin.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The experiments indicate that the context module and structured prediction are synergisic: the context module increases accuracy with or without subsequent structured prediction.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Qualitative results are shown in Figure 3.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CONCLUSION",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "We have examined convolutional network architectures for dense prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since the model must produce high-resolution output, we believe that high-resolution operation throughout the network  Table 3: Controlled evaluation of the effect of the context module on the accuracy of three different architectures for semantic segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments performed on the VOC-2012 validation set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Validation images were not used for training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Top: adding the context module to a semantic segmentation front end with no structured prediction (Long et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The basic context module increases accuracy, the large module increases it by a larger margin.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Middle: the context module increases accuracy when plugged into a front-end + dense CRF configuration (Chen et al, 2015a).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Bottom: the context module increases accuracy when plugged into a front-end + CRFRNN configuration (Zheng et al, 2015). is both feasible and desirable.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our work shows that the dilated convolution operator is particularly suited to dense prediction due to its ability to expand the receptive field without losing resolution or coverage.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We have utilized dilated convolutions to design a new network structure that reliably increases accuracy when plugged into existing semantic segmentation systems.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As part of this work, we have also shown that the accuracy of existing convolutional networks for semantic segmentation can be increased by removing vestigial components that had been developed for image classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 4: Evaluation on the VOC-2012 test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "'DeepLab++' stands for DeepLabCRFCOCOLargeFOV and 'DeepLabMSc++' stands for DeepLabMScCRFLargeFOVCOCOCrossJoint (Chen et al, 2015a).",
+              "tag": "Method"
+            },
+            {
+              "sent": "'CRFRNN' is the system of Zheng et al (2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "'Context' refers to the large context module plugged into our front end.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The context network yields very high accuracy, ourperforming the DeepLab++ architecture without performing structured prediction.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Combining the context network with the CRFRNN structured prediction module increases the accuracy of the CRFRNN system.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "State-of-the-art systems for semantic segmentation leave significant room for future advances.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Failure cases of our most accurate configuration are shown in Figure 4. We will release our code and trained models to support progress in this area.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "APPENDIX A URBAN SCENE UNDERSTANDING",
+      "selected_sentences": []
+    }
+  ],
+  "title": "MULTI-SCALE CONTEXT AGGREGATION BY DILATED CONVOLUTIONS"
+}

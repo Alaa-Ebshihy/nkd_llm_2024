@@ -1,0 +1,506 @@
+{
+  "paper_id": "1606.07947",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Neural machine translation (NMT) offers a novel alternative formulation of translation that is potentially simpler than statistical approaches.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However to reach competitive performance, NMT models need to be exceedingly large.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper we consider applying knowledge distillation approaches (Bucila et  al., 2006;Hinton et al, 2015) that have proven successful for reducing the size of neural models in other domains to the problem of NMT.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We demonstrate that standard knowledge distillation applied to word-level prediction can be effective for NMT, and also introduce two novel sequence-level versions of knowledge distillation that further improve performance, and somewhat surprisingly, seem to eliminate the need for beam search (even when applied on the original teacher model).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our best student model runs 10 times faster than its state-of-the-art teacher with little loss in performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is also significantly better than a baseline model trained without knowledge distillation: by 4.2/1.7 BLEU with greedy decoding/beam search.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Applying weight pruning on top of knowledge distillation results in a student model that has 13\u00d7 fewer parameters than the original teacher model, with a decrease of 0.4 BLEU.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Neural machine translation (NMT) (Kalchbrenner and Blunsom, 2013;Cho et al, 2014;Sutskever et al, 2014;Bahdanau et al, 2015) is a deep learningbased method for translation that has recently shown promising results as an alternative to statistical ap-proaches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "NMT systems directly model the probability of the next word in the target sentence simply by conditioning a recurrent neural network on the source sentence and previously generated target words.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "While both simple and surprisingly accurate, NMT systems typically need to have very high capacity in order to perform well: Sutskever et al ( 2014) used a 4-layer LSTM with 1000 hidden units per layer (herein 4\u00d71000) and Zhou et al (2016) obtained state-of-the-art results on English \u2192 French with a 16-layer LSTM with 512 units per layer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The sheer size of the models requires cutting-edge hardware for training and makes using the models on standard setups very challenging.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This issue of excessively large networks has been observed in several other domains, with much focus on fully-connected and convolutional networks for multi-class classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Researchers have particularly noted that large networks seem to be necessary for training, but learn redundant representations in the process (Denil et al, 2013).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore compressing deep models into smaller networks has been an active area of research.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As deep learning systems obtain better results on NLP tasks, compression also becomes an important practical issue with applications such as running deep learning models for speech and translation locally on cell phones.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Existing compression methods generally fall into two categories: (1) pruning and (2) knowledge distillation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Pruning methods (LeCun et al, 1990;He et al, 2014;Han et al, 2016), zero-out weights or entire neurons based on an importance criterion: LeCun et al (1990) use (a diagonal approximation to) the Hessian to identify weights whose removal minimally impacts the objective function, while Han et al (2016) remove weights based on thresholding their absolute values.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Knowledge distillation approaches (Bucila et al, 2006;Ba and Caruana, 2014;Hinton et al, 2015) learn a smaller student network to mimic the original teacher network by minimizing the loss (typically L 2 or cross-entropy) between the student and teacher output.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In this work, we investigate knowledge distillation in the context of neural machine translation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We note that NMT differs from previous work which has mainly explored non-recurrent models in the multiclass prediction setting.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For NMT, while the model is trained on multi-class prediction at the word-level, it is tasked with predicting complete sequence outputs conditioned on previous decisions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With this difference in mind, we experiment with standard knowledge distillation for NMT and also propose two new versions of the approach that attempt to approximately match the sequence-level (as opposed to word-level) distribution of the teacher network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This sequence-level approximation leads to a simple training procedure wherein the student network is trained on a newly generated dataset that is the result of running beam search with the teacher network.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "We run experiments to compress a large state-ofthe-art 4 \u00d7 1000 LSTM model, and find that with sequence-level knowledge distillation we are able to learn a 2 \u00d7 500 LSTM that roughly matches the performance of the full system.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We see similar results compressing a 2 \u00d7 500 model down to 2 \u00d7 100 on a smaller data set.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, we observe that our proposed approach has other benefits, such as not requiring any beam search at test-time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As a result we are able to perform greedy decoding on the 2 \u00d7 500 model 10 times faster than beam search on the 4 \u00d7 1000 model with comparable performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our student models can even be run efficiently on a standard smartphone. 1 Finally, we apply weight pruning on top of the student network to obtain a model that has 13\u00d7 fewer parameters than the original teacher model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We have released all the code for the models described in this paper.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We generally assume that the teacher has previously been trained, and that we are estimating parameters for the student.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Knowledge distillation suggests training by matching the student's predictions to the teacher's predictions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For classification this usually means matching the probabilities either via L 2 on the log scale (Ba and Caruana, 2014) or by crossentropy (Li et al, 2014;Hinton et al, 2015).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Knowledge Distillation for NMT",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "The large sizes of neural machine translation systems make them an ideal candidate for knowledge distillation approaches.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section we explore three different ways this technique can be applied to NMT.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Word-Level Knowledge Distillation",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "NMT systems are trained directly to minimize word NLL, L WORDNLL , at each position.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore if we have a teacher model, standard knowledge distillation for multi-class cross-entropy can be applied.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We define this distillation for a sentence as,",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Sequence-Level Knowledge Distillation",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Word-level knowledge distillation allows transfer of these local word distributions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Ideally however, we would like the student model to mimic the teacher's actions at the sequence-level.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The sequence distribution is particularly important for NMT, because wrong predictions can propagate forward at testtime.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "Using the mode seems like a poor approximation for the teacher distribution q(t | s), as we are approximating an exponentially-sized distribution with a single sample.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, previous results showing the effectiveness of beam search decoding for NMT lead us to belief that a large portion of q's mass lies in a single output sequence.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In fact, in experiments we find that with beam of size 1, q(\u0177 | s) (on average) accounts for 1.3% of the distribution for German \u2192 English, and 2.3% for Thai \u2192 English (Table 1: p(t = \u0177)). 5 o summarize, sequence-level knowledge distillation suggests to: (1) train a teacher model, (2) run beam search over the training set with this model, (3) train the student network with cross-entropy on this new dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Step (3) is identical to the word-level NLL process except now on the newly-generated data set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is shown in Figure 1 (center).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Sequence-Level Interpolation",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "As an alternative, we propose a single-sequence approximation that is more attractive in this setting.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This approach is inspired by local updating (Liang et al, 2006), a method for discriminative training in statistical machine translation (although to our knowledge not for knowledge distillation).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Local updating suggests selecting a training sequence which is close to y and has high probability under the teacher model,",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experimental Setup",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Sequence-Level Knowledge Distillation (Seq-KD)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results and Discussion",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "Sequence-level interpolation (SeqInter), in addition to improving models trained via WordKD and SeqKD, also improves upon the original teacher model that was trained on the actual data but finetuned towards SeqInter data (Baseline + SeqInter).",
+              "tag": "Result"
+            },
+            {
+              "sent": "In fact, greedy decoding with this fine-tuned model has similar performance (19.6) as beam search with the original model (19.5), allowing for faster decoding even with an identically-sized model.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "We hypothesize that sequence-level knowledge distillation is effective because it allows the student network to only model relevant parts of the teacher distribution (ie around the teacher's mode) instead of 'wasting' parameters on trying to model the entire  space of translations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our results suggest that this is indeed the case: the probability mass that SeqKD models assign to the approximate mode is much higher than is the case for baseline models trained on original data (Table 1: p(t = \u0177)).",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, on English \u2192 German the (approximate) argmax for the 2 \u00d7 500 SeqKD model (on average) accounts for 16.9% of the total probability mass, while the corresponding number is 0.9% for the baseline.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "Finally, although past work has shown that models with lower perplexity generally tend to have higher BLEU, our results indicate that this is not necessarily the case.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The perplexity of the baseline 2 \u00d7 500 English \u2192 German model is 8.2 while the perplexity of the corresponding SeqKD model is 22.7, despite the fact that SeqKD model does significantly better for both greedy (+4.2 BLEU) and beam search (+1.4 BLEU) decoding.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Decoding Speed",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "Run-time complexity for beam search grows linearly with beam size.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, the fact that sequencelevel knowledge distillation allows for greedy decoding is significant, with practical implications for running NMT systems across various devices.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To test the speed gains, we run the teacher/student models on GPU, CPU, and smartphone, and check the average number of source words translated per second (Table 2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use a GeForce GTX Titan X for GPU and a Samsung Galaxy 6 smartphone.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We find that we can run the student model 10 times faster with greedy decoding than the teacher model with beam search on GPU (1051.3 vs 101.9 words/sec), with similar performance.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Weight Pruning",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "Although knowledge distillation enables training faster models, the number of parameters for the student models is still somewhat large (Table 1: Params), due to the word embeddings which dominate most of the parameters. 10",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, on the  2 \u00d7 500 English \u2192 German model the word embeddings account for approximately 63% (50m out of 84m) of the parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The size of word embeddings have little impact on run-time as the word embedding layer is a simple lookup table that only affects the first layer of the model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We therefore focus next on reducing the memory footprint of the student models further through weight pruning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Weight pruning for NMT was recently investigated by See et al (2016), who found that up to 80 \u2212 90% of the parameters in a large NMT model can be pruned with little loss in performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We take our best English \u2192 German student model (2 \u00d7 500 SeqKD + SeqInter) and prune x% of the parameters by removing the weights with the lowest absolute values.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then retrain the pruned model on SeqKD data with a learning rate of 0.2 and fine-tune towards SeqInter data with a learning rate of 0.1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As observed by See et al (2016), retraining proved to be crucial.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results are shown in Table 3.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "Our findings suggest that compression benefits achieved through weight pruning and knowledge distillation are orthogonal. 11",
+              "tag": "Result"
+            },
+            {
+              "sent": "Pruning 80% of the weight in the 2 \u00d7 500 student model results in a model with 13\u00d7 fewer parameters than the original teacher model with only a decrease of 0.4 BLEU.",
+              "tag": "Result"
+            },
+            {
+              "sent": "While pruning 90% of the weights results in a more appreciable decrease of 1.0 BLEU, the model is drastically smaller with 8m parameters, which is 26\u00d7 fewer than the original teacher model.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Further Observations",
+      "selected_sentences": [
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "\u2022 For models trained with word-level knowledge distillation, we also tried regressing the student network's top-most hidden layer at each time step to the teacher network's top-most hidden layer as a pretraining step, noting that Romero et al ( 2015) obtained improvements with a similar technique on feed-forward models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We found this to give comparable results to standard knowledge distillation and hence did not pursue this further.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "Compressing deep learning models is an active area of current research.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Pruning methods involve pruning weights or entire neurons/nodes based on some criterion.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "LeCun et al (1990) prune weights based on an approximation of the Hessian, while Han et al (2016) show that a simple magnitude-based pruning works well.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Prior work on removing neurons/nodes include Srinivas and Babu (2015) and Mariet and Sra (2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "See et al (2016) were the first to apply pruning to Neural Machine Translation, observing that that different parts of the architecture (input word embeddings, LSTM matrices, etc) admit different levels of pruning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Knowledge distillation approaches train a smaller student model to mimic a larger teacher model, by minimizing the loss between the teacher/student predictions (Bucila et al, 2006;Ba and Caruana, 2014;Li et al, 2014;Hinton et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Romero et al (2015)  Other approaches for compression involve low rank factorizations of weight matrices (Denton et al, 2014;Jaderberg et al, 2014;Lu et al, 2016;Prabhavalkar et al, 2016), sparsity-inducing regularizers (Murray and Chiang, 2015), binarization of weights (Courbariaux et al, 2016;Lin et al, 2016), and weight sharing (Chen et al, 2015;Han et al, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Finally, although we have motivated sequence-level knowledge distillation in the context of training a smaller model, there are other techniques that train on a mixture of the model's predictions and the data, such as local updating (Liang et al, 2006), hope/fear training (Chiang, 2012), SEARN (Daum\u00e9 III et al, 2009), DAgger (Ross et al, 2011), and minimum risk training (Och, 2003;Shen et al, 2016).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "In this work we have investigated existing knowledge distillation methods for NMT (which work at the word-level) and introduced two sequence-level variants of knowledge distillation, which provide improvements over standard word-level knowledge distillation.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Sequence-Level Knowledge Distillation"
+}

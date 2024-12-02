@@ -1,0 +1,699 @@
+{
+  "paper_id": "1808.01558",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Facial landmarks are highly correlated with each other since a certain landmark can be estimated by its neighboring landmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most of the existing deep learning methods only use one fully-connected layer called shape prediction layer to estimate the locations of facial landmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose a novel deep learning framework named MultiCenter Learning with multiple shape prediction layers for face alignment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, each shape prediction layer emphasizes on the detection of a certain cluster of semantically relevant landmarks respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Challenging landmarks are focused firstly, and each cluster of landmarks is further optimized respectively.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, to reduce the model complexity, we propose a model assembling method to integrate multiple shape prediction layers into one shape prediction layer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Extensive experiments demonstrate that our method is effective for handling complex occlusions and appearance variations with real-time performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The code for our method is available at https://github.com/ZhiwenShao/MCNetExtension.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "I. INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Face alignment refers to detecting facial landmarks such as eye centers, nose tip, and mouth corners.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is the preprocessor stage of many face analysis tasks like face animation [1], face beautification [2], and face recognition [3].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A robust and accurate face alignment is still challenging in unconstrained scenarios, owing to severe occlusions and large appearance variations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most conventional methods [4], [5], [6], [7] only use low-level handcrafted features and are not based on the prevailing deep neural networks, which limits their capacity to represent highly complex faces.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Each facial landmark is not isolated but highly correlated with adjacent landmarks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown in Figure 1(a), facial landmarks along the chin are all occluded, and landmarks around the mouth are partially occluded.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Figure 1(b) shows that landmarks on the right side of face are almost invisible.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, In this work 1 , we propose a novel deep learning framework named MultiCenter Learning (MCL) to exploit the strong correlations among landmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, our network uses multiple shape prediction layers to predict the locations of landmarks, and each shape prediction layer emphasizes on the detection of a certain cluster of landmarks respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By weighting the loss of each landmark, challenging landmarks are focused firstly, and each cluster of landmarks is further optimized respectively.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, to decrease the model complexity, we propose a model assembling method to integrate multiple shape prediction layers into one shape prediction layer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The entire framework reinforces the learning process of each landmark with a low model complexity.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "\u2022 We propose a novel multi-center learning framework for exploiting the strong correlations among landmarks.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "\u2022 Extensive experiments demonstrate that our method is effective for handling complex occlusions and appearance variations with real-time performance.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "II. RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "We review researches from three aspects related to our method: conventional face alignment, unconstrained face alignment, face alignment via deep learning.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A. Conventional Face Alignment",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B. Unconstrained Face Alignment",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Large pose variations and severe occlusions are major challenges in unconstrained environments.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unconstrained face alignment methods are based on 3D models or deal with occlusions explicitly.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "There are several occlusion-free face alignment methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "BurgosArtizzu et al [6] developed a Robust Cascaded Pose Regression (RCPR) method to detect occlusions explicitly, and uses shape-indexed features to regress the shape increment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Yu et al [23] utilizes a Bayesian model to merge the estimation results from multiple regressors, in which each regressor is trained to localize facial landmarks with a specific pre-defined facial part being occluded.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Wu et al [24] proposed a Robust Facial Landmark Detection (RFLD) method, which uses a robust cascaded regressor to handle complex occlusions and large head poses.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To improve the performance of occlusion estimation, landmark visibility probabilities are estimated with an explicit occlusion constraint.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Different from these methods, our method is not based on 3D models and does not process occlusions explicitly.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "C. Face Alignment via Deep Learning",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Sun et al [8] estimated the locations of 5 facial landmarks using Cascaded Convolutional Neural Networks (Cascaded CNN), in which each level computes averaged estimated shape and the shape is refined level by level.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Zhou et al [9] used multi-level deep networks to detect facial landmarks from coarse to fine.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similarly, Zhang et al [10] proposed Coarse-toFine Auto-encoder Networks (CFAN).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These methods all use multi-stage deep networks to localize landmarks in a coarse-tofine manner.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead of using cascaded networks, Honari et al [25] proposed Recombinator Networks (RecNet) for learning coarse-to-fine feature aggregation with multi-scale input maps, where each branch extracts features based on current maps and the feature maps of coarser branches.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "III. MULTI-CENTER LEARNING FOR FACE ALIGNMENT A. Network Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": ", x 0 = 1 corresponds to the bias, and \u03a6 S (\u2022) is a composite function of operations including convolution, BN, ReLU, and pooling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Traditionally, only one shape prediction layer is used, which limits the performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In contrast, our MCL uses multiple shape prediction layers, each of which emphasizes on the detection of a certain cluster of landmarks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first several layers are shared by multiple shape prediction layers, which are called shared layers forming the composite function \u03a6 S (\u2022).",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the i-th shape prediction layer )\u00d72n is used to connect the feature x, where m and n are the number of shape prediction layers and landmarks, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The reason why we train each shape prediction layer to predict n landmarks instead of one cluster of landmarks is that different facial parts have correlations, as shown in Figure 1.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "To decrease the model complexity, we use a model assembling function \u03a6 a (\u2022) to integrate multiple shape prediction layers into one shape prediction layer, which is formulated as",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "B. Learning Algorithm",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "The overview of our learning algorithm is shown in Algorithm 1. \u2126 t and \u2126 v are the training set and the validation Algorithm 1 MultiCenter Learning Algorithm.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Input: A network MCL, \u2126 t , \u2126 v , initialized \u0398. Output: \u0398. 1: Pre-train shared layers and one shape prediction layer until convergence; 2: Fix the parameters of the first six convolutional layers and fine-tune subsequent layers until convergence; 3: Fine-tune all the layers until convergence; 4: for i = 1 to m do 5:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "n respectively, which are averaged over all the images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The landmarks with larger errors than remaining landmarks are treated as challenging landmarks.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "2) MultiCenter FineTuning and Model Assembling: The face is partitioned into seven parts according to its semantic structure: left eye, right eye, nose, mouth, left contour, chin, and right contour.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 3, different labeling patterns of 5, 29, and 68 facial landmarks are partitioned into 4, 5, and 7 clusters respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the i-th shape prediction layer, the i-th cluster of landmarks are treated as the optimized center, and the set of indexes of remaining landmarks is denoted as Q i .",
+              "tag": "Method"
+            },
+            {
+              "sent": "From Steps 4 to 6, the parameters of shared layers \u0398 S are fixed, and each shape prediction layer is initialized with the parameters of the shape prediction layer of WM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When finetuning the i-th shape prediction layer, the weights of landmarks in P i and Q i are defined as",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "where \u03b1 1 is a coefficient to make the i-th shape prediction layer emphasize on the detection of the i-th cluster of landmarks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The constraint between u P i and u Q i is formulated as",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "Although the landmarks in P i are mainly optimized, remaining landmarks are still considered with very small weights rather than zero.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This is beneficial for utilizing implicit structural correlations of different facial parts and searching the solutions smoothly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This stage is called multi-center finetuning which learns multiple shape prediction layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Step 7, multiple shape prediction layers are assembled into one shape prediction layer by Eq. 2. With this model assembling stage, our method learns an assembling model (AM).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "There is no increase of model complexity in the assembling process, so AM has a low computational cost.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "It improves the detection precision of each facial landmark by integrating the advantage of each shape prediction layer.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "where \u03b7 is the learning rate.",
+              "tag": "Method"
+            },
+            {
+              "sent": "If the j-th landmark is given a larger weight, its corresponding parameters will be updated with a larger step towards the optimal solution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, weighting the loss of each landmark ensures that the landmarks with larger weights are mainly optimized.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our method first uses the weighting fine-tuning stage to optimize challenging landmarks, and further uses the multi-center fine-tuning stage to optimize each cluster of landmarks respectively.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "B. Comparison with State-of-the-Art Methods",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "Table I reports the results of our method and previous works on three benchmarks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our method MCL outperforms most of the state-of-the-art methods, especially on AFLW dataset where a relative error reduction of 3.93% is achieved compared to RecNet.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Cascaded CNN estimates the location of each 2 The result is acquired by running the code at https://github.com/seetaface/SeetaFaceEngine/tree/master/FaceAlignment. landmark separately in the second and third level, and every two networks are used to detect one landmark.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is difficult to be extended to dense landmarks owing to the explosion of the number of networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "TCDCN relies on outside training data for auxiliary facial attribute recognition, which limits the universality.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It can be seen that MCL outperforms Cascaded CNN and TCDCN on all the benchmarks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, MCL is robust to occlusions with the performance on par with RFLD, benefiting from utilizing semantical correlations among different landmarks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "RecNet and RAR show significant results, but their models are very complex with high computational costs.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "We compare with other methods on several challenging images from AFLW and COFW respectively in Figure 4. Our method MCL indicates higher accuracy in the details than previous works.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More examples on challenging IBUG are presented in Figure 5. MCL demonstrates a superior capability of handling severe occlusions and complex variations of pose, expression, illumination.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The CED curves of MCL and several state-of-the-art methods are shown in Figure 6.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is observed that MCL achieves competitive performance on all three benchmarks.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Method",
+      "selected_sentences": [
+        {
+          "par_id": 57,
+          "sentences": [
+            {
+              "sent": "The average running speed of deep learning methods for detecting 68 facial landmarks are presented in Table II.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Except for the methods tested on the i5-6200U 2.3GHz CPU, other methods are reported with the results in the original papers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since CFAN utilizes multiple networks, it costs more running time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "RAR achieves only 4 FPS on a TitanZ GPU, which cannot be applied to practical scenarios.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Both TCDCN and our method MCL are based on only one network, so they show higher speed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our method only takes 17.5 ms per face on a single core i5-6200U 2.3GHz CPU.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This profits from low model complexity and computational costs of our network.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "It can be concluded that our method is able to be extended to real-time facial landmark tracking in unconstrained environments.",
+              "tag": "Result"
+            },
+            {
+              "sent": "[13], the last maxpooling layer and the D-dimensional fully-connected layer are replaced with a convolutional layer and a Global Average Pooling layer [14].",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results of the mean error of BM and the previous version (preBM) [13] are shown in Table III.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It can be seen that BM performs better on IBUG and  COFW but worse on AFLW than preBM.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It demonstrates that Global Average Pooling is more advantageous for more complex problems with more facial landmarks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "There are higher requirements for learned features when localizing more facial landmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For simple problems especially for localizing 5 landmarks of AFLW, a plain network with full connection is more prone to being trained.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "\u2022 refers to rounding down to the nearest integer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Figure 7 shows the variations of mean error of WM with the increase of \u03b4.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When \u03b4 is 0.4, WM can still achieves good performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Therefore, weighting the loss of each landmark is robust to random perturbations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Even if different weights are obtained, the results will not be affected as long as the relative sizes of weights are identical.",
+              "tag": "Method"
+            },
+            {
+              "sent": "3) Analysis of Shape Prediction Layers: Our method learns each shape prediction layer respectively with a certain cluster of landmarks being emphasized.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results of WM and two shape prediction layers with respect to the left eye and the right eye on IBUG benchmark are shown in Table IV.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared to WM, the left eye model and the right eye model both reduce the alignment errors of their corresponding clusters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As a result, the assembled AM can improve the detection accuracy of landmarks of the left eye and the right eye on the basis of WM.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "Note that the two models also improve the localization precision of other clusters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Taking the left eye model as an example, it additionally reduces the errors of landmarks of right eye, mouth, and chin, which is due to the correlations among different facial parts.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, for the right eye cluster, the right eye model improves the accuracy more significantly than the left eye model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It can be concluded that each shape prediction layer emphasizes on the corresponding cluster respectively.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "D. MCL for Partially Occluded Faces",
+      "selected_sentences": [
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "The correlations among different facial parts are very useful for face alignment especially for partially occluded faces.",
+              "tag": "Result"
+            },
+            {
+              "sent": "To  Table VII shows the mean error results for the left eye cluster and other clusters of WM and AM on COFW benchmark, where \"with (w/) occlusion (occlu.)\" denotes that left eyes of the testing faces are processed with handcrafted occlusions as illustrated in Figure 9, and \"without (w/o) occlu.\" denotes that the testing faces are kept unchanged.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that our method does not process occlusions explicitly, in which the training data is not performed handcrafted occlusions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "After processing testing faces with occlusions, the mean error results of both WM and AM increase.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Besides the results of landmarks from the left eye cluster, the results of remaining landmarks from other clusters become worse slightly.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is because different facial parts have correlations and the occlusions of the left eye influences results of other facial parts.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that WM and AM still perform well on occluded left eyes with the mean error of 6.60 and 6.50 respectively, due to the following reasons.",
+              "tag": "Result"
+            },
+            {
+              "sent": "First, WM weights each landmark proportional to its alignment error, which exploits correlations among landmarks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, AM uses an independent shape prediction layer focusing on a certain cluster of landmarks with small weights u j > 0, j \u2208 Q i in Eq. 9 for remaining landmarks, respectively, where correlations among landmarks are further exploited.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "E. Weighting Fine-Tuning for State-of-the-Art Frameworks",
+      "selected_sentences": [
+        {
+          "par_id": 63,
+          "sentences": [
+            {
+              "sent": "Most recently, there are a few well-designed and welltrained deep learning frameworks advancing the performance of face alignment, in which DAN [45] is a typical work.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DAN uses cascaded deep neural networks to refine the localization accuracy of landmarks iteratively, where the entire face image and the landmark heatmap generated from the previous stage  Note that the results of retrained DAN (reDAN) using the published code [45] are slightly worse than reported results of DAN [45].",
+              "tag": "Method"
+            },
+            {
+              "sent": "For a fair comparison, the results of mean error of DAN, reDAN, and DANWM on IBUG benchmark are all shown in Table VIII.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It can be seen that the mean error of reDAN is reduced from 7.97 to 7.81 after using our proposed weighting fine-tuning.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that our method uses only a single neural network, which has a concise structure with low model complexity.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Our network can be replaced with a more powerful one such as cascaded deep neural networks, which could further improve the performance of face alignment.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "V. CONCLUSION",
+      "selected_sentences": [
+        {
+          "par_id": 64,
+          "sentences": [
+            {
+              "sent": "In this paper, we have developed a novel multi-center learning framework with multiple shape prediction layers for face alignment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The structure of multiple shape prediction layers is beneficial for reinforcing the learning process of each cluster of landmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition, we have proposed the model assembling method to integrate multiple shape prediction layers into one shape prediction layer so as to ensure a low model complexity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Extensive experiments have demonstrated the effectiveness of our method including handling complex occlusions and appearance variations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "First, each component of our framework including Global Average Pooling, multiple shape prediction layers, weighting fine-tuning, and multicenter fine-tuning contributes to face alignment.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, our proposed neural network and model assembling method allow real-time performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Third, we have extended our method for detecting partially occluded faces and integrating with state-of-the-art frameworks, and have shown that our method exploits correlations among landmarks and can further improve the performance of state-of-the-art frameworks.",
+              "tag": "Other"
+            },
+            {
+              "sent": "The proposed framework is also promising to be applied for other face analysis tasks and multi-label problems.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Deep Multi-Center Learning for Face Alignment"
+}

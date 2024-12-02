@@ -1,0 +1,1072 @@
+{
+  "paper_id": "1701.07717",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "The main contribution of this paper is a simple semisupervised pipeline that only uses the original training set without collecting extra data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is challenging in 1) how to obtain more training data only from the training set and 2) how to use the newly generated data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this work, the generative adversarial network (GAN) is used to generate unlabeled samples.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We propose the label smoothing regularization for outliers (LSRO).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This method assigns a uniform label distribution to the unlabeled images, which regularizes the supervised model and improves the baseline.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We verify the proposed method on a practical problem: person re-identification (reID).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This task aims to retrieve a query person from other cameras.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adopt the deep convolutional generative adversarial network (DCGAN) for sample generation, and a baseline convolutional neural network (CNN) for representation learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments show that adding the GAN-generated data effectively improves the discriminative ability of learned CNN embeddings.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On three large-scale datasets, Market-1501, CUHK03 and  DukeMTMC-reID, we obtain +4.37%, +1.6% and +2.46%   improvement in rank-1 precision over the baseline CNN, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We additionally apply the proposed method to fine-grained bird recognition and achieve a +0.6% improvement over a strong baseline.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The code is available at https://github.com/layumi/Person-reID_GAN .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Unsupervised learning can serve as an important auxiliary task to supervised tasks [14,29,11,28].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we propose a semi-supervised pipeline that works on the original training set without an additional data collection process.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, the training set is expanded with unlabeled data using a GAN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then our model minimizes the sum of the supervised and the unsupervised losses through a new Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The pipeline of the proposed method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are two components: a generative adversarial model [27] for unsupervised learning and a convolutional neural network for semi-supervised learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "\"Real Data\" represents the labeled data in the given training set; \"Training data\" includes both the \"Real Data\" and the generated unlabeled data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We aim to learn more discriminative embeddings with the \"Training data\".",
+              "tag": "Method"
+            },
+            {
+              "sent": "This method is evaluated with person reID, which aims to spot the target person in different cameras.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This has been recently viewed as an image retrieval problem [50].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "First, current research in GANs typically considers the quality of the sample generation with and without semi-supervised learning in vivo [24,32,27,7,26,41].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Yet a scientific problem remains unknown: moving the generated samples out of the box and using them in currently available learning frameworks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To this end, this work uses unlabeled data produced by the DCGAN model [27] in conjunction with the labeled training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 1, our pipeline feeds the newly generated samples into another learning machine (ie a CNN).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, we use the term \"in vitro\" to differentiate our method from [24,32,27,7]; these methods perform semi-supervised learning in the discriminator of the GANs (in vivo).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Second, the challenge of performing semi-supervised learning using labeled and unlabeled data in CNN-based methods remains.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Usually, the unsupervised data is used as a pre-training step before supervised learning [28,11,14].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our method uses all the data simultaneously.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In [25,18,24,32], the unlabeled/weak-labeled real data are assigned labels according to pre-defined training classes, but our method assumes that the GAN generated data does not belong to any of the existing classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The proposed LSRO method neither includes unsupervised pre-training nor label assignments for the known classes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We address semisupervised learning from a new perspective.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since the unlabeled samples do not belong to any of the existing classes, they are assigned a uniform label distribution over the training classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network is trained not to predict a particular class for the generated data with high confidence.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In an attempt to overcome the above-mentioned challenges, this paper 1) adopts GAN in unlabeled data generation, 2) proposes the label smoothing regularization for outliers (LSRO) for unlabeled data integration, and 3) reports improvements over a CNN baseline on three person reID datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In more details, in the first step, we train DCGAN [27] on the original reID training set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We generate new pedestrian images by inputting 100-dim random vectors in which each entry falls within [-1, 1].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Some generated samples are shown in Figure 3 and Figure 5.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the second step, these unlabeled GAN-generated data are fed into the ResNet model [13].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The LSRO method regularizes the learning process by integrating the unlabeled data and, thus, reduces the risk of over-fitting.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we evaluate the proposed method on person reID and show that the learned embeddings demonstrate a consistent improvement over the strong ResNet baseline.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "\u2022 an LSRO method for semi-supervised learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The integration of unlabeled data regularizes the CNN learning process.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that the LSRO method is  [49], CUHK03 [19] and DukeMTMC-reID [30].",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe that all these datasets suffer from the limited images per class.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that there are only a few classes with more than 20 images.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "superior to the two available strategies for dealing with unlabeled data; and",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "\u2022 a demonstration that the proposed semi-supervised pipeline has a consistent improvement over the ResNet baseline on three person reID datasets and one finegrained recognition dataset.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "In this section, we will discuss the relevant works on GANs, semi-supervised learning and person reID.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Generative Adversarial Networks",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "The generative adversarial networks (GANs) learn two sub-networks: a generator and a discriminator.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The discriminator reveals whether a sample is generated or real, while the generator produces samples to cheat the discriminator.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The GANs are first proposed by Goodfellow et al [12] to generate images and gain insights into neural networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Then, DCGANs [27] provides some techniques to improve the stability of training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The discriminator of DCGAN can serve as a robust feature extractor.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Salimans et al [32] achieve a state-of-art result in semi-supervised classification and improves the visual quality of GANs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "InfoGAN [7] learns interpretable representations by introducing latent codes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On the other hand, GANs also demonstrate potential in generating images for specific fields.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Pathak et al [26] propose an encoder-decoder method for image inpainting, where GANs are used as the image generator.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similarly, Yeh et al [45] improve the inpainting performance by introducing two loss types.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In [41], 3D object images are generated by a 3DGAN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we do not focus on investigating more sophisticated sample generation methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, we use a basic GAN model [27] to generate unlabeled samples from the training data and show that these samples help improve discriminative learning.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Semi-supervised Learning",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Semi-supervised learning is a sub-class of supervised learning taking unlabeled data into consideration, especially when the volume of annotated data is small.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On the one hand, some research treats unsupervised learning as an auxiliary task to supervised learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, in [14], Hinton et al learn a stack of unsupervised restricted Boltzmann machines to pre-train the model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Ranzato et al propose to reconstruct the input at every level of a network to get a compact representation [28].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [29], the auxiliary task of ladder networks is to denoise representations at every level of the model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On the other hand, several works assign labels to the unlabeled data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Papandreou et al [25] combine strong and weak labels in CNNs using an expectation-maximization (EM) process for image segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [18], Lee assigns a \"pseudo label\" to the unlabeled data in the class that has the maximum predicted probability.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In [24,32], the samples produced by the generator of the GAN are all taken as one class in the discriminator.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Departing from previous semi-supervised works, we adopt a different regularization approach by assigning a uniform label distribution to the generated samples.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Person Re-identification",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "A CNN can be very discriminative by itself without explicit part-matching.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Zheng et al [50,51] directly use a conventional fine-tuning approach (called the IDdiscriminative embedding, or IDE) on the Market-1501 dataset [49] and its performance exceeds many other recent results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Wu et al [43] combine the CNN embedding with hand-crafted features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [52], Zheng et al combine an identification model with a verification model and improve the fine-tuned CNN performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we adopt the IDE model [50,51] as a baseline, and show that the GAN samples and LSRO effectively improve its performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, Barbosa et al [5] propose synthesizing human images through a photorealistic body generation software.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These images are used to pre-train an IDE model before dataset-specific fine-tuning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our method is different from [5] in both data generation and the training strategy.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Network Overview",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "In this section, we describe the pipeline of the proposed method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 1, the real data in the training set is used to train the GAN model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then, the real training data and the newly generated samples are combined into training input for the CNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the following section, we will illustrate the structure of the two components, ie, the GAN and the CNN, in detail.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that, our system does not make major changes to the network structures of the GAN or the CNN with one exception -the number of neurons in the last fully-connected layer in the CNN is modified according to the number of training classes.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Generative Adversarial Network",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Convolutional Neural Network",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "The ResNet-50 [13] model is used in our experiment.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We resize the generated images to 256 \u00d7 256 \u00d7 3 using bilinear sampling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The generated images are mixed with the original training set as the input of the CNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "That is, the labeled and unlabeled data are simultaneously trained.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following the conventional fine-tuning strategy [50], we use a model pre-trained on ImageNet [31].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We modify the last fully-connected layer to have K neurons to predict the K-classes, where K is the number of the classes in the original training set (as well as the merged new training set).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Unlike [24,32], we do not view the new samples as an extra class but assign a uniform label distribution over the existing classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "So the last fully-connected layer remains K-dimensional.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The assigned label distribution of the generated images is discussed in the next section.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "The Proposed Regularization Method",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "In this section, we first revisit the label smoothing regularization (LSR), which is used for fully-supervised learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We then extend LSR to the scenario of unlabeled learning, yielding the proposed label smoothing regularization for outliers (LSRO) method.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Label Smoothing Regularization Revisit",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Label Smoothing Regularization for Outliers",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "The label smoothing regularization for outliers (LSRO) is used to incorporate the unlabeled images in the network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This extends LSR from the supervised domain to leverage unsupervised data generated by the GAN.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "In LSRO, we propose a virtual label distribution for the unlabeled images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We set the virtual label distribution to be uniform over all classes, due to two inspirations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "1) We assume that the generated samples do not belong to any predefined classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "2) LSR assumes a uniform distribution over the all classes to address over-fitting.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During testing, we expect that the maximum class probability of a generated image will be low, ie, the network will fail to predict a particular class with high confidence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Formally, for a generated image, its class label distribution, q LSRO (k), is defined as:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "We call Eq. 6 the label smoothing regularization for outliers (LSRO).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The one-hot distribution defined in Eq. 2 will still be used for the loss computation for the real images in the training set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Combining Eq. 2, Eq. 6 and Eq. 1, we can re-write the cross-entropy loss as:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "For a real training image, Z = 0.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For a generated training image, Z = 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "So our system actually has two types of losses, one for real images and one for generated images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Using LSRO, we can deal with more training images (outliers) that are located near the real training images in the sample space, and introduce more color, lighting and pose variances to regularize the model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For instance, if we only have one green-clothed identity in the training set, the network may be misled into considering that the color green is a discriminative feature, and this limits the discriminative ability of the model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By adding generated training samples, such as an unlabeled green-clothed person, the classifier will be penalized if it makes the wrong prediction towards the labeled green-clothed person.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this manner, we encourage the network to find more underlying causes and to be less prone to over-fitting.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We only use the GAN trained on the original training set to produce outlier images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It would be interesting to further evaluate whether real-world unlabeled images are able to achieve a similar effect (see Table 4).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "We compare LSRO with two alternative methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Details of both methods are available in existing literature [24,32,18]; breif descriptions follow.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiment",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Person Re-id Datasets",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "Market-1501 is a large-scale person reID dataset collected from six cameras.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It contains 19,732 images for testing and 12,936 images for training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The images are automatically detected by the deformable part model (DPM) [9], so misalignment is common, and the dataset is close to realistic settings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are 751 identities in the training set and 750 identities in the testing set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are 17.2 images per identity in the training set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use all the 12,936 detected images from the training set to train the GAN.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "CUHK03 contains 14,097 images of 1,467 identities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each identity is captured by two cameras on the CUHK campus.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset contains two image sets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "One is annotated by hand-drawn bounding boxes, and the other is produced by the DPM detector [9].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the detected set in this paper.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are 9.6 images per identity in the training set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We report the averaged result after training/testing 20 times.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the single shot setting.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "DukeMTMC-reID is a subset of the newly-released multi-target, multi-camera pedestrian tracking dataset [30].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The original dataset contains eight 85-minute highresolution videos from eight different cameras.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Handdrawn pedestrian bounding boxes are available.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this work, we use a subset of [30] for image-based reID, in the format of the Market-1501 dataset [49].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We crop pedestrian images from the videos every 120 frames, yielding 36,411 total bounding boxes with IDs annotated by [30].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The DukeMTMC-reID dataset for reID has 1,812 identities from eight cameras.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are 1,404 identities appearing in more than two cameras and 408 identities (distractor ID) who appear in only one camera.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We randomly select 702 IDs as the training set and the remaining 702 IDs as the testing set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the testing set, we pick one query image for each ID in each camera and put the remaining images in the gallery.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a result, we get 16,522 training images with 702 identities, 2,228 query images of the other 702 identities and 17,661 gallery images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The evaluation protocol is available on our website [2].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Some example reID results from the DukeMTMC-reID are shown in Figure 6.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Implementation Details",
+      "selected_sentences": [
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "We adopt the CNN reID baseline used in [50,51].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, the Matconvnet [37] package is used.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During training, We use the ResNet-50 model [13] and modify the fully-connected layer to have 751, 702 and 1,367 neurons for Market-1501, DukeMTMC-reID and CUHK03, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All the images are resized to 256 \u00d7 256 before being randomly cropped into 224 \u00d7 224 with random horizontal flipping.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We insert a dropout layer before the final convolutional layer and set the dropout rate to 0.5 for CUHK03 and 0.75 for Market-1501 and DukeMTMC-reID, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use stochastic gradient descent with momentum 0.9.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The learning rate of the convolution layers is set to 0.002 and decay to 0.0002 after 40 epochs and we stop training after the 50th epochs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During testing, we extract the 2,048-dim CNN embedding in the last convolutional layer for an 224 \u00d7 224 input image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The similarity between two images is calculated by a cosine distance for ranking.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "We use Tensorflow [3] and the DCGAN package [1] to train the GAN model using the provided data in the original training set without preprocessing (eg, foreground detection).",
+              "tag": "Method"
+            },
+            {
+              "sent": "All the images are resized to 128\u00d7128 and randomly flipped before training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use Adam [15] with the parameters \u03b2 1 = 0.5, \u03b2 2 = 0.99.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We stop training after 30 epochs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During GAN testing, we input a 100-dim random vector in GAN, and the value of each entry ranges in [-1, 1].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The outputted image is resized to 256 \u00d7 256 and then used in CNN training (with LSRO).",
+              "tag": "Method"
+            },
+            {
+              "sent": "More GAN images are shown in Figure 5.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "The GAN images improve the baseline.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown in Table 2, when we add 24, 000 GAN images to the CNN training, our method significantly improves the reID performance on Market-1501.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe improvement of +4.37% (from 73.69% to 78.06%) and +4.75% (from 51.48% to 56.23%) in rank-1 accuracy and mAP, respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On CUHK03, we observe improvements of +1.6%, +1.2%, +0.8%, and +1.6% in rank-1, 5, 10 accuracy and mAP, respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The improvement on CUHK03 is relatively small compared to that of Market-1501, because the DCGAN model is trained on Market-1501 and the generated images share a more similar distribution with Market-1501 than CUHK03.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also observe improvements of +2.46% and +2.14% in rank-1 and mAP, respectively, on the strong ResNet baseline in the DukeMTMC-reID dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results indicate that the unlabeled images generated by the GAN effectively yield improvements over the baseline using the LSRO method.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "The impact of using different numbers of GAN images during training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate how the number of GAN images affects the reID performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since unlabeled data is easy to obtain, we expect the model would learn more general knowledge as the number of unlabeled images increases.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results on Market-1501 are shown in Table 2.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We note that the number of real training images in Market-1501 is 12,936.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "Nevertheless, we find that LSRO exceeds both strategies by approximately +1% \u223c +2%.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We speculate the reason is that the \"All in one\" method makes a coarse label estimation, while the \"Pseudo label\" originally assumes that all the unlabeled data belongs to the existing classes [18] which is not true in person reID.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "While these two methods still use the one-hot label distribution, the LSRO method makes a less stronger assumption (label smoothing) towards the labels of the GAN images.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "These reasons may explain why LSRO has a superior performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare our method with the state-of-the-art methods on Market-1501 and CUHK03, listed in Table 1 and Table 5, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On Market-1501, we achieve rank-1 accuracy = 78.06%, when using the single query mode, which is the best result compared to the published papers, and the second best among all the available results including ArXiv papers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On CUHK03, we arrive at rank-1 accuracy = 73.1%, mAP = 77.4% which is also very competitive.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The previous best result is produced by combining the identification and verification losses [10,52].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We further investigate whether the LSRO could work on this model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We fine-tuned the publicly available model in [52] with LSRO and achieve state-of-the-art results rank-1 accuracy = 83.97%,",
+              "tag": "Method"
+            },
+            {
+              "sent": "On CUHK03, we also observe a state-of-the art performance rank-1 accuracy = 84.6%,",
+              "tag": "Result"
+            },
+            {
+              "sent": "We, therefore, show that the LSRO method is complementary to previous methods due to the regularization of the GAN data.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Fine-grained Recognition",
+      "selected_sentences": [
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "Fine-grained recognition also faces the problem of a lack of training data and annotations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To further test the effectiveness of our method, we provide results on the CUB-200-2011 dataset [38].",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset contains 200 bird classes with 29.97 training images per class on average.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Bounding boxes are used in both training and testing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We do not use part annotations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our implementation, the ResNet baseline has a recognition accuracy of 82.6%, which is slightly higher than the 82.3% reported in [21].",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is the baseline method model annotation top-1 Zhang et al [48] AlexNet 2\u00d7part 76.7 Zhang et al [48] VGGNet 2\u00d7part 81.6 Liu et al [21] ResNet-50 attribute 82.9 Wang et al [39] 3\u00d7VGGNet \u00d7 83.0 Basel.",
+              "tag": "Result"
+            },
+            {
+              "sent": "[21] ResNet The proposed method has a 0.6% improvement over the competitive baseline.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The two-model ensemble shows a competitive result.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 58,
+          "sentences": [
+            {
+              "sent": "Using the same pipeline in Figure 1, we train DCGAN on the 5,994 images in the training set, and then we combine the real images with the generated images (see Figure 5) to train the CNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During testing, we adopt the standard 10crop testing [17], which uses 256 \u00d7 256 images as input and the averaged prediction as the classification result.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown in Table 6, the strong baseline outperforms some recent methods, and the proposed method further yields an improvement of +0.6% (from 82.6% to 83.2%).",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also combine the two models generated by our method with different initializations to form an ensemble.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This leads to a 84.4% recognition accuracy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [21], Liu et al report a 85.5% accuracy with a five-model ensemble using parts and a global scene.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We do not include this result because extra annotations are used.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We focus on the regularization ability of the GAN, but not on producing a state-of-the-art result.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose an \"in vitro\" usage of the GANs for representation learning, ie, person re-identification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Using a baseline DCGAN model [27], we show that the imperfect GAN images effectively demonstrate their regularization ability when trained with a ResNet baseline model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Through the proposed LSRO method, we mix the unlabeled GAN images with the labeled real training images for simultaneous semi-supervised learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Albeit simple, we demonstrate consistent performance improvement over the reID and fine-grained recognition baseline systems, which sheds light on the practical use of GAN-generated data.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Unlabeled Samples Generated by GAN Improve the Person Re-identification Baseline in vitro"
+}

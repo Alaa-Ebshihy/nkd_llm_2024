@@ -1,0 +1,542 @@
+{
+  "paper_id": "1603.03958",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Face recognition performance evaluation has traditionally focused on one-to-one verification, popularized by the Labeled Faces in the Wild dataset [1] for imagery and the YouTubeFaces dataset [2] for videos.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast, the newly released IJBA face recognition dataset [3] unifies evaluation of one-to-many face identification with one-to-one face verification over templates, or sets of imagery and videos for a subject.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we study the problem of template adaptation, a form of transfer learning to the set of media in a template.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Extensive performance evaluations on IJBA show a surprising result, that perhaps the simplest method of template adaptation, combining deep convolutional network features with template specific linear SVMs, outperforms the state-of-the-art by a wide margin.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We study the effects of template size, negative set construction and classifier fusion on performance, then compare template adaptation to convolutional networks with metric learning, 2D and 3D alignment.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Our unexpected conclusion is that these other methods, when combined with template adaptation, all achieve nearly the same top performance on IJBA for template-based face verification and identification.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Face recognition performance using deep learning has seen dramatic improvements in recent years.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Convolutional networks trained with large datasets of millions of images of thousands of subjects have shown remarkable capability of learning facial representations that are invariant to age, pose, illumination and expression (APIE) [4,5,6,7,8,9].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These representations have shown strong performance for recognition of imagery and video in-the-wild in unconstrained datasets, with recent approaches demonstrating capabilities that exceed human performance on the well known Labeled Faces in the Wild dataset [1].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "The problem of face recognition may be described in terms of face verification and face identification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Face verification involves computing a one-to-one similarity between a probe image and a reference image, to determine if two image observations are of the same subject.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast, face identification involves computing a one-to-many similarity between a probe media and a gallery of known subjects in order to determine a probe identity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Face verification is important for access control or re-identification tasks, and face identification is important for watch-list surveillance or forensic search tasks.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Face recognition performance evaluations have traditionally focused on the problem of face verification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Over the past fifteen years, face datasets have steadily increased in size in terms of number of subjects and images, as well as complexity in terms controlled vs. uncontrolled collection and amount of APIE variability [10].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The Labeled Faces in the Wild dataset [1] contains 13233 images of 1680 subjects, and compares specific pairs of images of subjects to characterize 1:1 verification performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similarly, the YouTubeFaces dataset [2] contains 3425 videos of 1595 subjects, and compares pairs of videos of subjects for verification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These datasets have set the established standard for face recognition research, with steadily increasing performance [11,5,6,4].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, protocols for face identification have been introduced for LFW [12] to address the performance evaluation for identification on a common dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the imagery in LFW was constructed with a well known near-frontal selection bias, which means evaluations are not predictive of performance for large in-the-wild pose variation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In fact, recent studies have shown that while algorithm performance for near frontal recognition is equal to or better than humans, performance of automated systems at the extremes of illumination and pose are still well behind human performance [13].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "The IJBA dataset [3] was created to provide the newest and most challenging dataset for both verification and iden-tification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset includes both imagery and video of subjects manually annotated with facial bounding boxes to avoid the near frontal bias, along with protocols for evaluation of both verification and identification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, this dataset performs evaluations over templates [14] as the smallest unit of representation, instead of image-to-image or video-to-video.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A template is a set of all media (images and/or videos) of a subject that are to be combined into a single representation suitable for matching.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Template based representations are important for many face recognition tasks, which take advantage of an historical record of observations to further improve performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, a template provides a useful abstraction to capture the mugshot history of a criminal for forensic search in law enforcement, or lifetime enrollment images for visa or driver's licenses in civil identity credentialing for improved access control.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Biometric templates have been studied for face recognition, where performance on older algorithms have increased given an historical set of images [14].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The IJBA dataset is the only public dataset that enables a controlled evaluation of template-based verification and identification at the extremes of pose, illumination and expression.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "In this paper, we study the problem of template adaptation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Template adaptation is an example of transfer learning, where the target domain is defined by the set of media of a subject in a template.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In general, transfer learning includes a source domain for feature encoding of subjects trained offline, and a specific target domain with limited available observations of new subjects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the case of template adaptation, the source domain may be a deep convolutional network trained offline to predict subject identity, and the target domain is the set of media in templates of never before seen subjects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we study perhaps the simplest form of template adaptation based on deep convolutional networks and one-vs-rest linear SVMs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We combine deep CNN features trained offline to predict subject identity, with a simple linear SVM classifier trained at test time using all media in a template as positive features to classify each new subject.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Extensive evaluation of template adaptation on the IJBA dataset has generated surprising results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "First, template adaptation outperforms all top performing techniques in the literature: convolutional networks combined with triplet loss similarity [6,4,15], joint Bayesian metric learning [16], pose specialized networks [17], 2D alignment [4], 3D frontalization [5] and novel convolutional network architectures [18].",
+              "tag": "Result"
+            },
+            {
+              "sent": "Second, template adaptation when combined with these other techniques results in nearly equivalent performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Third, we show a clear tradeoff between the size of a template (eg the number of unique media in the template) and performance, which leads to the conclusion that if the average largest template size is big enough, then a simple template adaptation strategy is the best choice for both verification and identification on template based datasets.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "The top performing approaches for face verification on Labeled Faces in the Wild [1] and YouTubeFaces [2] are all based on convolutional networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "VGGFace is the application of the VGG-16 convolutional network architecture [19] trained on a newly curated dataset of 2.6M images of 2622 subjects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This representation includes triplet loss embedding and 2D alignment for normalization to provide state of the art performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "FaceNet [6] applied the inception CNN architecture [20] to the problem of face verification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This approach included metric learning to train a triplet loss embedding to learn a 128 dimensional embedding optimized for verification and clustering.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This network was trained using a private dataset of over 200M subjects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DeepFace [5][7] uses a deep network coupled with 3D alignment, to normalize facial pose by warping facial landmarks to a canonical position prior to encoding.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DeepID2+ [9] and DeepID3 [8] extended the inception architecture to include joint Bayesian metric learning [21] and multi-task learning for both identification and verification.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Template Adaptation",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Template adaptation is a form of transfer learning, combining deep convolutional network features trained on a source domain of many labeled faces, with template specific linear SVMs trained on a target domain using the media in a template.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Template adaptation can be further decomposed into probe adaptation for face verification and gallery adaptation for face identification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section, we describe these approaches.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Figure 1 shows an overview of this concept.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each colored shape corresponds to a feature encoding of image or a video feature for the media in a template, such as generated from a convolutional network trained offline.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The gray squares correspond to encodings of a large set of media of unique subjects that are very likely to be disjoint from any template.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The centroid of the colored shapes corresponds to the average encoding for this template.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Probe adaptation is the problem of max-margin classification of the positive features from a template to the large negative feature set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The similarity between the blue probe template and the mated (genuine subject) green template is the margin (dotted lines) of the green feature encodings to the decision surface.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Observe that this margin is positive, whereas the margin for the red classifier is negative, so that the blue/green similarity is much larger than blue/red as desired.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Gallery adaptation is the problem of max-margin classification where the negative feature set for the gallery templates are defined by the other gallery templates.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Observe that adding the magenta subject causes the decision surface for the red and green classifiers to shift, improving the margin score for the probe.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "How does this compare to the state of the art?",
+              "tag": "Method"
+            },
+            {
+              "sent": "In section 4.2, we compare the template adaptation approach to all published results and show that the proposed approach exceeds the state of the art by a wide margin.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, in section 4.3 we perform an analysis of alternatives to combine the state of the art techniques with template adaptation and show that when combined, these alternative approaches all result in nearly the same performance.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "How large do the templates need to be?",
+              "tag": "Method"
+            },
+            {
+              "sent": "In section 4.5, we study the effect of template size, or total number of media in a template, on verification performance to identify the minimum template size necessary, to help guide future template based dataset construction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We show that a minimum of three unique media per template results in diminishing returns for template adaptation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "How should template classifier scores be fused?",
+              "tag": "Method"
+            },
+            {
+              "sent": "In section 4.6, we study the effect of different strategies for combination of two classifiers, based on winner take all and weighted combinations of on template size.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We conclude that an average combination is best with winner take all a close second.",
+              "tag": "Result"
+            },
+            {
+              "sent": "What are the error modes of the template adaptation?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In section 4.7, we visualize the best and worst templates pairs in IJBA for verification (identification errors are shown in the supplementary material), and we show that template size (eg number of media in a template) has the largest effect on performance.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experimental System",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "IJB-A Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "Figure 2 shows the overall evaluation results on IJBA.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This evaluation compares the baseline approach of VGGFace only [4] with the proposed approach of VGGFace encoding with probe and gallery template adaptation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results show that identification performance is slightly improved for rank 1 and rank 10 retrieval, however there are large performance improvements for the 1:N DET for identification and the 1:1 DET for verification.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The table in figure 2 shows performance at specific operating points for verification and identification, and compares to published results in the literature for joint Bayesian metric learning [16], triplet similarity embedding [15], multi-pose learning [17], bilinear CNNs [18] and very deep CNNs [4,32].",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results show that the proposed template adaptation, while conceptually simple, exhibits state-of-the-art performance by a wide margin on this dataset.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Analysis of Alternatives",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "Figure 4 shows an analysis of alternatives study.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The state of the art approaches on LFW and YouTubeFaces often augment a very deep CNN encoding with metric learning [6,4] for improved verification scores or 2D alignment [5,4] to better align facial bounding boxes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this study, we implement triplet loss similarity embedding, joint Bayesian similarity embedding and 2D alignment, and use these alternative feature encodings as input to template adaptation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this study, we seek to answer whether these alternative strategies will provide improved performance over using CNN encoding only or CNN encoding with template adaptation.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "We report 1:1 DET for all probe and gallery template pairs in IJBA split 1 and CMC for identification on IJBA split 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This study shows that template adaptation on the CNN output provides nearly the same result as template adaptation with metric learning or 2D alignment based features.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This implies that the additional training and computational requirements for these approaches are not necessary for template based datasets.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Furthermore, this study shows that 2D alignment does not provide much benefit on IJBA, in contrast with reported performance on near frontal datasets [4,5].",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "One hypothesis is that this is due to the fact that this dataset has many profile faces for which facial landmark alignment is inaccurate or fails altogether.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Negative Set Study",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "Next, we experimented with the CASIA WebFace dataset [38].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The best negative set for probe adaptation is a set drawn from the same distribution as the templates.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, in many operatational conditions, this dataset will not be available.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To study these effects, we constructed a dataset by sampling 70K images from CASIA balanced over classes, and pre-encoding these images for template adaptation training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 3 (bottom) shows that this results in slightly reduced verification performance.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "One hypothesis is that this imagery exhibits an unmodeled dataset bias for IJBA faces, or that CASIA is image only, while IJBA is imagery and videos.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Template Size Study",
+      "selected_sentences": [
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "Figure 5 (right) shows the effect of template size on ver- (top) Template adaptation compared with CNN encoding with metric learning using triplet similarity embedding [4,6] or Joint Bayesian embedding [21,23].",
+              "tag": "Result"
+            },
+            {
+              "sent": "(bottom) Template adaptation compared with CNN encoding and 2D alignment [5,4].",
+              "tag": "Result"
+            },
+            {
+              "sent": "In both cases, template adaptation outperforms all methods, and when combined with metric learning or 2D alignment, generates nearly equivalent performance.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Fusion Study",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Error Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "In this paper, we have introduced template adaptation, a simple and surprisingly effective strategy for face verification and identification that achieves state of the art performance on the IJBA dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, we showed that this strategy can be applied to existing networks to improve performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Futhermore, our evaluation provides compelling evidence that there are many face recognition tasks that can benefit from a historical record of media to aid in matching, and that this is an important problem to further evaluate with new template-based face datasets.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Template Adaptation for Face Verification and Identification"
+}

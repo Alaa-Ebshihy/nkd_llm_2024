@@ -1,0 +1,408 @@
+{
+  "paper_id": "1511.02274",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "This paper presents stacked attention networks (SANs) that learn to answer natural language questions from images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "SANs use semantic representation of a question as query to search for the regions in an image that are related to the answer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We argue that image question answering (QA) often requires multiple steps of reasoning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, we develop a multiple-layer SAN in which we query an image multiple times to infer the answer progressively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments conducted on four image QA data sets demonstrate that the proposed SANs significantly outperform previous state-of-the-art approaches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The visualization of the attention layers illustrates the progress that the SAN locates the relevant visual clues that lead to the answer of the question layer-by-layer.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "With the recent advancement in computer vision and in natural language processing (NLP), image question answering (QA) becomes one of the most active research areas [7,21,18,1,19].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unlike pure language based QA systems that have been studied extensively in the NLP community [28,14,4,31,3,32], image QA systems are designed to automatically answer natural language questions according to the content of a reference image.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "By examining the image QA data sets, we find that it is often that case that answering a question from an image requires multi-step reasoning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Take the question and image in Figure 1 as an example.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "There are several objects in the image: bicycles, window, street, baskets and  dogs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To answer the question what are sitting in the basket on a bicycle, we need to first locate those objects (eg basket, bicycle) and concepts (eg, sitting in) referred in the question, then gradually rule out irrelevant objects, and finally pinpoint to the region that are most indicative to infer the answer (ie, dogs in the example).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "The main contributions of our work are three-fold.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, we propose a stacked attention network for image QA tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, we perform comprehensive evaluations on four image QA benchmarks, demonstrating that the proposed multiple-layer SAN outperforms previous state-of-the-art approaches by a substantial margin.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Third, we perform a detailed analysis where we visualize the outputs of different attention layers of the SAN and demonstrate the process that the SAN takes multiple steps to progressively focus the attention on the relevant visual clues that lead to the answer.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Several image QA models were proposed in the literature.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "[18] used semantic parsers and image segmentation methods to predict answers based on images and questions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "[19,7] both used encoder-decoder framework to generate answers given images and questions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They first used a LSTM to encoder the images and questions and then used another LSTM to decode the answers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They both fed the image feature to every LSTM cell.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "[21] proposed several neural network based models, including the encoderdecoder based models that use single direction LSTMs and bi-direction LSTMs, respectively.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the authors found the concatenation of image features and bag of words features worked the best.",
+              "tag": "Method"
+            },
+            {
+              "sent": "[1] first encoded questions with LSTMs and then combined question vectors with image vectors by element wise multiplication.",
+              "tag": "Method"
+            },
+            {
+              "sent": "[17] used a CNN for question modeling and used convolution operations to combine question vectors and image feature vectors.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare the SAN with these models in Sec. 4.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "To the best of our knowledge, the attention mechanism, which has been proved very successful in image captioning, has not been explored for image QA.",
+              "tag": "Other"
+            },
+            {
+              "sent": "The SAN adapt the attention mechanism to image QA, and can be viewed as a significant extension to previous models [30] in that multiple attention layers are used to support multi-step reasoning for the image QA task.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Stacked Attention Networks (SANs)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Image Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Question Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "LSTM based question model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CNN based question model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Stacked Attention Networks",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "Given the image feature matrix v I and the question feature vector v Q , SAN predicts the answer via multi-step reasoning.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "Compared to models that simply combine the question vector and the global image vector, attention models construct a more informative u since higher weights are put on the visual regions that are more relevant to the question.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, for complicated questions, a single attention layer is not sufficient to locate the correct region for answer prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, the question in Figure 1 what are sitting in the basket on a bicycle refers to some subtle relationships among multiple objects in an image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, we iterate the above query-attention process using multiple attention layers, each extracting more fine-grained visual attention information for answer prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Formally, the SANs take the following formula: for the k-th attention layer, we compute:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "That is, in every layer, we use the combined question and image vector u k\u22121 as the query for the image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After the image region is picked, we update the new query vector as u k = \u1e7dk I + u k\u22121 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We repeat this K times and then use the final u K to infer the answer:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Data sets",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "We evaluate the SAN on four image QA data sets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are 6, 795 training questions and 5, 673 test questions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These questions are generated on 795 and 654 images respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The images are mainly indoor scenes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The questions are categorized into three types including Object, Color and Number.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most of the answers are single words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following the setting in [21,17,19], we exclude data samples that have multiple words answers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The remaining data set covers 90% of the original data set.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Baselines and evaluation methods",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model configuration and training",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results and analysis",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "The experimental results on DAQUARALL, DAQUARREDUCED, COCOQA and VQA are presented in Table .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model names explain their settings: SAN is short for the proposed stacked attention networks, the value 1 or 2 in the brackets refer to using one or two attention layers, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The keyword LSTM or CNN refers to the question model that SANs use.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "Our results demonstrate clearly the positive impact of using multiple attention layers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In all four data sets, twolayer SANs always perform better than the one-layer SAN.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Specifically, on COCOQA, on average the two-layer SANs outperform the one-layer SANs by 2.2% in the type of Color, followed by 1.3% and 1.0% in the Location and Objects categories, and then 0.4% in Number.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This aligns to the order of the improvements of the SAN over baselines.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Similar trends are observed on VQA (Table.",
+              "tag": "Result"
+            },
+            {
+              "sent": "6), eg, the two-layer SAN improve over the one-layer SAN by 1.4% for the Other type of question, followed by 0.2% improvement for Number, and flat for Yes/No.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Visualization of attention layers",
+      "selected_sentences": [
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "More examples are presented in the appendix.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They cover types as broad as Object, Numbers, Color and Location.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For each example, the three images from left to right are the original image, the output of the first attention layer and the output of the second attention layer, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The bright part of the image is the detected attention.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Across all those examples, we see that in the first attention layer, the attention is scattered on many objects in the image, largely corresponds to the objects and concepts referred in the question, whereas in the second layer, the attention is far more focused on the regions that lead to the correct answer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, consider the question what is the color of the horns, which asks the color of the horn on the woman's head in Figure 5(f).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the output of the first attention layer, the model first recognizes a woman in the image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the output of the second attention layer, the attention is focused on the head of the woman, which leads to the answer of the question: the color of the horn is red.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Errors analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose a new stacked attention network (SAN) for image QA.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "SAN uses a multiple-layer attention mechanism that queries an image multiple times to locate the relevant visual region and to infer the answer progressively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Experimental results demonstrate that the proposed SAN significantly outperforms previous state-of-theart approaches by a substantial margin on all four image QA",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Stacked Attention Networks for Image Question Answering"
+}

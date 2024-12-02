@@ -1,0 +1,497 @@
+{
+  "paper_id": "1601.02376",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Predicting user responses, such as click-through rate and conversion rate, are critical in many web applications including web search, personalised recommendation, and online advertising.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Different from continuous raw features that we usually found in the image and audio domains, the input features in web space are always of multi-field and are mostly discrete and categorical while their dependencies are little known.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Major user response prediction models have to either limit themselves to linear models or require manually building up high-order combination features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The former loses the ability of exploring feature interactions, while the latter results in a heavy computation in the large feature space.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To tackle the issue, we propose two novel models using deep neural networks (DNNs) to automatically learn effective patterns from categorical feature interactions and make predictions of users' ad clicks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To get our DNNs efficiently work, we propose to leverage three feature transformation methods, ie, factorisation machines (FMs), restricted Boltzmann machines (RBMs) and denoising auto-encoders (DAEs).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This paper presents the structure of our models and their efficient training algorithms.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The large-scale experiments with real-world data demonstrate that our methods work better than major state-of-the-art models.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "User response (eg, click-through or conversion) prediction plays a critical part in many web applications including web search, recommender systems, sponsored search, and display advertising.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In online advertising, for instance, the ability of targeting individual users is the key advantage compared to traditional offline advertising.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "All these targeting techniques, essentially, rely on the system function of predicting whether a specific user will think the potential ad is \"relevant\", ie, the probability that the user in a certain context will click a given ad [6].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Sponsored search, contextual advertising, and the recently emerged realtime bidding (RTB) display advertising all heavily rely on the ability of learned models to predict ad click-through rates (CTR) [32,41].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The applied CTR estimation models today are mostly linear, ranging from logistic regression [32] and naive Bayes [14] to FTRL logistic regression [28] and Bayesian probit regression [12], all of which are based on a huge number of sparse features with one-hot encoding [1].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Linear models have advantages of easy implementation, efficient learning but relative low performance because of the failure of learning the nontrivial patterns to catch the interactions between the assumed (conditionally) independent raw features [12].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Non-linear models, on the other hand, are able to utilise different feature combinations and thus could potentially improve estimation performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, factorisation machines (FMs) [29] map the user and item binary features into a low dimensional continuous space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "And the feature interaction is automatically explored via vector inner product.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Gradient boosting trees [38] automatically learn feature combinations while growing each decision/regression tree.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, these models cannot make use of all possible combinations of different features [20].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition, many models require feature engineering that manually designs what the inputs should be.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another problem of the mainstream ad CTR estimation models is that most prediction models have shallow structures and have limited expression to model the underlying patterns from complex and massive data [15].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a result, their data modelling and generalisation ability is still restricted.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Deep learning [25] has become successful in computer vision [22], speech recognition [13], and natural language processing (NLP) [19,33] during recent five years.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As visual, aural, and textual signals are known to be spatially and/or temporally correlated, the newly introduced unsupervised training on deep structures [18] would be able to explore such local dependency and establish a dense representation of the feature space, making neural network models effective in learning high-order features directly from the raw feature input.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With such learning ability, deep learning would be a good candidate to estimate online user response rate such as ad CTR.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, most input features in CTR estimation are of multi-field and are discrete categorical features, eg, the user location city (London, Paris), device type (PC, Mobile), ad category (Sports, Electronics) etc, and their local dependencies (thus the sparsity in the feature space) are unknown.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, it is of great interest to see how deep learning improves the CTR estimation via learning feature representation on such large-scale multifield discrete categorical features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To our best knowledge, there is no previous literature of ad CTR estimation using deep learning methods thus far 1 .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition, training deep neural networks (DNNs) on a large input feature space requires tuning a huge number of parameters, which is computationally expensive.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For instance, unlike image and audio cases, we have about 1 million binary input features and 100 hidden units in the first layer; then it requires 100 million links to build the first layer neural network.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this paper, we take ad CTR estimation as a working example to study deep learning over a large multi-field categorical feature space by using embedding methods in both supervised and unsupervised fashions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce two types of deep learning models, called Factorisation Machine supported Neural Network (FNN) and Sampling-based Neural Network (SNN).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, FNN with a supervised-learning embedding layer using factorisation machines [31] is proposed to efficiently reduce the dimension from sparse features to dense continuous features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second model SNN is a deep neural network powered by a sampling-based restricted Boltzmann machine (SNNRBM) or a samplingbased denoising auto-encoder (SNNDAE) with a proposed negative sampling method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Based on the embedding layer, we build multiple layers neural nets with full connections to explore non-trivial data patterns.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our experiments on multiple real-world advertisers' ad click data have demonstrated the consistent improvement of CTR estimation from our proposed models over the state-ofthe-art ones.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Click-through rate, defined as the probability of the ad click from a specific user on a displayed ad, is essential in online advertising [39].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In order to maximise revenue and user satisfaction, online advertising platforms must predict the expected user behaviour for each displayed ad and maximise the expectation that users will click.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The majority of current models use logistic regression based on a set of sparse binary features converted from the original categorical features via one-hot encoding [26,32].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Heavy engineering efforts are needed to design features such as locations, top unigrams, combination features, etc [15].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Embedding very large feature vector into low-dimensional vector spaces is useful for prediction task as it reduces the data and model complexity and improves both the effectiveness and the efficiency of the training and prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Various methods of embedding architectures have been proposed [37,23].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Factorisation machine (FM) [31], originally proposed for collaborative filtering recommendation, is regarded as one of the most successful embedding models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "FM naturally has the capability of estimating interactions between any two features via mapping them into vectors in a low-rank latent space.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Deep Learning [2] is a branch of artificial intelligence research that attempts to develop the techniques that will allow computers to handle complex tasks such as recognition and prediction at high performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Deep neural networks (DNNs) are able to extract the hidden structures and intrinsic patterns at different levels of abstractions from training data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DNNs have been successfully applied in computer vision [40], speech recognition [8] and natural language processing (NLP) [7,19,33].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, with the help of unsupervised pre-training, we can get good feature representation which guides the learning towards basins of attraction of minima that support better generalisation from the training data [10].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Usually, these deep models have two stages in learning [18]: the first stage performs model initialisation via unsupervised learning (ie, the restricted Boltzmann machine or stacked denoising auto-encoders) to make the model catch the input data distribution; the second stage involves a fine tuning of the initialised model via supervised learning with back-propagation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The novelty of our deep learning models lies in the first layer initialisation, where the input raw features are high dimensional and sparse binary features converted from the raw categorical features, which makes it hard to train traditional DNNs in large scale.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Compared with the word-embedding techniques used in NLP [19,33], our models deal with more general multi-field categorical features without any assumed data structures such as word alignment and letter-n-gram etc",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "DNNs for CTR Estimation given Categorical Features",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Factorisation-machine supported Neural Networks (FNN)",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Our first model FNN is based on the factorisation machine as the bottom layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network structure is shown in Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With a top-down description, the output unit is a real number \u0177 \u2208 (0, 1) as predicted CTR, ie, the probability of a specific user clicking a given ad in a certain context:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "In this way, z vector of the first layer is initialised as shown in Figure 1 via training a factorisation machine (FM) [31]:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "where each feature i is assigned with a bias weight w i and a K-dimensional vector v i and the feature interaction is modelled as their vectors' inner product v i , v j .",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this way, the above neural nets can learn more efficiently from factorisation machine representation so that the computational complexity problem of the high-dimensional binary inputs has been naturally bypassed.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Different hidden layers can be regarded as different internal functions capturing different forms of representations of the data instance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this reason, this model has more abilities of catching intrinsic data patterns and leads to better performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The idea using FM in the bottom layer is ignited by Convolutional Neural Networks (CNNs) [11], which exploit spatially local correlation by enforcing a local connectivity pattern between neurons of adjacent layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similarly, the inputs of hidden layer 1 are connected to the input units of a specific field.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Also, the bottom layer is not fully connected as FM performs a field-wise training for one-hot sparse encoded input, allowing local sparsity, illustrated as the dash lines in Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "FM learns good structural data representation in the latent space, helpful for any further model to build on.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A subtle difference, though, appears between the product rule of FM and the sum rule of DNN for combination.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, according to [21], if the observational discriminatory information is highly ambiguous (which is true in our case for ad click behaviour), the posterior weights (from DNN) will not deviate dramatically from the prior (FM).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "where \u0177 is the predicted CTR in Eq. ( 1) and y is the binary click ground-truth label.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Using the chain rule of back propagation, the FNN weights including FM Field 1",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Opposite connection with layer one",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Sampling-based Neural Networks (SNN)",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "The structure of the second model SNN is shown in Figure 2(a).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The difference between SNN and FNN lies in the structure and training method in the bottom layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "SNN's bottom layer is fully connected with sigmoid activation function:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Regularisation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiment Setup",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "We evaluate our models based on iPinYou dataset [27] Our experiment code 2 of both FNN and SNN is implemented with Theano 3 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "To measure the CTR estimation performance of each model, we employ the area under ROC curve (AUC) 4 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The AUC [12] metric is a widely used measure for evaluating the CTR performance.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Performance Comparison",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Hyperparameter Tuning",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Architecture Selection",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Regularisation Comparison",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "Neural network training algorithms are very sensitive to the overfitting problem since deep networks have multiple non-linear layers, which makes them very expressive models that can learn very complicated functions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For DNN models, we compared L2 regularisation (Eq.",
+              "tag": "Method"
+            },
+            {
+              "sent": "( 11)) and dropout [35] for preventing complex co-adaptations on the training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dropout rate implemented in this experiment refers to the probability of each unit being active.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Figure 4(a) shows the compared AUC performance of SNNRBM regularised by L2 norm and dropout.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is obvious that dropout outperforms L2 in all compared settings.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The reason why dropout is more effective is that when feeding each training case, each hidden unit is stochastically excluded from the network with a probability of dropout rate, ie, each training case can be regarded as a new model and these models are averaged as a special case of bagging [5], which effectively improves the generalisation ability of DNN models.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Analysis of Parameters",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "In this paper, we investigated the potential of training deep neural networks (DNNs) to predict users' ad click response based on multi-field categorical features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To deal with the computational complexity problem of high-dimensional discrete categorical features, we proposed two DNN models: field-wise feature embedding with supervised factorisation machine pre-training, and fully connected DNN with field-wise sampling-based RBM and DAE unsupervised pretraining.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These architectures and pre-training algorithms make our DNNs trained very efficiently.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Comprehensive experiments on a public real-world dataset verifies that the proposed DNN models successfully learn the underlying data patterns and provide superior CTR estimation performance than other compared models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The proposed models are very general and could enable a wide range of future works.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "For example, the model performance can be improved by momentum methods in that it suffices for handling the curvature problems in DNN training objectives without using complex second-order methods [36].",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition, the partial connection in the bottom layer could be extended to higher hidden layers as partial connectivities have many advantages such as lower complexity, higher generalisation ability and more similar to human brain [9].",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Deep Learning over Multi-field Categorical Data -A Case Study on User Response Prediction"
+}

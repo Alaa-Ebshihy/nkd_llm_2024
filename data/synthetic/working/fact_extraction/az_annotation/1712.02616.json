@@ -1,0 +1,649 @@
+{
+  "paper_id": "1712.02616",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "In this work we present InPlace Activated Batch Normalization (INPLACEABN) -a novel approach to drastically reduce the training memory footprint of modern deep neural networks in a computationally efficient way.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our solution substitutes the conventionally used succession of BatchNorm + Activation layers with a single plugin layer, hence avoiding invasive framework surgery while providing straightforward applicability for existing deep learning frameworks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We obtain memory savings of up to 50% by dropping intermediate results and by recovering required information during the backward pass through the inversion of stored forward results, with only minor increase (0.8-2%) in computation time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Also, we demonstrate how frequently used checkpointing approaches can be made computationally as efficient as INPLACEABN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiments on image classification, we demonstrate on-par results on ImageNet-1k with state-of-the-art approaches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the memory-demanding task of semantic segmentation, we report results for COCOStuff, Cityscapes and Mapillary Vistas, obtaining new state-of-the-art results on the latter without additional training data but in a single-scale and -model scenario.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Code can be found at https:// github.com/mapillary/inplace_abn .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Obviously, depth/width of networks strongly correlate with GPU memory requirements and at given hardware memory limitations, trade-offs have to be made to balance feature extractor performance vs. application-specific parameters like network output resolution or training data size.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A particularly memory-demanding task is semantic seg-  [12].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Left: Implementation with standard BN and in-place activation layers, which requires storing 6 buffers for the backward pass.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Right: Implementation with our proposed INPLACEABN layer, which requires storing only 3 buffers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our solution avoids storing the buffers that are typically kept for the backward pass through BN and exhibits a lower computational overhead compared to state-of-the-art memory-reduction methods.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "mentation, where one has to compromise significantly on the number of training crops per minibatch and their spatial resolution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In fact, many recent works based on modern backbone networks have to set the training batch size to no more than a single crop per GPU [2,30], which is partially also due to suboptimal memory management in some deep learning frameworks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we focus on increasing the memory efficiency of the training process of modern network architectures in order to further leverage performance of deep neural networks in tasks like image classification and semantic segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce a novel and unified layer that replaces the commonly used succession of batch normalization (BN) and nonlinear activation layers (ACT), which are integral with modern deep learning architectures like ResNet [11], ResNeXt [32], InceptionResNet [28], WideResNet [34], Squeeze-andExcitation Networks [13], DenseNet [14], etc",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our solution is coined INPLACEABN and proposes to merge batch normalization and activation layers in order to enable in-place computation, using only a single memory buffer for storing the results (see illustration in Figure 1).",
+              "tag": "Method"
+            },
+            {
+              "sent": "During the backward pass, we can efficiently recover all required quantities from this buffer by inverting the forward pass computations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our approach yields a theoretical memory reduction of up to 50%, and our experiments on semantic segmentation show additional data throughput of up to +75% during training, when compared to prevailing sequential execution of BN+ACT.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our memory gains are obtained without introducing noticeable computational overhead, ie side-by-side runtime comparisons show only between +0.8-2% increase in computation time.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "As additional contribution, we review the checkpointing memory management strategy [4] and propose a computationally optimized application of this idea in the context of BN layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This optimization allows us to drop recomputation of certain quantities needed during the backward pass, eventually leading to reduced computation times as per our INPLACEABN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, independent of the proposed optimized application of [4], conventional checkpointing in general suffers from higher implementation complexity (with the necessity to invasively manipulate the computation graph), while our main INPLACEABN contribution can be easily implemented as self-contained, standard plug-in layer and therefore simply integrated in any modern deep learning framework.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Our experimental evaluations demonstrate on-par performance with state-of-the-art models trained for image classification on ImageNet [26] (in directly comparable memory settings), and significantly improved results for the memory-critical application of semantic segmentation.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "\u2022 Introduction of a novel, self-contained INPLACEABN layer that enables joint, in-place computation of BN+ACT, approximately halvening the memory requirements during training of modern deep learning models.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "\u2022 A computationally more efficient application of the checkpointing memory management strategy in the context of BN layers, inspired by optimizations used for INPLACEABN.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "\u2022 Experimental evaluations for i) image classification on ImageNet-1k showing approximately on-par performance with state-of-the-art models and ii) semantic segmentation on COCOStuff, Cityscapes and Mapillary Vistas, considerably benefiting from the additional available memory and generating new high-scores on the challenging Vistas dataset.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Virtually all deep learning frameworks based on NVIDIA hardware exploit low-level functionality libraries CUDA and cuDNN 1 , providing GPU-accelerated and performance-optimized primitives and basic functionalities.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another line of research has focused on training CNNs with reduced precision and therefore smaller memoryfootprint datatypes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such works include (partially) binarized weights/activations/gradients [6,15,16], which however typically lead to degraded overall performance.",
+              "tag": "Other"
+            },
+            {
+              "sent": "With mixed precision training [22], this issue seems to be overcome and we plan to exploit this as complementary technique in future work, freeing up even more memory for training deep networks without sacrificing runtime.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "In [9] the authors modify ResNet in a way to contain reversible residual blocks, ie residual blocks whose activations can be reconstructed backwards.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Backpropagation through reversible blocks can be performed without having stored intermediate activations during the forward pass, which allows to save memory.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the cost to pay is twofold.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, one has to recompute each residual function during the backward pass, thus having the same overhead as checkpointing [21].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, the network design is limited to using blocks with certain restrictions, ie reversible blocks cannot be generated for bottlenecks where information is supposed to be discarded.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "In-Place Activated Batch Normalization",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Here, we describe our contribution to avoid the storage of a buffer that is typically needed for the gradient computation during the backward pass through the batch normalization layer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As opposed to existing approaches we also show that our solution minimizes the computational overhead we have to trade for saving additional memory.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Batch Normalization Review",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Batch Normalization has been introduced in [17] as an effective tool to reduce internal covariate shift in deep networks and accelerate the training process.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Ever since, BN plays a key role in most modern deep learning architectures.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Memory Optimization Strategies",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "Here we sketch our proposed memory optimization strategies after introducing both, the standard (memoryinefficient) use of batch normalization and the state-of-theart coined checkpointing [4,21].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In Figure 2, we provide diagrams showing the forward and backward passes of a typical building block BN+ACT+CONV 3 that we find in modern deep architectures.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Computations occurring during the forward pass are shown in green and involve the entire minibatch B (we omit the subscript B).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Computations happening during the backward pass are shown in cyan and gray.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The gray part aims at better highlighting the additional computation that has been introduced to compensate for the memory savings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Rectangles are in general volatile buffers holding intermediate results, except for rectangles surrounded by a dashed frame, which represent buffers that need to be stored for the backward pass and thus significantly impact the training memory footprint.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Eg, in Figure 2(a) only x and z will be stored for the backward pass, while in Figure 2(b) only x is stored.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the sake of presentation clarity, we have omitted two additional buffers holding \u00b5 B and \u03c3 B for the BN backward phase.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Nevertheless, these buffers represent in general a small fraction of the total allocated memory.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, we have also omitted the gradients with respect to the model parameters (ie",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "The three approaches that follow are all contributions of this work.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The first represents a variation of checkpointing, which allows us to save additional computations in the context of BN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The second and third are our main contributions, providing strategies that yield the same memory savings and even lower computational costs compared to the proposed, optimized checkpointing, but are both selfcontained and thus much easier to integrate in existing deep learning frameworks.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "Direct application of the checkpointing technique in the sketched building block, which is adopted also in [24], is not computationally optimal since additional operations could be saved by storing x, ie the normalized value of x as per Eq. ( 1), instead of x.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Indeed, as we will see in the next subsection, the backward pass through BN requires recomputing x if not already stored.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For this reason, we propose in Figure 2(c) an alternative implementation that is computationally more efficient by retaining x from the forward pass through the BN layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "From x we can recover z during the backward pass by applying the scale-and-shift operation \u03c0 \u03b3,\u03b2 (x) = \u03b3 x + \u03b2, followed by the activation function \u03c6 (see gray-colored operations).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "In this way, the computation of z becomes slightly more efficient than the one shown in Figure 2(b), for we save the fusion operation.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Finally, an additional saving of the normalization step derives from using the stored x in the backward implementation of BN rather than recomputing it from x.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To distinguish the efficient backward implementation of BN from the standard one we write BN * \u03b3,\u03b2 in place of BN \u03b3,\u03b2 (cyan-colored, see additionally \u00a7 3.3).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Technical Details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "INPLACE-ABN II:",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Implementation Details",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "We have implemented the proposed INPLACEABN I layer in PyTorch, by simply creating a new layer that fuses batch normalization with an (invertible) activation function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this way we can deal with the computation of x from z internally in the layer, thus keeping the implementation selfcontained.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We have released code at https://github. com/mapillary/inplace_abn for easy plug-in replacement of the block BN+ACT in modern The forward and backward implementations are also given as pseudocode in Algorithm 1 and 2. In the forward pass, in line 3, we explicitly indicate the buffers that are stored and needed for the backward pass.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Any other buffer can be overwritten with in-place computations, eg x, y and z can point to the same memory location.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the backward pass, we recover the stored buffers in line 1 and, again, every computation can be done in-place if the buffer is not needed anymore (eg",
+              "tag": "Method"
+            },
+            {
+              "sent": "\u2202L \u2202x , \u2202L \u2202y , \u2202L \u2202z can share the same memory location as well as x, y and z).",
+              "tag": "Method"
+            },
+            {
+              "sent": "As opposed to Figure 2, the pseudocode shows also the dependencies on additional, small, buffers like \u03c3 B and reports the gradients with respect to the BN layer parameters \u03b3 and \u03b2.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Image Classification",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "We have trained several residual-unit-based models on ImageNet-1k [26] to demonstrate the effectiveness of INPLACEABN for the task of image classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, we focus our attention on two main questions: i) whether using an invertible activation function (ie",
+              "tag": "Claim"
+            },
+            {
+              "sent": "LEAKY RELU in our experiments) impacts on the performance of the models, and ii) how the memory savings obtained with our method can be exploited to improve classification accuracy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our results are summarized in Table 2 and described in this subsection.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion of results.",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Our results may slightly differ from what was reported in the original papers, as our training protocol does not exactly match the one in [32] (eg data augmentation regarding scale and aspect ratio settings, learning rate schedule, etc) or due to changes in reference implementations. 5 ext, we focus on how to better exploit the memory savings due to our proposed INPLACEABN for improving classification accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a baseline, we train ResNeXt-101 with standard Batch Normalization and the maximum batch size that fits in GPU memory, ie 256 images per batch.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then, we consider two different options: i) using the extra memory to fit more images per training batch while fixing the network architecture, or ii) fixing the batch size while training a larger network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For option i) we double the batch size to 512 (ResNeXt-101, INPLACEABN, 512 in Table 2), while for option ii) we train ResNeXt-152 and WideResNet-38.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that neither ResNeXt-152 nor WideResNet-38 would fit in memory when using 256 images per training batch and when using standard BN.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As it is clear from the table, both i) and ii) result in a noticeable performance increase.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Interestingly, training ResNeXt-101 with an increased batch size results in similar accuracy to the deeper (and computationally more expensive) ResNeXt-152 model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As an additional reference, we train ResNeXt-101 with synchronized Batch Normalization (INPLACEABN sync ), which can be seen as a \"virtual\" increase of batch size applied to the computation of BN statistics.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this case we only observe small accuracy improvements when compared to the baseline model.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Semantic Segmentation",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "The goal of semantic segmentation is to assign categorical labels to each pixel in an image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "State-of-the-art segmentations are typically obtained by combining classification models pretrained on ImageNet (typically referred to as body) with segmentation-specific head architectures and jointly fine-tuning them on suitable, (densely) annotated training data like Cityscapes [5], COCOStuff [1], ADE20K [37] or Mapillary Vistas [23].",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "We report results on Cityscapes [5], COCOStuff [1] and Mapillary Vistas [23], since these datasets have complementary properties in terms of image content, size, number of class labels and annotation quality.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Cityscapes shows street-level images captured in central Europe and comprises a total of 5k densely annotated images (19 object categories + 1 void class, all images sized 2048\u00d71024), split into 2975/500/1525 images for training, validation and test, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While there exist additional 20k images with so-called coarse annotations, we learn only from the high-quality (fine) annotations in the training set and test on the corresponding validation set (for which ground truth is publicly available).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also show results on COCOStuff, which provides stuff -class annotations for the well-known MS COCO dataset [19].",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset comprises 65k COCO images (with 40k for training, 5k for validation, 5k for test-dev and 15k as challenge test set) with annotations for 91 stuff classes and 1 void class.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Images are smaller than in Cityscapes and with varying sizes, and the provided semantic annotations are based on superpixel segmentations, consequently suffering from considerable mislabelings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we also report results on Mapillary Vistas (research edition), a novel and large-scale street-level image dataset comprising 25k densely annotation images (65 object categories + 1 void class, images have varying aspect ratios and sizes up to 22 Megapixel), split into 18k/2k/5k images for training, validation and test, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similar to the aforementioned datasets, we train on training data and test on validation data.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "Finally, we have run another experiment with 12 crops at 872 \u00d7 872 where we however used a different training data sampling strategy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead of just randomly perturbing the dataset and taking training crops from random positions, we compiled the minibatches per epoch in a way to show all classes approximately uniformly (thus following an oversampling strategy for underrepresented categories).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In practice, we tracked object class presence for all images and eventually class-uniformly sampled from eligible image candidates, making sure to take training crops from areas containing the class of interest.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Applying this sampling strategy coined CLASSUNIFORM SAMPLING yields 79.40%, which matches the highest reported score on Cityscapes validation data reported in [8], without however using additional training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Next, we provide results for the Mapillary Vistas dataset, using hyperparameter settings inspired by our highest scoring configuration for Cityscapes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Vistas is considerably larger than Cityscapes (in terms of #classes, #images and image resolution), so running an exhaustive amount of experiments is prohibitive in terms of training time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Due to the increase of object classes (19 for Cityscapes and 65 for Vistas), we used minibatches of 12 crops at 776 \u00d7 776 (with INPLACEABN sync ), increased the initial learning rate to 3.5 \u00d7 10 \u22123 and trained for 90 epochs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This setting leads to the highest reported single-scale score of 53.12% on validation data so far, significantly outperforming the LSUN 2017 segmentation winner's single-scale approach [35] of 51.59%.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As also listed in Table 4, their approach additionally used hybrid dilated convolutions [29], applied an inverse frequency weighting for correcting training data class imbalance as well as pretrained on Cityscapes.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Timing analyses",
+      "selected_sentences": [
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "Besides the discussed memory improvements and their impact on computer vision applications, we also provide actual runtime comparisons and analyses for the INPLACEABN I setting shown in 2(d), as this is the implementation we made publicly available 6 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Isolating a single BN+ACT+CONV block, we evaluate the computational times required for a forward and backward pass over it (Figure 4).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We compare the conventional approach of serially executing layers and storing intermediate results (STANDARD), our proposed INPLACEABN I and the CHECKPOINTING approach.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In order to obtain fair timing comparisons, we re-implemented the checkpointing idea in PyTorch.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The results are obtained by running all operations over a batch comprising 32-images and setting the meta-parameters (number of feature channels, spatial dimensions) to those encountered in the four modules of ResNeXt-101, denoted as CONV1CONV4.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The actual runtimes were averaged over 200 iterations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We observe consistent speed advantages in favor of our method when comparing against CHECKPOINTING, with the actual percentage difference depending on block's metaparameters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As we can see, INPLACEABN induces computation time increase between 0.8 \u2212 2% over STANDARD while CHECKPOINTING is almost doubling our overheads.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "In this work we have presented INPLACEABN, which is a novel, computationally efficient fusion of batch normalization and activation layers, targeting memoryoptimization for modern deep neural networks during training time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We reconstruct necessary quantities for the backward pass by inverting the forward computation from the storage buffer, and manage to free up almost 50% of the memory needed in conventional BN+ACT implementations at little additional computational costs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In contrast to stateof-the-art checkpointing attempts, our method is reconstructing discarded buffers backwards during the backward pass, thus allowing us to encapsulate BN+ACT as selfcontained layer, which is easy to implement and deploy in virtually all modern deep learning frameworks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We have validated our approach with experiments for image classification on ImageNet-1k and semantic segmentation on Cityscapes, COCOStuff and Mapillary Vistas.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our obtained networks have performed consistently and considerably better when trained with larger batch sizes (or training crop sizes), leading to a new high-score on the challenging Mapillary Vistas dataset in a single-scale, single-model inference setting.",
+              "tag": "Other"
+            },
+            {
+              "sent": "In future works, we will investigate the consequences of our approach for problems like object detection, instance-specific segmentation and learning in 3D.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Derivations for gradient computation are provided in the Appendix.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "In-Place Activated BatchNorm for Memory-Optimized Training of DNNs"
+}

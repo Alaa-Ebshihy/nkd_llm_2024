@@ -1,0 +1,348 @@
+{
+  "paper_id": "1808.09075",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Conventional wisdom is that hand-crafted features are redundant for deep learning models, as they already learn adequate representations of text automatically from corpora.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we test this claim by proposing a new method for exploiting handcrafted features as part of a novel hybrid learning approach, incorporating a feature auto-encoder loss component.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We evaluate on the task of named entity recognition (NER), where we show that including manual features for partof-speech, word shapes and gazetteers can improve the performance of a neural CRF model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We obtain a F 1 of 91.89 for the CoNLL-2003 English shared task, which significantly outperforms a collection of highly competitive baseline models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also present an ablation study showing the importance of autoencoding, over using features as either inputs or outputs alone, and moreover, show including the autoencoder components reduces training requirements to 60%, while retaining the same predictive accuracy.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Orthogonal to the advances in deep learning is the effort spent on feature engineering.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A representative example is the task of named entity recognition (NER), one that requires both lexical and syntactic knowledge, where, until recently, most models heavily rely on statistical sequential labelling models taking in manually engineered features (Florian et al, 2003;Chieu and Ng, 2002;Ando and Zhang, 2005).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Typical features include POS and chunk tags, prefixes and suffixes, and external gazetteers, all of which represent years of accumulated knowledge in the field of computational linguistics.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "More recently, there has been increasing recognition of the utility of linguistic features Chen et al, 2017;Wu et al, 2017;Liu et al, 2018a) where such features are integrated to improve model performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Inspired by this, taking NER as a case study, we investigate the utility of hand-crafted features in deep learning models, challenging conventional wisdom in an attempt to refute the utility of manually-engineered features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Of particular interest to this paper is the work by Ma and Hovy (2016)   introduce a strong end-to-end model combining a bi-directional Long ShortTerm Memory (BiLSTM) network with Convolutional Neural Network (CNN) character encoding in a Conditional Random Field (CRF).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Their model is highly capable of capturing not only word-but also characterlevel features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We extend this model by integrating an auto-encoder loss, allowing the model to take hand-crafted features as input and re-construct them as output, and show that, even with such a highly competitive model, incorporating linguistic features is still beneficial.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Perhaps the closest to this study is the works by Ammar et al (2014) and , who show how CRFs can be framed as auto-encoders in unsupervised or semisupervised settings.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "With our proposed model, we achieve strong performance on the CoNLL 2003 English NER shared task with an F 1 of 91.89, significantly outperforming an array of competitive baselines.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We conduct an ablation study to better understand the impacts of each manually-crafted feature.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we further provide an in-depth analysis of model performance when trained with varying amount of data and show that the proposed model is highly competent with only 60% of the training set.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Methodology",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In this section, we first outline the model architecture, then the manually crafted features, and finally how they are incorporated into the model.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "We build on a highly competitive sequence labelling model, namely BiLSTMCNNCRF, first introduced by Ma and Hovy (2016).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given an input sequence of x = {x 1 , x 2 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", x T } of length T , the model is capable of tagging each input with a predicted label \u0177, resulting in a sequence of \u0177 = {\u0177 1 , \u01772 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", \u0177T } closely matching the gold label sequence y = {y 1 , y 2 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Here, we extend the model by incorporating an auto-encoder loss taking hand-crafted features as in/output, thereby forcing the model to preserve crucial information stored in such features and allowing us to evaluate the impacts of each feature on model performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, our model, referred to as NeuralCRF+AE, consists of four major components: (1) a character-level CNN (charCNN);",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Previous studies (Santos and Zadrozny, 2014;Chiu and Nichols, 2016;Ma and Hovy, 2016) have demonstrated that CNNs are highly capable of capturing character-level features.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Here, our character-level CNN is similar to that used in Ma and Hovy (2016) but differs in that we use a ReLU activation (Nair and Hinton, 2010). 1 BiLSTM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use a BiLSTM to learn contextual information of a sequence of words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As inputs to the BiLSTM, we first concatenate the pre-trained embedding of each word w i with its character-level representation c w i (the output of the charCNN) and a vector of manually crafted features f i (described in Section 2.2):",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "where \u03c3 is the sigmoid activation function, t denotes the type of feature, and W t is a trainable parameter matrix.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More formally, we define the auto-encoder loss as:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Hand-crafted Features",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "In addition, we also experimented with including the label of the incoming dependency edge to each word as a feature, but observed performance deterioration on the development set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While we still study and analyse the impacts of this feature in Table 3 and Section 3.2, it is excluded from our model configuration (not considered as part of f i unless indicated otherwise).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "In this section, we present our experimental setup and results for name entity recognition over the CoNLL 2003 English NER shared task dataset (Tjong Kim Sang and De Meulder, 2003).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experimental Setup",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "We use the CoNLL 2003 NER shared task dataset, consisting of 14,041/3,250/3,453 sentences in the training/development/test set respectively, all extracted from Reuters news articles during the period from 1996 to 1997.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dataset is annotated with four categories of name entities: PERSON, LOCATION, ORGANIZATION and MISC.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the IOBES tagging scheme, as previous study have shown that this scheme provides a modest improvement to the model performance (Ratinov and Roth, 2009;Chiu and Nichols, 2016;Lample et al, 2016;Ma and Hovy, 2016).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "We measure model performance with the official CoNLL evaluation script and report span-level named entity F-score on the test set using early stopping based on the performance on the validation set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We report average F-scores and standard deviation over 5 runs for our model.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "The experimental results are presented in Table 2. Observe that NeuralCRF+AE, trained either on the training set only or with the addition of the development set, achieves substantial improvements in F-score in both settings, superior to all but one of the benchmark models, highlighting the utility of hand-crafted features incorporated with the proposed auto-encoder loss.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared against the NeuralCRF, a very strong model in itself, our model significantly improves performance, showing the positive impact of our technique for exploiting manually-engineered features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Although Peters et al (2018) report a higher F-score using their ELMo embedding technique, our approach here is orthogonal, and accordingly we would expect a performance increase if we were to incorporate their ELMo representations into our model.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Ablation Study",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "We observe performance degradation when eliminating POS, word shape and gazetteer features, showing that each feature contributes to NER performance beyond what is learned through deep learning alone.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Interestingly, the contribution of gazetteers is much less than that of the other features, which is likely due to the noise introduced in the matching process, with many incorrectly identified false positives.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "(1) input only; (2) output only (equivalent to multi-task learning); and (3) both input and output (NeuralCRF+AE) and present the results in Table 4. Simply using features as either input or output only improves model performance slightly, but insignificantly so.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is only when features are incorporated with the proposed auto-encoder loss do we observe a significant performance boost.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hyperparameters Three extra hyperparameters are introduced into our model, controlling the weight of the autoencoder loss relative to the CRF loss, for each feature type.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 3 shows the effect of each hyperparameter on test performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Observe that setting \u03bb i = 1 gives strong performance, and that the impact of the gazetteer is less marked than the other two feature types.",
+              "tag": "Result"
+            },
+            {
+              "sent": "While increasing \u03bb is mostly beneficial, performance drops if the \u03bbs are overly large, that is, the auto-encoder loss overwhelms the main prediction task.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "In this paper, we set out to investigate the utility of hand-crafted features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To this end, we have presented a hybrid neural architecture to validate this hypothesis extending a BiLSTMCNNCRF by incorporating an auto-encoder loss to take manual features as input and then reconstruct them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On the task of named entity recognition, we show significant improvements over a collection of competitive baselines, verifying the value of such features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Lastly, the method presented in this work can also be easily applied to other tasks and models, where hand-engineered features provide key insights about the data.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Evaluating the Utility of Hand-crafted Features in Sequence Labelling *"
+}

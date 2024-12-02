@@ -1,0 +1,611 @@
+{
+  "paper_id": "1704.08545",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We focus on the challenging task of real-time semantic segmentation in this paper.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It finds many practical applications and yet is with fundamental difficulty of reducing a large portion of computation for pixel-wise label inference.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We propose an image cascade network (ICNet) that incorporates multi-resolution branches under proper label guidance to address this challenge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We provide in-depth analysis of our framework and introduce the cascade feature fusion unit to quickly achieve highquality segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our system yields real-time inference on a single GPU card with decent quality results evaluated on challenging datasets like Cityscapes, CamVid and COCOStuff.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Semantic image segmentation is a fundamental task in computer vision.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It predicts dense labels for all pixels in the image, and is regarded as a very important task that can help deep understanding of scene, objects, and human.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Development of recent deep convolutional neural networks (CNNs) makes remarkable progress on semantic segmentation [1,2,3,4,5,6].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The effectiveness of these networks largely depends on the sophisticated model design regarding depth and width, which has to involve many operations and parameters.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "CNN-based semantic segmentation mainly exploits fully convolutional networks (FCNs).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is common wisdom now that increase of result accuracy almost means more operations, especially for pixel-level prediction tasks like semantic segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To illustrate it, we show in Figure 1(a) the accuracy and inference time of different frameworks on Cityscapes [7] dataset.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Status of Fast Semantic Segmentation Contrary to the extraordinary development of high-quality semantic segmentation, research along the line to make semantic segmentation run fast while not sacrificing too much quality is left behind.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We note actually this line of work is similarly important since it can inspire or enable many practical tasks in, for example, automatic driving, robotic interaction, online video processing, and even mobile computing where running time becomes a critical factor to evaluate system performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Inference speed and mIoU performance on Cityscapes [7] test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Methods involved are PSPNet [5], ResNet38 [6], DUC [10], RefineNet [11], FRRN [12], DeepLabv2CRF [13], Dilation10 [14], DPN [15], FCN-8s [1], DeepLab [2], CRFRNN [16], SQ [9], ENet [8], SegNet [3], and our ICNet.",
+              "tag": "Method"
+            },
+            {
+              "sent": "(b): Time spent on PSPNet50 with dilation 8 for two input images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Roughly running time is proportional to the pixel number and kernel number.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Different from previous architectures, we make comprehensive consideration on the two factors of speed and accuracy that are seemingly contracting.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first make in-depth analysis of time budget in semantic segmentation frameworks and conduct extensive experiments to demonstrate insufficiency of intuitive speedup strategies.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This motivates development of image cascade network (ICNet), a high efficiency segmentation system with decent quality.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It exploits efficiency of processing low-resolution images and high inference quality of high-resolution ones.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The idea is to let low-resolution images go through the full semantic perception network first for a coarse prediction map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then cascade feature fusion unit and cascade label guidance strategy are proposed to integrate medium and high resolution features, which refine the coarse semantic map gradually.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We make all our code and models publicly available 2 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our main contributions and performance statistics are the following.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "We develop a novel and unique image cascade network for real-time semantic segmentation, it utilizes semantic information in low resolution along with details from high-resolution images efficiently.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The developed cascade feature fusion unit together with cascade label guidance can recover and refine segmentation prediction progressively with a low computation cost.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our ICNet achieves 5\u00d7 speedup of inference time, and reduces memory consumption by 5\u00d7 times.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It can run at high resolution 1024\u00d72048 in speed of 30 fps while accomplishing high-quality results.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It yields real-time inference on various datasets including Cityscapes [7], CamVid [17] and COCOStuff [18].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Image Cascade Network",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "We start by analyzing computation time budget of different components on the high performance segmentation framework PSPNet [5] with experimental statistics.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we introduce the image cascade network (ICNet) as illustrated in Figure 2, along with the cascade feature fusion unit and cascade label guidance, for fast semantic segmentation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Speed Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Network Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Our proposed system image cascade network (ICNet) does not simply choose either way.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead it takes cascade image inputs (ie, low-, medium-and high resolution images), adopts cascade feature fusion unit (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "3.3) and is trained with cascade label guidance (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The new architecture is illustrated in Figure 2. The input image with full resolution (eg, 1024 \u00d7 2048 in Cityscapes [7]) is downsampled by factors of 2 and 4, forming cascade input to medium-and high-resolution branches.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Segmenting the high-resolution input with classical frameworks like FCN directly is time consuming.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To overcome this shortcoming, we get semantic extraction using low-resolution input as shown in top branch of Figure 2. A 1/4 sized image is fed into PSPNet with downsampling rate 8, resulting in a 1/32-resolution feature map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To get high quality segmentation, medium and high resolution branches (middle and bottom parts in Figure 2) help recover and refine the coarse prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Though some details are missing and blurry boundaries are generated in the top branch, it already harvests most semantic parts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus we can safely limit the number of parameters in both middle and bottom branches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Light weighted CNNs (green dotted box) are adopted in higher resolution branches; different-branch output feature maps are fused by cascade-feature-fusion unit (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "3.3) and trained with cascade label guidance (Sec.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Although the top branch is based on a full segmentation backbone, the input resolution is low, resulting in limited computation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Even for PSPNet with 50+ layers, inference time and memory are 18ms and 0.6GB for the large images in Cityscapes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Because weights and computation (in 17 layers) can be shared between low-and medium-branches, only 6ms is spent to construct the fusion map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Bottom branch has even less layers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Although the resolution is high, inference only takes 9ms.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Details of the architecture are presented in the supplementary file.",
+              "tag": "Result"
+            },
+            {
+              "sent": "With all these three branches, our ICNet becomes a very efficient and memory friendly architecture that can achieve good-quality segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To combine cascade features from differentresolution inputs, we propose a cascade feature fusion (CFF) unit as shown in Figure 3.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The input to this unit contains three components: two feature maps F 1 and F 2 with sizes We first apply upsampling rate 2 on F 1 through bilinear interpolation, yielding the same spatial size as F 2 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then a dilated convolution layer with kernel size C 3 \u00d7 3 \u00d7 3 and dilation 2 is applied to refine the upsampled features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The resulting feature is with size",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Cascade Feature Fusion",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "This dilated convolution combines feature information from several originally neighboring pixels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Compared with deconvolution, upsampling followed by dilated convolution only needs small kernels, to harvest the same receptive field.",
+              "tag": "Result"
+            },
+            {
+              "sent": "To keep the same receptive field, deconvolution needs larger kernel sizes than upsampling with dilated convolution (ie, 7 \u00d7 7 vs. 3 \u00d7 3), which causes more computation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Cascade Label Guidance",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "To enhance the learning procedure in each branch, we adopt a cascade label guidance strategy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It utilizes different-scale (eg, 1/16, 1/8, and 1/4) groundtruth labels to guide the learning stage of low, medium and high resolution input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given T branches (ie, T =3) and N categories.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In branch t, the predicted feature map F t has spatial size Y t \u00d7 X t .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The value at position (n, y, x) is F t n,y,x .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The corresponding ground truth label for 2D position (y, x) is n.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To train ICNet, Figure 4. Comparison of semantic segmentation frameworks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "(a) Intermediate skip connection used by FCN [1] and Hypercolumns [21].",
+              "tag": "Method"
+            },
+            {
+              "sent": "(b) Encoder-decoder structure incorporated in SegNet [3], DeconvNet [4], UNet [33], ENet [8], and step-wise reconstruction & refinement from LRR [34] and RefineNet [11].",
+              "tag": "Method"
+            },
+            {
+              "sent": "(c) Multi-scale prediction ensemble adopted by DeepLabMSC [2] and PSPNetMSC [5].",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Structure Comparison and Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experimental Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "Our method is effective for high resolution images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate the architecture on three challenging datasets, including urban-scene understanding dataset Cityscapes [7] with image resolution 1024 \u00d7 2048, CamVid [17] with image resolution 720 \u00d7 960 and stuff understanding dataset COCOStuff [18] with image resolution up to 640 \u00d7 640.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There is a notable difference between COCOStuff and object/scene segmentation datasets of VOC2012 [35] and ADE20K [36].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the latter two sets, most images are of low resolution (eg, 300 \u00d7 500), which can already be processed quickly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While in COCOStuff, most images are larger, making it more difficult to achieve real-time performance.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Implementation Details",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "For the training hyper-parameters, the mini-batch size is set to 16.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The base learning rate is 0.01 and the 'poly' learning rate policy is adopted with power 0.9, together with the maximum iteration number set to 30K for Cityscapes, 10K for CamVid and 30K for COCOStuff.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Momentum is 0.9 and weight decay is 0.0001.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Data augmentation contains random mirror and rand resizing between 0.5 and 2. The auxiliary loss weights are empirically set to 0.4 for \u03bb 1 and \u03bb 2 , 1 for \u03bb 3 in Eq. 2, as adopted in [5].",
+              "tag": "Method"
+            },
+            {
+              "sent": "For evaluation, both mean of class-wise intersection over union (mIoU) and network forward time (Time) are used.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Cityscapes",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "Cascade Branches We do ablation study on cascade branches, the results are shown in Table 2. Our baseline is the half-compressed PSPNet50, 170ms inference time is yielded with mIoU reducing to 67.9%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "They indicate that model compression has almost no chance to achieve real-time performance under the condition of keeping decent segmentation quality.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Based on this baseline, we test our ICNet on different branches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To show the effectiveness of the proposed cascade framework, we denote the outputs of low-, medium-and high-resolution branches as 'sub4', 'sub24' and 'sub124', where the numbers stand for the information used.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The setting 'sub4' only uses the top branch with the low-resolution input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "'sub24' and 'sub124' respectively contain top two and all three branches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We test these three settings on the validation set of Cityscapes and list the results in Table 2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With just the low-resolution input branch, although running time is short, the result quality drops to 59.6%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using two and three branches, we increase mIoU to 66.5% and 67.7% respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The running time only increases by 7ms and 8ms.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note our segmentation quality nearly stays the same as the baseline, and yet is 5.2\u00d7 times faster.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The memory consumption is significantly reduced by 5.8\u00d7.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Cascade Structure",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "We also do ablation study on cascade feature fusion unit and cascade label guidance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results are shown in Table 3.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared to the deconvolution layer with 3 \u00d7 3 and 5 \u00d7 5 kernels, with similar inference efficiency, cascade feature fusion unit gets higher mIoU performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared to deconvolution layer with a larger kernel with size 7\u00d77, the mIoU performance is close, while cascade feature fusion unit yields faster processing speed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Without the cascade label guidance, the performance drops a lot as shown in the last row. validation sets of Cityscapes for 90K iterations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Results are included in Table 4.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The reported mIoUs and running time of other methods are shown in the official Cityscapes leadboard.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For fairness, we do not include methods without reporting running time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Many of these methods may have adopted time-consuming multiscale testing for the best result quality.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is even quantitatively better than several methods that do not care about speed.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is about 10 points higher than ENet [8] and SQ [9].",
+              "tag": "Result"
+            },
+            {
+              "sent": "Training with both fine and coarse data boosts mIoU performance to 70.6%.",
+              "tag": "Method"
+            },
+            {
+              "sent": "ICNet is a 30fps method on 1024 \u00d7 2048 resolution images using only one TitanX GPU card.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Video example can be accessed through link 4 .",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Methods Comparison",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CamVid",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "COCO-Stuff",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "We have proposed a real-time semantic segmentation system ICNet.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It incorporates effective strategies to accelerate network inference speed without sacrificing much performance.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The major contributions include the new framework for saving operations in multiple resolutions and the powerful fusion unit.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "We believe the optimal balance of speed and accuracy makes our system important since it can benefit many other tasks that require fast scene and object segmentation.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "It greatly enhances the practicality of semantic segmentation in other disciplines.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "ICNet for Real-Time Semantic Segmentation on High-Resolution Images"
+}

@@ -1,0 +1,694 @@
+{
+  "paper_id": "1506.04579",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We present a technique for adding global context to fully convolutional networks for semantic segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The approach is simple, using the average feature for a layer to augment the features at each location.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, we study several idiosyncrasies of training, significantly increasing the performance of baseline networks (eg from FCN Long et al ( 2014)).",
+              "tag": "Method"
+            },
+            {
+              "sent": "When we add our proposed global feature, and a technique for learning normalization parameters, accuracy increases consistently even over our improved versions of the baselines.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our proposed approach, ParseNet, achieves state-of-the-art performance on SiftFlow and PASCALContext with small additional computational cost over baselines, and near current state-of-the-art performance on PASCAL VOC 2012 semantic segmentation with a simple approach.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Code is available at https://github.com/weiliu89/caffe/tree/fcn .",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Semantic segmentation, largely studied in the last 10 years, merges image segmentation with object recognition to produce per-pixel labeling of image content.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The currently most successful techniques for semantic segmentation are based on fully convolution networks (FCN) Long et al (2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These are adapted from networks designed to classify whole images Krizhevsky et al (2012); Szegedy et al (2014a); Simonyan & Zisserman (2014), and have demonstrated impressive level of performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The FCN approach can be thought of as sliding an classification network around an input image, and processes each sliding window area independently.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, FCN disregards global information about an image, thus ignoring potentially useful scene-level semantic context.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In order to integrate more context, several approaches Chen et al (2014); Schwing & Urtasun (2015); Lin et al (2015); Zheng et al (2015), propose using techniques from graphical models such as conditional random field (CRF), to introduce global context and structured information into a FCN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although powerful, these architectures can be complex, combining both the challenges of tuning a deep neural network and a CRF, and require a fair amount of experience in managing the idiosyncrasies of training methodology and parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "At the least, this leads to time-consuming training and inference.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "In this work, we propose ParseNet, an end-to-end simple and effective convolutional neural network, for semantic segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One of our main contributions, as shown in Figure 1, is to use global context to help clarify local confusions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Looking back at previous work, adding global context for semantic segmentation is not a new idea, but has so far been pursued in patch-based frameworks Lucchi et al (2011).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such patch-based approaches have much in common with detection and segmentation work that have also shown benefits from integrating global context into classifying regions or objects in an image Szegedy et al (2014b); Mostajabi et al (2014).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our approach allows integrating global context in an end-to-end fully convolutional network (as opposed to a patch-based approach) for semantic segmentation with small computational overhead.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our setting, the image is not divided into regions or objects, instead the network makes a joint prediction of all pixel values.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Previous work on fully convolutional networks did not include global features, and there were limits in the pixel distance across which consistency in labeling was maintained.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "The key \"widget\" that allows adding global context to the FCN framework is simple, but has several important consequences in addition to improving the accuracy of FCN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, the entire end-to-end process is a single deep network, making training relatively straightforward compared to combining deep networks and CRFs.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "In addition, the way we add global context does not introduce much computational overhead versus training and evaluating a standard FCN, while improving performance   significantly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our approach, the feature map for a layer is pooled over the whole image to result in a context vector.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is appended to each of the features sent on to the subsequent layer of the network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In implementation, this is accomplished by unpooling the context vector and appending the resulting feature map with the standard feature map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The process is shown in Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This technique can be applied selectively to feature maps within a network, and can be used to combine information from multiple feature maps, as desired.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Notice that the scale of features from different layers may be quite different, making it difficult to directly combine them for prediction.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We find that L 2 normalizing features for each layer and combining them using a scaling factor learned through backpropagation works well to address this potential difficulty.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In section 4, we demonstrate that these operations, appending global context pooled from a feature map along with an appropriate scaling, are sufficient to significantly improve performance over the basic FCN, resulting in accuracy on par with the method of Chen et al ( 2014) that uses detailed structure information for post processing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "That said, we do not advocate ignoring the structure information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead, we posit that adding the global feature is a simple and robust method to improve FCN performance by considering contextual information.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "In fact, our network can be combined with explicit structure output prediction, eg a CRF, to potentially further increase performance.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Deep convolutional neural networks (CNN) Krizhevsky et al (2012); Szegedy et al (2014a); Simonyan & Zisserman (2014) have become powerful tools not only for whole image classification, but also for object detection and semantic segmentation Girshick et al (2014); Szegedy et al (2014b); Gupta et al (2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This success has been attributed to both the large capacity and effective training of the CNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following the proposal + post-classification scheme Uijlings et al (2013), CNNs achieve state-of-the-art results on object detection and segmentation tasks.",
+              "tag": "Other"
+            },
+            {
+              "sent": "As a caveat, even though a single pass through the networks used in these systems is approaching or already past video frame rate for individual patch, these approaches require classifying hundreds or thousands of patches per image, and thus are still slow.",
+              "tag": "Other"
+            },
+            {
+              "sent": "He et al (2014); Long et al (2014) improve the computation by applying convolution to the whole image once, and then pool features from the final feature map of the network for each region proposal or pixel to achieve comparable or even better results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Yet, these methods still fall short of including whole image context and only classify patches or pixels locally.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our ParseNet is built upon the fully convolutional network architecture Long et al (2014) with a strong emphasis on including contextual information in a simple approach.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "GLOBAL CONTEXT",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Context is known to be very useful for improving performance on detection and segmentation tasks using deep learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Mostajabi et al (2014); Szegedy et al (2014b) and references therein illustrate how context can be used to help in different tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As for semantic segmentation, per pixel classification, is often ambiguous in the presence of only local information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the task becomes much simpler if contextual information, from the whole image, is available.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although theoretically, features from the top layers of a network have very large receptive fields (eg fc7 in FCN with VGG has a 404 \u00d7 404 pixels receptive field), we argue that in practice, the empirical size of the receptive fields is much smaller, and is not enough to capture the global context.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To identify the effective receptive field, we slide a small patch of random noise across the input image, and measure the change in the activation of the desired layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "If the activation does not vary significantly, that suggests the given random patch is outside of the empirical receptive field, as shown in Figure 2. The effective receptive field at the last layer of this network barely covers 1 4 of the entire image.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Such an effect of difference between empirical and theoretical receptive field sizes was also observed in Zhou et al (2014).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Fortunately, it is rather straightforward to get the context within the FCN architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we use global average pooling and pool the context features from the last layer or any layer if that is desired.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The quality of semantic segmentation is greatly improved by adding the global feature to local feature map, either with early fusion 1 or late fusion as discussed in Sec.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, Fig 1 has misclassified a large portion of the image as bird since it only used local information, however, adding contextual information in the loop, which might contain strong signal of cat, corrects the mistake.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Experiment results on VOC2012 and PASCALContext dataset also verify our assumption.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared with Chen et al (2014), the improvement is similar as of using CRF to post-process the output of FCN.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "EARLY FUSION AND LATE FUSION",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Once we get the global context feature, there are two general standard paradigms of using it with the local feature map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, the early fusion, illustrated in in Figure 1 where we unpool (replicate) global feature to the same size as of local feature map spatially and then concatenate them, and use the combined feature to learn the classifier.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The alternative approach, is late fusion, where each feature is used to learn its own classifier, followed by merging the two predictions into a single classification score Long et al (2014); Chen et al (2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "There are cons and pros for both fusion methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "If there is no additional processing on combined features, early fusion is quite similar to late fusion as pointed out in Hariharan et al (2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With late fusion, there might be a case where individual features cannot recognize something but combining them may and there is no way to recover from independent predictions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our experiments show that both method works more or less the same if we normalize the feature properly for early fusion case.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "When merging the features, one must be careful to normalize each individual feature to make the combined feature work well; in classical computer vision this is referred as the cue combination problem.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 3, we extract a feature vector at a position combined from increasing higher level layers (from left to right), with lower level feature having a significantly larger scale than higher level layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "4.2, by naively combining features, the resultant feature will not be discriminative, and heavy parameter tuning will be required to achieve sufficient accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, we can first L 2 normalize each feature and also possibly learn the scale parameter, which makes the learning more stable.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We will describe more details in Sec.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "L 2 NORMALIZATION LAYER",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "L 2 norm layer is not only useful for feature combination.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "As was pointed out above, in some cases late fusion also works equally well, but only with the help of L 2 normalization.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, if we want to use lower level feature to learn classifier, as demonstrated in Figure 3, some of the features will have very large norm.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is not trivial to learn with it without careful weight initialization and parameter tuning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A work around strategy is to apply an additional convolutional layer Chen et al (2014); Hariharan et al (2014) and use several stages of finetuning Long et al (2014) with much lower learning rate for lower layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This again goes against the principle of simply and robustness.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our work, we apply L 2 -norm and learn the scale parameter for each channel before using the feature for classification, which leads to more stable training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Formally, let be the loss we want to minimize.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Here we use the summed softmax loss.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For a layer with d-dimensional input",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Note that simply normalizing each input of a layer changes the scale of the layer and will slow down the learning if we do not scale it accordingly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For example, we tried to normalize a feature s.t.",
+              "tag": "Method"
+            },
+            {
+              "sent": "L 2 -norm is 1, yet we can hardly train the network because the features become very small.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, if we normalize it to eg 10 or 20, the network begins to learn well.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Motivated by batch normalization Ioffe & Szegedy (2015) and PReLU He et al (2015), we introduce a scaling parameter \u03b3 i , for each channel, which scales the normalized value by",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "The number of extra parameters is equal to total number of channels, and are negligible and can be learned with backprogation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Indeed, by setting \u03b3 i = ||x|| 2 , we could recover the L 2 normalized feature, if that was optimal.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Notice that this is simple to implement as the normalization and scale parameter learning only depend on each input feature vector and do not need to aggregate information from other samples as batch normalization does.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During training, we use backpropagation and chain rule to compute derivatives with respect to scaling factor \u03b3 and input data x",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "EXPERIMENTS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "BEST PRACTICE OF FINETUNING",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "PASCAL-Context",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "We then apply the same model on PASCALContext by concatenating features from different layers of the network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Table 4, by adding global context pool6, it instantly helps improve by about 1.6%, which means that context is useful here as opposed to the observation in SiftFlow.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Context becomes more important proportionally to the image size.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Another interesting observation from the table is that, without normalization, the performance keep increasing until we add conv5.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, if we naively keep adding conv4, it starts decreasing the performance a bit; and if we add conv3, the network collapses.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Interestingly, if we normalize all the features before we combine them, we don't see such a drop, instead, adding all the feature together can achieve the state-of-the-art result on PASCALContext as far as we know.",
+              "tag": "Result"
+            },
+            {
+              "sent": "ParseNet Baseline performance is higher than DeepLab Baseline and it is faster, thus we switch to use it for most of the experimental comparison for VOC2012.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown in Table 5, we observe a similar pattern as of DeepLab Baseline that if we add pool6, it is helping improve the performance by 3.8%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, we also notice that if we do not normalize them and learn the scaling factors, its effect is diminished.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, we notice that early fusion and late fusion both work very similar.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Figure 4 illustrates some examples of how global context helps.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can clearly see that without using context feature, the network will make many mistakes by confusing between similar categories as well as making spurious predictions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Two similar looking patches are indistinguishable by the network if considered in isolation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, adding context solves this issue as the global context helps discriminate the local patches more accurately.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On the other hand, sometimes context also brings confusion for prediction as shown in Figure 5.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, in the first row, the global context feature definitely captured the spotty dog information that it used to help discriminate sheep from dog.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, it also added bias to classify the spotty horse as a dog.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also tried to combine lower level feature as was done with PASCALContext and SiftFlow, but no significant improvements using either early fusion or late fusion were observed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We believe it is because the fc7 of ParseNet Baseline is the same size as of conv4, and including lower level feature will not help much as they are not sufficiently discriminative.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Besides, we also tried the idea similar to spatial pyramid pooling where we pool 1 \u00d7 1 global feature, 2 \u00d7 2 subregion feature, and 4 \u00d7 4 subregion feature, and tried both early fusion and late fusion.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We conjecture that the receptive field of the high level feature map (eg fc7) is sufficiently large that sub-region global feature does not help much.",
+              "tag": "Result"
+            },
+            {
+              "sent": "6, we can see that our baseline result is already higher than many of the existing methods due to proper finetuning.",
+              "tag": "Result"
+            },
+            {
+              "sent": "By adding the global context feature, we achieve performance that is within the standard deviation of the one Chen et al ( 2014) using fully connect CRF to smooth the outputs and perform better on more than half of categories.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Again, our approach is much simpler to implement and train, hence is more robust.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Using late fusion has almost no extra training/inference cost.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "PASCAL VOC2012",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "We carry over the parameters we found on PASCALContext to VOC2012.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We tried both FCN-32s and DeepLabLargeFOV 4 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 2 shows the reproduced baseline results.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "DeepLab is very similar to FCN-32s, and our reproduced result is 5% better (64.96 vs. 59.80) using the parameters we found in PASCALContext.",
+              "tag": "Result"
+            },
+            {
+              "sent": "DeepLabLargeFOV uses the filter rarefication technique (atrous algorithm) that has much less parameters and is faster.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also use the same parameters on this architecture and can achieve 3.5% improvements.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The gap between these two models is not significant anymore as reported in Chen et al (2014) Until now, we see that parameters and details are important to get best performance using FCN models.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Below, we report all our results with the reproduced baseline networks.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "COMBINING LOCAL AND GLOBAL FEATURES",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "In this section, we report results of combining global and local feature on three dataset: SiftFlow Liu et al (2011), PASCALContext, and PASCAL VOC2012.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For simplicity, we use pool6 as the global context feature, conv5 as conv5 3, conv4 as conv4 3, and conv3 as conv3 3 through the rest of paper.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "SiftFlow is a relatively small dataset that only has 2,688 images with 33 semantic categories.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We do not use the geometric categories during training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the FCN-32s network with the parameters found in PASCALContext.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead of using two stages of learning as done in Long et al (2014), we combine the feature directly from different layers for learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Table 3, adding more layers can normally improve the performance as lower level layers have more detailed information.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also notice that adding global context feature does not help much.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is perhaps due to the small image size (256 \u00d7 256), as we know even the empirical receptive field of fc7 (eg",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Adding more layers of feature generally increase the performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Global feature is not that helpful as receptive field size of fc7 is large enough to cover most of the input image.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CONCLUSION",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "In this work we presented ParseNet, a simple fully convolutional neural network architecture that allows for direct inclusion of global context for the task of semantic segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We have explicitly demonstrated that relying on the largest receptive field of FCN network does not provide sufficient global context, and the largest empirical receptive field is not sufficient to capture global context -modeling global context directly in required.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On PASCAL VOC2012 test set, segmentation results of ParseNet are within the standard deviation of the DeepLabLargeFOVCRF, which suggests that adding a global feature has a similar effect of post processing FCN predictions with a graphical model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As part of developing and analyzing this approach we provided analysis of many",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Under review as a conference paper at ICLR 2016 PARSENET: LOOKING WIDER TO SEE BETTER"
+}

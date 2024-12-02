@@ -1,0 +1,678 @@
+{
+  "paper_id": "1506.08959",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "This paper aims to highlight vision related tasks centered around \"car\", which has been largely neglected by vision community in comparison to other objects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We show that there are still many interesting car-related problems and applications, which are not yet well explored and researched.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To facilitate future car-related research, in this paper we present our on-going effort in collecting a large-scale dataset, \"CompCars\", that covers not only different car views, but also their different internal and external parts, and rich attributes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Importantly, the dataset is constructed with a cross-modality nature, containing a surveillancenature set and a web-nature set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We further demonstrate a few important applications exploiting the dataset, namely car model classification, car model verification, and attribute prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We also discuss specific challenges of the car-related problems and other potential applications that worth further investigations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The latest dataset can be downloaded at http://mmlab.ie.cuhk.edu.hk/ datasets/comp_cars/index.html ** Update: This technical report serves as an extension to our earlier work [28] published in CVPR 2015.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The experiments shown in Sec. 5 gain better performance on all three tasks, ie car model classification, attribute prediction, and car model verification, thanks to more training data and better network structures.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The experimental results can serve as baselines in any later research works.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The settings and the train/test splits are provided on the project page.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "** Update 2: This update provides preliminary experiment results for fine-grained classification on the surveillance data of CompCars.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The train/test splits are provided in the updated dataset.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Automated car model analysis, particularly the finegrained car categorization and verification, can be used for innumerable purposes in intelligent transportation system including regulation, description and indexing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For instance, fine-grained car categorization can be exploited to inexpensively automate and expedite paying tolls from the lanes, based on different rates for different types of vehicles.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In video surveillance applications, car verification from appearance helps tracking a car over a multiple camera network when car plate recognition fails.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In post-event investigation, similar cars can be retrieved from the database with car verification algorithms.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Car model analysis also bears significant value in the personal car consumption.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "When people are planning to buy cars, they tend to observe cars in the street.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Think of a mobile application, which can instantly show a user the detailed information of a car once a car photo is taken.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such an application will provide great convenience when people want to know the information of an unrecognized car.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Other applications such as predicting popularity based on the appearance of a car, and recommending cars with similar styles can be beneficial both for manufacturers and consumers.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Despite the huge research and practical interests, car model analysis only attracts few attentions in the computer vision community.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We believe the lack of high quality datasets greatly limits the exploration of the community in this domain.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To this end, we collect and organize a large-scale and comprehensive image database called \"Comprehensive Cars\", with \"CompCars\" being short.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The \"CompCars\" dataset is much larger in scale and diversity compared with the current car image datasets, containing 208, 826 images of 1, 716 car models from two scenarios: web-nature and surveillance-nature.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, the dataset is carefully labelled with viewpoints and car parts, as well as rich attributes such as type of car, seat capacity, and door number.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The new dataset dataset thus provides a comprehensive platform to validate the effectiveness of a wide range of computer vision algorithms.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "It is also ready to be utilized for realistic applications and enormous novel research topics.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, the multi-scenario nature enables the use of the dataset for cross modality research.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The detailed description of CompCars is provided in Section 3.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "To validate the usefulness of the dataset and to encourage the community to explore for more novel research topics, we demonstrate several interesting applications with the dataset, including car model classification and verification based on convolutional neural network (CNN) [13].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another interesting task is to predict attributes from novel car models (see details in Section 4.2).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The experiments reveal several challenges specific to the car-related problems.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We conclude our analyses with a discussion in Section 7.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "To our knowledge, there is no previous attempt on the car model verification task.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Closely related to car model verification, face verification has been a popular topic [8,12,22,32].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The recent deep learning based algorithms [22] first train a deep neural network on human identity classification, then train a verification model with the feature extracted from the deep neural network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Joint Bayesian [2] is a widely-used verification model that models two faces jointly with an appropriate prior on the face representation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We adopt Joint Bayesian as a baseline model in car model verification.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Attribute prediction of humans is a popular research topic in recent years [1,4,12,29].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, a large portion of the labeled attributes in the current attribute datasets [4], such as long hair and short pants lack strict criteria, which causes annotation ambiguities [1].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The attributes with ambiguities will potentially harm the effectiveness of evaluation on related datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast, the attributes provided by CompCars (eg maximum speed, door number, seat capacity) all have strict criteria since they are set by the car manufacturers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The dataset is thus advantageous over the current datasets in terms of the attributes validity.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "Other car-related research includes detection [23], tracking [18] [26], joint detection and pose estimation [6,27], and 3D parsing [33].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Fine-grained car models are not explored in these studies.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Previous research related to car parts includes car logo recognition [20] and car style analysis based on mid-level features [14].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Similar to CompCars, the Cars dataset [10] also targets at fine-grained tasks on the car category.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Apart from the larger-scale database, our CompCars dataset offers several significant benefits in comparison to the Cars dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, our dataset contains car images diversely distributed in all viewpoints (annotated by front, rear, side, front-side, and rear-side), while Cars dataset mostly consists of frontside car images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, our dataset contains aligned car part images, which can be utilized for many computer vision algorithms that demand precise alignment.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Third, our dataset provides rich attribute annotations for each car model, which are absent in the Cars dataset.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Properties of CompCars",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "The CompCars dataset contains data from two scenarios, including images from web-nature and surveillance-nature.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The images of the web-nature are collected from car forums, public websites, and search engines.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The images of the surveillance-nature are collected by surveillance cameras.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The data of these two scenarios are widely used in the real-world applications.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They open the door for cross-modality analysis of cars.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, the web-nature data contains 163 car makes with 1, 716 car models, covering most of the commercial car models in the recent ten years.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are a total of 136, 727 images capturing the entire cars and 27, 618 images capturing the car parts, where most of them are labeled with attributes and viewpoints.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The surveillance-nature data contains 44, 481 car images captured in the front view.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each image in Car Hierarchy The car models can be organized into a large tree structure, consisting of three layers , namely car make, car model, and year of manufacture, from top to bottom as depicted in Figure 3.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The complexity is further compounded by the fact that each car model can be produced in different years, yielding subtle difference in their appearances.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For instance, three versions of \"Audi A4L\" were produced between 2009 to 2011 respectively.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Applications",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "In this section, we study three applications using Com-pCars, including fine-grained car classification, attribute prediction, and car verification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We select 78, 126 images from the CompCars dataset and divide them into three subsets without overlaps.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first subset (PartI) contains 431 car models with a total of 30, 955 images capturing the entire car and 20, 349 images capturing car parts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second subset (PartII) consists 111 models with 4, 454 images in total.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The last subset (PartIII) contains 1, 145 car models with 22, 236 images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Fine-grained car classification is conducted using images in the first subset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For attribute prediction, the models are trained on the first subset but tested on the second one.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The last subset is utilized for car verification.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "We investigate the above potential applications using Convolutional Neural Network (CNN), which achieves great empirical successes in many computer vision problems, such as object classification [11], detection [5], face alignment [30], and face verification [22,32].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we employ the Overfeat [21] model, which is pretrained on ImageNet classification task [3], and fine-tuned with the car images for car classification and attribute prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For car model verification, the fine-tuned model is employed as a feature extractor.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Fine-Grained Classification",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "The Entire Car Images",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "We also conduct a cross-modality experiment, where the CNN model fine-tuned by the web-nature data is evaluated on the surveillance-nature data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 9 illustrates some predictions, suggesting that the model may account for data variations in a different modality to a certain extent.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This experiment indicates that the features obtained from the web-nature data have potential to be transferred to data in the other scenario.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Car Parts",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Attribute Prediction",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "In this section, we deliberately design a challenging experimental setting for attribute recognition, where the car models presented in the test images are exclusive from the training images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We fine-tune the CNN with the sumof-square loss to model the continuous attributes, such as \"maximum speed\" and \"displacement\", but a logistic loss to predict the discrete attributes such as \"door number\", \"seat number\", and \"car type\".",
+              "tag": "Method"
+            },
+            {
+              "sent": "For example, the \"door number\" has four states, ie {2, 3, 4, 5} doors, while \"seat number\" also has four states, ie {2, 4, 5, > 5} seats.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The attribute \"car type\" has twelve states as discussed in Sec. 3.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "To study the effectiveness of different viewpoints for attribute prediction, we train CNN models for different viewpoints separately.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 5 summarizes the results, where the \"mean guess\" represents the errors computed by using the mean of the training set as the prediction.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe that the performances of \"maximum speed\" and \"displacement\" are insensitive to viewpoints.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, for the explicit attributes, the best accuracy is obtained under side view.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also found that the the implicit attributes are more difficult to predict then the explicit attributes.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Several test images and their attribute predictions are provided in Figure 11.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Car Verification",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "In this section, we perform car verification following the pipeline of face verification [22].",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, we adopt the classification model in Section 4.1.1 as a feature extractor of the car images, and then apply Joint Bayesian [2] to train a verification model on the PartII data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we test the performance of the model on the PartIII data, which includes 1, 145 car models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The test data is organized into three sets, each of which has different difficulty, ie easy, medium, and hard.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each set contains 20, 000 pairs of images, including 10, 000 positive pairs and 10, 000 negative pairs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each image pair in the \"easy set\" is selected from the same viewpoint, while each pair in the \"medium set\" is selected from a pair of random viewpoints.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each negative pair in the \"hard set\" is chosen from the same car make.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Updated Results: Comparing Different Deep Models",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "As an extension to the experiments in Section 4, we conduct experiments for fine-grained car classification, attribute prediction, and car verification with the entire dataset and different deep models, in order to explore the different capabilities of the models on these tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The split of the dataset into the three tasks is similar to Section 4, where three subsets contain 431, 111, and 1, 145 car models, with 52, 083, 11, 129, and 72, 962 images respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The only difference is that we adopt full set of CompCars in order to establish updated baseline experiments and to make use of the dataset to the largest extent.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We keep the testing sets of car verification same to those in Section 4.3.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "We evaluate three network structures, namely AlexNet [11], Overfeat [21], and GoogLeNet [24] for all three tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All networks are pre-trained on the ImageNet classification task [3], and fine-tuned with the same mini-batch size, epochs, and learning rates for each task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All predictions of the deep models are produced with a single center crop of the image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use Caffe [9] as the platform for our experiments.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The experimental results can serve as baselines in any later research works.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The train/test splits can be downloaded from CompCars webpage http://mmlab.ie.cuhk.edu.hk/datasets/",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Fine-Grained Classification with Surveillance Data",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "This is a follow-up experiment for fine-grained classification with surveillance-nature data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The data includes 44, 481 images in 281 different car models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "70% images are for training and 30% are for testing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The car images are all in front views with various environment conditions such as rainy, foggy, and at night.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adopt the same three network structures (AlexNet, Overfeat, and GoogLeNet) as in the web-nature data applications for this task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The networks are also pre-trained on the ImageNet classification task, and the test is done with a single center crop.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The car images are first cropped with the labeled bounding boxes with paddings of around 7% on each side.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All cropped images are resized to 256 \u00d7 256 pixels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The experimental results are shown in Table 10.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The three networks all achieve very high accuracies for this task.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The result indicates that the fixed view (front view) greatly simplifies the finegrained classification task, even when large environmental differences exist.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussions",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "In this paper, we wish to promote the field of research related to \"cars\", which is largely neglected by the computer vision community.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To this end, we have introduced a largescale car dataset called CompCars, which contains images with not only different viewpoints, but also car parts and rich attributes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "CompCars provides a number of unique properties that other fine-grained datasets do not have, such as a much larger subcategory quantity, a unique hierarchical structure, implicit and explicit attributes, and large amount of car part images which can be utilized for style analysis and part recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It also bears cross modality nature, consisting of web-nature data and surveillance-nature data, ready to be used for cross modality research.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To validate the usefulness of the dataset and inspire the community for other novel tasks, we have conducted baseline experiments on three tasks: car model classification, car model verification, and attribute prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The experimental results reveal several challenges of these tasks and provide qualitative observations of the data, which is beneficial for future research.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "There are many other potential tasks that can exploit CompCars.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Image ranking is one of the long-lasting topics in the literature, car model ranking can be adapted from this line of research to find the models that users are mostly interested in.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The rich attributes of the dataset can be used to learn the relationships between different car models.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "Combining with the provided 3-level hierarchy, it will yield a stronger and more meaningful relationship graph for car models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Car images from different viewpoints can be utilized for ultra-wide baseline matching and 3D reconstruction, which can benefit recognition and verification in return.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "A Large-Scale Car Dataset for Fine-Grained Categorization and Verification"
+}

@@ -1,0 +1,589 @@
+{
+  "paper_id": "1509.08985",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We seek to improve deep neural networks by generalizing the pooling operations that play a central role in current architectures.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We pursue a careful exploration of approaches to allow pooling to learn and to adapt to complex and variable patterns.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The two primary directions lie in (1) learning a pooling function via (two strategies of) combining of max and average pooling, and (2) learning a pooling function in the form of a tree-structured fusion of pooling filters that are themselves learned.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "In our experiments every generalized pooling operation we explore improves performance when used in place of average or max pooling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We experimentally demonstrate that the proposed pooling operations provide a boost in invariance properties relative to conventional pooling and set the state of the art on several widely adopted benchmark datasets; they are also easy to implement, and can be applied within various deep neural network architectures.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These benefits come with only a light increase in computational overhead during training and a very modest increase in the number of model parameters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Both the mixed strategy and the gated strategy involve combinations of fixed pooling operations; a complementary",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "The recent resurgence of neurally-inspired systems such as deep belief nets (DBN) [10], convolutional neural networks (CNNs) [18], and the sum-and-max infrastructure [32] has derived significant benefit from building more sophisticated network structures [38,33] and from bringing learning to non-linear activations [6,24].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The pooling operation has also played a central role, contributing to invariance to data variation and perturbation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, pooling operations have been little revised beyond the current primary options of average, max, and stochastic pooling Patent disclosure, UCSD Docket No. SD2015-184, \"Forest Convolutional Neural Network\", filed on March 4, 2015.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "UCSD Docket No. SD2016-053, \"Generalizing Pooling Functions in Convolutional Neural Network\", filed on Sept 23, 2015 [3,40]; this despite indications that eg choosing from more than just one type of pooling operation can benefit performance [31].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this paper, we desire to bring learning and \"responsiveness\" (ie, to characteristics of the region being pooled) into the pooling operation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Various approaches are possible, but here we pursue two in particular.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the first approach, we consider combining typical pooling operations (specifically, max pooling and average pooling); within this approach we further investigate two strategies by which to combine these operations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "One of the strategies is \"unresponsive\"; for reasons discussed later, we call this strategy mixed max-average pooling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The other strategy is \"responsive\"; we call this strategy gated max-average pooling, where the ability to be responsive is provided by a \"gate\" in analogy to the usage of gates elsewhere in deep learning.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Another natural generalization of pooling operations is to allow the pooling operations that are being combined to themselves be learned.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence in the second approach, we learn to combine pooling filters that are themselves learned.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, the learning is performed within a binary tree (with number of levels that is pre-specified rather than \"grown\" as in traditional decision trees) in which each leaf is associated with a learned pooling filter.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As we consider internal nodes of the tree, each parent node is associated with an output value that is the mixture of the child node output values, until we finally reach the root node.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The root node corresponds to the overall output produced by the tree.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We refer to this strategy as tree pooling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Tree pooling is intended (1) to learn pooling filters directly from the data; (2) to learn how to combine leaf node pooling filters in a differentiable fashion; (3) to bring together these other characteristics within a hierarchical tree structure.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "We pursue experimental validation and find that: In the ar- chitectures we investigate, replacing standard pooling operations with any of our proposed generalized pooling methods boosts performance on each of the standard benchmark datasets, as well as on the larger and more complex ImageNet dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We attain state-of-the-art results on MNIST, CIFAR10 (with and without data augmentation), and SVHN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our proposed pooling operations can be used as drop-in replacements for standard pooling operations in various current architectures and can be used in tandem with other performance-boosting approaches such as learning activation functions, training with data augmentation, or modifying other aspects of network architecture -we confirm improvements when used in a DSN-style architecture, as well as in AlexNet and GoogLeNet.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Our proposed pooling operations are also simple to implement, computationally undemanding (ranging from 5% to 15% additional overhead in timing experiments), differentiable, and use only a modest number of additional parameters.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Since our tree pooling approach involves a tree structure in its learning, we observe an analogy to \"logic-type\" approaches such as decision trees [27] or \"logical operators\" [25].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such approaches have played a central role in artificial intelligence for applications that require \"discrete\" reasoning, and are often intuitively appealing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unfortunately, despite the appeal of such logic-type approaches, there is a disconnect between the functioning of decision trees and the functioning of CNNs -the output of a standard decision tree is non-continuous with respect to its input (and thus nondifferentiable).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This means that a standard decision tree is not able to be used in CNNs, whose learning process is performed by back propagation using gradients of differentiable functions.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Part of what allows us to pursue our approaches is that we ensure the resulting pooling operation is differentiable and thus usable within network backpropagation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Generalizing Pooling Operations",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "A typical convolutional neural network is structured as a series of convolutional layers and pooling layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Each convolutional layer is intended to produce representations (in the form of activation values) that reflect aspects of local spatial structures, and to consider multiple channels when doing so.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More specifically, a convolution layer computes \"feature response maps\" that involve multiple channels within some localized spatial region.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the other hand, a pooling layer is restricted to act within just one channel at a time, \"condensing\" the activation values in each spatiallylocal region in the currently considered channel.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "An early reference related to pooling operations (although not explicitly using the term \"pooling\") can be found in [11].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In modern visual recognition systems, pooling operations play a role in producing \"downstream\" representations that are more robust to the effects of variations in data while still preserving important motifs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The specific choices of average pooling [18,19] and max pooling [28] have been widely used in many CNN-like architectures; [3] includes a theoretical analysis (albeit one based on assumptions that do not hold here).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Our goal is to bring learning and \"responsiveness\" into the pooling operation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We focus on two approaches in particular.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the first approach, we begin with the (conventional, non-learned) pooling operations of max pooling and average pooling and learn to combine them.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Within this approach, we further consider two strategies by which to combine these fixed pooling operations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One of these strategies is \"unresponsive\" to the characteristics of the region being pooled; the learning process in this strategy will result in an effective pooling operation that is some specific, unchanging \"mixture\" of max and average.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To emphasize this unchanging mixture, we refer to this strategy as mixed max-average pooling.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "generalization to these strategies is to learn the pooling operations themselves.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "From this, we are in turn led to consider learning pooling operations and also learning to combine those pooling operations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since these combinations can be considered within the context of a binary tree structure, we refer to this approach as tree pooling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We pursue further details in the following sections.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At present, max pooling is often used as the default in CNNs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We touch on the relative performance of max pooling and, eg, average pooling as part of a collection of exploratory experiments to test the invariance properties of pooling functions under common image transformations (including rotation, translation, and scaling); see Figure 2.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "The results indicate that, on the evaluation dataset, there are regimes in which either max pooling or average pooling demonstrates better performance than the other (although we observe that both of these choices are outperformed by our proposed pooling operations).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "In the light of observation that neither max pooling nor average pooling dominates the other, a first natural generalization is the strategy we call \"mixed\" max-average pooling, in which we learn specific mixing proportion parameters from the data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When learning such mixing proportion parameters one has several options (listed in order of increasing number of parameters): learning one mixing proportion parameter (a) per net, (b) per layer, (c) per layer/region being pooled (but used for all channels across that region), (d) per layer/channel (but used for all regions in each channel) (e) per layer/region/channel combination.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "where \u03b4 = \u2202E/\u2202f mix (x) is the error backpropagated from the following layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since pooling operations are typically placed in the midst of a deep neural network, we also need  to compute the error signal to be propagated back to the previous layer:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "where 1[\u2022] denotes the 0/1 indicator function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the experiment section, we report results for the \"one parameter per pooling layer\" option; the network for this experiment has 2 pooling layers and so has 2 more parameters than a network using standard pooling operations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We found that even this simple option yielded a surprisingly large performance boost.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also obtain results for a simple 50/50 mix of max and average, as well as for the option with the largest number of parameters: one parameter for each combination of layer/channel/region, or pc \u00d7 ph \u00d7 pw parameters for each \"mixed\" pooling layer using this option (where pc is the number of channels being pooled by the pooling layer, and the number of spatial regions being pooled in each channel is ph \u00d7 pw).",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe that the increase in the number of parameters is not met with a corresponding boost in performance, and so we pursue the \"one per layer\" option.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "\"Gated\" max-average pooling",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "In the previous section we considered a strategy that we referred to as \"mixed\" max-average pooling; in that strat-egy we learned a mixing proportion to be used in combining max pooling and average pooling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As mentioned earlier, once learned, each mixing proportion a remains fixed -it is \"nonresponsive\" insofar as it remains the same no matter what characteristics are present in the region being pooled.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We now consider a \"responsive\" strategy that we call \"gated\" max-average pooling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this strategy, rather than directly learning a mixing proportion that will be fixed after learning, we instead learn a \"gating mask\" (with spatial dimensions matching that of the regions being pooled).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "In a head-to-head parameter count, every single mixing proportion parameter a in the \"mixed\" max-average pooling strategy corresponds to a gating mask \u03c9 in the \"gated\" strategy (assuming they use the same parameter count option).",
+              "tag": "Method"
+            },
+            {
+              "sent": "To take a specific example, suppose that we consider a network with 2 pooling layers and pooling regions that are 3 \u00d7 3.",
+              "tag": "Method"
+            },
+            {
+              "sent": "If we use the \"mixed\" strategy and the per-layer option, we would have a total of 2 = 2 \u00d7 1 extra parameters relative to standard pooling.",
+              "tag": "Result"
+            },
+            {
+              "sent": "If we use the \"gated\" strategy and the per-layer option, we would have a total of 18 = 2 \u00d7 9 extra parameters, where 9 is the number of parameters in each gating mask.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The \"mixed\" strategy detailed immediately above uses fewer parameters and is \"nonresponsive\"; the \"gated\" strategy involves more parameters and is \"responsive\".",
+              "tag": "Result"
+            },
+            {
+              "sent": "In our experiments, we find that \"mixed\" (with one mix per pooling layer) is outperformed by \"gated\" with one gate per pooling layer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Interestingly, an 18 parameter \"gated\" network with only one gate per pooling layer also outperforms a \"mixed\" option with far more parameters (40,960 with one mix per layer/channel/region) -except on the relatively large SVHN dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We touch on this below; Section 5 contains details.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Quick comparison: mixed and gated pooling",
+      "selected_sentences": [
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "The results in Table 1 indicate the benefit of learning pooling operations over not learning.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Within learned pooling operations, we see that when the number of parameters in the mixed strategy is increased, performance improves; however, parameter count is not the entire story.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We see that the \"responsive\" gated max-avg strategy consistently yields better performance (using 18 extra parameters) than is achieved with the >40k extra parameters in the 1 per layer/rg/ch \"non-responsive\" mixed max-avg strategy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The relatively larger SVHN dataset provides the sole exception (SVHN has \u2248600k training images versus \u224850k for MNIST, CIFAR10, and CIFAR100) -we found baseline 1.91%, 50/50 mix 1.84%, mixed (1 per lyr) 1.76%, mixed (1 per lyr/ch/rg) 1.64%, and gated (1 per lyr) 1.74%.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Tree pooling",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "The strategies described above each involve combinations of fixed pooling operations; another natural generalization of pooling operations is to allow the pooling operations that are being combined to themselves be learned.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These pooling layers remain distinct from convolution layers since pooling is performed separately within each channel; this channel isolation also means that even the option that introduces the largest number of parameters still introduces far fewer parameters than a convolution layer would introduce.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The most basic version of this approach would not involve combining learned pooling operations, but simply learning pooling operations in the form of the values in pooling filters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "One step further brings us to what we refer to as tree pooling, in which we learn pooling filters and also learn to responsively combine those learned filters.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "Our method requires only 72 extra parameters and obtains state-of-the-art 7.62% error.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On the other hand, making networks deeper with conv layers adds many more parameters but yields test error that does not drop below 9.08% in the configuration explored.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Since we follow each additional conv layer with a ReLU, these networks correspond to increasing nonlinearity as well as adding depth and adding (many) parameters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These experiments indicate that the performance of our proposed pooling is not accounted for as a simple effect of the addition of depth/parameters/nonlinearity.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Comparison with alternative pooling layers To see whether we might find similar performance boosts by replacing the max pooling in the baseline network configuration with alternative pooling operations such as stochastic pooling, \"pooling\" using a stride 2 convolution layer as pooling (cf AllCNN), or a simple fixed 50/50 proportion in max-avg pooling, we performed another set of experiments on unaugmented CIFAR10.",
+              "tag": "Result"
+            },
+            {
+              "sent": "From the baseline error rate of 9.10%, replacing each of the 2 max pooling layers with stacked stride 2 conv:ReLU (as in [34]) lowers the error to 8.77%, but adds 0.5M extra parameters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using stochastic pooling [40] adds computational overhead but no parameters and results in 8.50% error.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A simple 50/50 mix of max and average is computationally light and yields 8.07% error with no additional parameters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, our tree+gated max-avg configuration adds 72 parameters and achieves a state-of-the-art 7.62% error.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Quick Performance Overview",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "Second, the performance that we attain in the experiments reported in Figure 2, Table 1, Table 2, Table 4, and Table 5 is achieved with very modest additional numbers of parameters -eg on CIFAR10, our best performance (obtained with the tree+gated max-avg configuration) only uses an additional 72 parameters (above the 1.8M of our baseline network) and yet reduces test error from 9.10% to 7.62%; see the CIFAR10 Section for details.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In our AlexNet experiment, replacing the maxpool layers with our proposed pooling operations gave a 6% relative reduction in test error (top-5, single-view) with only 45 additional parameters (above the >50M of standard AlexNet); see the Im-ageNet 2012 Section for details.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also investigate the additional time incurred when using our proposed pooling operations; in the experiments reported in the Timing section, this overhead ranges from 5% to 15%.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "Testing invariance properties Before going to the overall classification results, we investigate the invariance properties of networks utilizing either standard pooling operations (max and average) or two instances of our proposed pooling operations (gated max-avg and 2 level tree, each using the \"1 per pool layer\" option) that we find to yield best performance (see Sec. 5 for architecture details used across each network).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We begin by training four different networks on the CIFAR10 training set, one for each of the four pooling operations selected for consideration; training details are found in Sec. 5. We seek to determine the respective invariance properties of these networks by evaluating their accuracy on various transformed versions of the CIFAR10 test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 2 illustrates the test accuracy attained in the presence of image rotation, (vertical) translation, and scaling of the CIFAR10 test set.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Classification results",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "The AllCNN method in [34] uses convolutional layers in place of pooling layers in a CNN-type network architecture.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, a standard convolutional layer requires many more parameters than a gated max-average pooling layer (only 9 parameters for a 3 \u00d7 3 pooling region kernel size in the 1 per pooling layer option) or a tree-pooling layer (27 parameters for a 2 level tree and 3 \u00d7 3 pooling region kernel size, again in the 1 per pooling layer option).",
+              "tag": "Result"
+            },
+            {
+              "sent": "The pooling operations in our tree+max-avg network conTable 4: Classification error (in %) reported by recent comparable publications on four benchmark datasets with a single model and no data augmentation, unless otherwise indicated.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A superscripted + indicates the standard data augmentation as in [24,21,34].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A \"-\" indicates that the cited work did not report results for that dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A fixed network configuration using the proposed tree+max-avg pooling (1 per pool layer option) yields state-of-the-art performance on all datasets (with the exception of CIFAR100). figuration use 7 \u00d7 9 = 63 parameters for the (first, 3 level) tree-pooling layer -4 leaf nodes and 3 internal nodesand 9 parameters in the gating mask used for the (second) gated max-average pooling layer, while the best result in [34] contains a total of nearly 500, 000 parameters in layers performing \"pooling like\" operations; the relative CIFAR10 accuracies are 7.62% (ours) and 9.08% (AllCNN).",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Observations from Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "In each experiment, using any of our proposed pooling operations boosted performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A fixed network configuration using the proposed tree+max-avg pooling (1 per pool layer option) yields state-of-the-art performance on MNIST, CIFAR10 (with and without data augmentation), and SVHN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We observed boosts in tandem with data augmentation, multi-view predictions, batch normalization, and several different architectures NiN-style, DSN-style, the >50M parameter AlexNet, and the 22-layer GoogLeNet.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A1 Supplementary Materials",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Generalizing Pooling Functions in Convolutional Neural Networks: Mixed, Gated, and Tree"
+}

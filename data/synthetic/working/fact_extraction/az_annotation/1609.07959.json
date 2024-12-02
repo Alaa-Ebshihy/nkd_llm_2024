@@ -1,0 +1,397 @@
+{
+  "paper_id": "1609.07959",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We introduce multiplicative LSTM (mLSTM), a recurrent neural network architecture for sequence modelling that combines the long short-term memory (LSTM) and multiplicative recurrent neural network architectures. mLSTM is characterised by its ability to have different recurrent transition functions for each possible input, which we argue makes it more expressive for autoregressive density estimation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We demonstrate empirically that mLSTM outperforms standard LSTM and its deep variants for a range of character level language modelling tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In this version of the paper, we regularise mLSTM to achieve 1.27 bits/char on text8 and 1.24 bits/char on Hutter Prize.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also apply a purely byte-level mLSTM on the WikiText-2 dataset to achieve a character level entropy of 1.26 bits/char, corresponding to a word level perplexity of 88.8, which is comparable to word level LSTMs regularised in similar ways on the same task.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "We argue that RNN architectures with hidden-to-hidden transition functions that are input-dependent are better suited to recover from surprising inputs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our approach to generative RNNs combines LSTM denotes which of N possible inputs is encountered at timestep t.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given h t , the starting node of the tree, there will be a different possible h t+1 for every x (n) t+1 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similarly, for every h t+1 that can be reached from h t , there is a different possible h t+2 for each x (n) t+2 , and so on. units with multiplicative RNN (mRNN) factorized hidden weights, allowing flexible input-dependent transitions that are easier to control due to the gating units of LSTM .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We compare this multiplicative LSTM hybrid architecture with other variants of LSTM on a range of character level language modelling tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Multiplicative LSTM is most appropriate when it can learn parameters specifically for each possible input at a given timestep.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, its main application is to sequences of discrete mutually exclusive elements, such as language modelling and related problems.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INPUT-DEPENDENT TRANSITION FUNCTIONS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "MULTIPLICATIVE RNN",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "mRNNs have improved on vanilla RNNs at character level language modelling tasks (Sutskever et al, 2011;Mikolov et al, 2012), but have fallen short of the more popular LSTM architecture, for instance as shown with LSTM baselines from (Cooijmans et al, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The standard RNN units in an mRNN do not provide an easy way for information to bypass its complex transitions, resulting in the potential for difficulty in retaining long term information.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "LONG SHORT-TERM MEMORY",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "COMPARING LSTM WITH MRNN",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "The LSTM and mRNN architectures both feature multiplicative units, but these units serve different purposes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "LSTM's gates are designed to control the flow of information through the network, whereas mRNN's gates are designed to allow transition functions to vary across inputs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "LSTM gates receive input from both the input units and hidden units, allowing multiplicative interactions between hidden units, but also potentially limiting the extent of input-hidden multiplicative interaction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "LSTM gates are also squashed with a sigmoid, forcing them to take values between 0 and 1, which makes them easier to control, but less expressive than mRNN's linear gates.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For language modelling problems, mRNN's linear gates do not need to be controlled by the network because they are explicitly learned for each input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They are also placed in between a product of 2 dense matrices, giving more flexibility to the possible values of the final product of matrices.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MULTIPLICATIVE LSTM",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "Since the LSTM and mRNN architectures are complimentary, we propose the multiplicative LSTM (mLSTM), a hybrid architecture that combines the factorized hidden-to-hidden transition of mRNNs with the gating framework from LSTMs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The mRNN and LSTM architectures can be combined by adding connections from the mRNN's intermediate state m t (which is redefined below for convenience) to each gating units in the LSTM, resulting in the following system:",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RELATED APPROACHES",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "Recurrent depth has been found to perform better than other kinds of non-recurrent depth for sequence modelling .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recurrent highway networks (RHNs) (Zilly et al, 2017) use a more sophisticated recurrent depth that carefully controls propagation through layers using gating units.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The gating units also allow for a greater deal of multiplicative interaction between the inputs and hidden units.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While adding recurrent depth could improve our model, we believe that maximizing the input-dependent flexibility of the transition function is more important for expressive sequence modelling.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Recurrent depth can do this through non-linear layers combining hidden and input contributions, but our method can do this independently of non-linear depth.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "SYSTEM SETUP",
+      "selected_sentences": [
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "Our experiments measure the performance of mLSTM for character-level language modelling tasks of varying complexity 1 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our initial experiments, which appeared in previous versions of this work, were mainly designed to compare the convergence and final performance of mLSTM vs LSTM and its deep variants.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our follow up experiments explored training and regularisation of mLSTM in more detail, with goal of comparing more directly with the most competitive architectures in the literature.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "We compared mLSTM to previously reported regular LSTM, stacked LSTM, and RNN characterlevel language models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We run detailed experiments on the text8 and Hutter Prize datasets (Hutter, 2012) to test medium scale character-level language modelling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We test our best model from these experiments on the WikiText-2 dataset (Merity et al, 2017b) to measure performance on smaller scale character level language modelling, and to compare with word level models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Previous versions of the paper also report a character level result on Penn Treebank dataset (Marcus et al, 1993) of 1.35 bits/char with an unregularised mLSTM, however we do not include this experiment in this version as we have no results with our updated training and regularisation methodology.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "HUTTER PRIZE DATASET",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "We also tested an MILSTM, mLSTM's nearest neighbor, with a slightly larger size (22M parameters) and a very similar hyperparameter configuration and initialisation scheme 2 (compared with unregularised mLSTM with no WN).",
+              "tag": "Result"
+            },
+            {
+              "sent": "MILSTM achieved a relatively poor test set performance of 1.53 bits/char, as compared with 1.40 bits/char for mLSTM under the same settings.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The MILSTM also converged more slowly, although eventually did require early stopping like the mLSTM.",
+              "tag": "Result"
+            },
+            {
+              "sent": "While this particular experiment cannot conclusively prove anything about the relative utility of mLSTM vs. MILSTM on this task, it does show that the two architectures are sufficiently different to obtain very different results under the same hyper-parameter settings.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "TEXT8 DATASET",
+      "selected_sentences": [
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "We later considered our best training setup from the Hutter Prize dataset, reusing the exact same architecture and hyper-parameters from this task, with the only difference being the number of input characters (27 for text8), which reduces the number of parameters to around 45 million.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This well regularised mLSTM was able to achieve a much stronger performance on text8, tying RHNs with a recurrent depth of 10 for the best result on this dataset. architecture test set error mRNN (Mikolov et al, 2012) 1.54 MILSTM  1.44 LSTM (Cooijmans et al, 2017) 1.43 batch normalised LSTM (Cooijmans et al, 2017) 1.36 layer-norm hierarchical multiscale LSTM (Chung et al, 2017) 1.29 Recurrent highway networks, rec. depth 10 +VD (Zilly et al, 2017) 1.27 small LSTM  1.65 small deep LSTM (best)  1.63 small LSTM (RMSprop)",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "Table 2: Text8 dataset test set error in bits/char.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Architectures labelled with small used a highly restrictive hidden dimensionality (512 for LSTM, 450 for mLSTM).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "WIKITEXT-2",
+      "selected_sentences": [
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "Character level language models can be compared with word level language models by converting bits per character to perplexity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this case, we model the data at the UTF-8 byte level.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The bits per word can be computed as bits/word = bits/symbol \u00d7 symbols/f ile words/f ile",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "where in this case, symbols are UTF-8 bytes. 2 raised to the power of the number of bits/word is then the perplexity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The WikiText-2 test set is 245,569 words long, and 1,256,449 bytes long, so each word is on average 5.1165 UTF-8 bytes long.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A character level model can also assign word level probabilities directly by taking the product of the probabilities of the characters in a word, including the probability of the character ending the word (either a space or a newline).",
+              "tag": "Method"
+            },
+            {
+              "sent": "A byte level model is likely at a slight disadvantage compared with word-level because it must predict some information that gets removed during tokenization (such as spaces vs. newlines), but the perplexity given by the conversion above could atleast be seen as an upper bound of the word level perplexity such a model could achieve predicting byte by byte.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is because the entropy of the file after tokenization (which word level models measure) will always be less than or equal to the entropy of the file before tokenization (which byte level models measure).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 61,
+          "sentences": [
+            {
+              "sent": "We trained the mLSTM configuration from the Hutter Prize dataset, using an embedding layer, weight normalization, and a variational dropout of 0.  (Merity et al, 2017b) 84.8 80.8 LSTM (tied) + VD + BB tuning (Melis et al, 2017) 69.1 65.9 LSTM + neural cache (Grave et al, 2017) 72.1 68.9 LSTM + dynamic eval (Krause et al, 2017) 63.7 59.8 AWDLSTM (tied) (Merity et al, 2017a) 68.6 65.8 AWDLSTM (tied)+ neural cache (Merity et al, 2017a) 53.8 52.0 AWDLSTM (tied) + dynamic eval (Krause et al, 2017)  Byte mLSTM achieves a byte-level test set cross entropy of 1.2649 bits/char, corresponding to a perplexity of 88.8.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Despite all the disadvantages faced by character level models, byte level mLSTM achieves similar word level perplexity to previous word-level LSTM baselines that also use variational dropout for regularisation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Byte mLSTM does not perform as well as word-level models that use adaptive add-on methods or very recent advances in regularisation/hyper-parameter tuning, however it could likely benefit from these advances as well.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "DISCUSSION",
+      "selected_sentences": [
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "This work combined the mRNN's factorized hidden weights with the LSTM's hidden units for generative modelling of discrete multinomial sequences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This mLSTM architecture was motivated by its ability to have both controlled and flexible input-dependent transitions, to allow for fast changes to the distributed hidden representation without erasing information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In a series of character-level language modelling experiments, mLSTM showed improvements over LSTM and its deep variants. mLSTM regularised with variational dropout performed favorably compared with baselines in the literature, outperforming all previous neural models on Hutter Prize and tying the best previous result on text8.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Byte-level mLSTM was also able to perform competitively with word-level language models on WikiText-2.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 63,
+          "sentences": [
+            {
+              "sent": "Unlike many previous approaches that have achieved success at character level language modelling, mLSTM does not use non-linear recurrent depth.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All mLSTMs considered in this work only had 2 linear recurrent transition matrices, whereas comparable works such as recurrent highway networks use a recurrent depth of up to 10 to achieve best results.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This makes mLSTM more easily parallelizable than these approaches.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Additionally, our work suggests that a large depth is not necessary to achieve competitive results on character level language modelling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We hypothesize that mLSTM's ability to Previous version appeared in workshop track ICLR 2017 have very different transition functions for each possible input is what makes it successful at this task.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While recurrent depth can accomplish this too, mLSTM can achieve this more efficiently.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "MULTIPLICATIVE LSTM FOR SEQUENCE MODELLING"
+}

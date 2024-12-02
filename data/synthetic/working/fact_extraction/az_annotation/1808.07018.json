@@ -1,0 +1,460 @@
+{
+  "paper_id": "1808.07018",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Knowledge graphs are graphical representations of large databases of facts, which typically suffer from incompleteness.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Inferring missing relations (links) between entities (nodes) is the task of link prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A recent state-of-the-art approach to link prediction, ConvE, implements a convolutional neural network to extract features from concatenated subject and relation vectors.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Whilst results are impressive, the method is unintuitive and poorly understood.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We propose a hypernetwork architecture that generates simplified relation-specific convolutional filters that (i) outperforms ConvE and all previous approaches across standard datasets; and (ii) can be framed as tensor factorization and thus set within a well established family of factorization models for link prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We thus demonstrate that convolution simply offers a convenient computational means of introducing sparsity and parameter tying to find an effective trade-off between non-linear expressiveness and the number of parameters to learn.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Knowledge graphs, such as WordNet, Freebase, and Google Knowledge Graph, are large graph-structured databases of facts, containing information in the form of triples (e 1 , r, e 2 ), with e 1 and e 2 representing subject and object entities and r a relation between them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They are considered important information resources, used for a wide variety of tasks ranging from question answering to information retrieval and text summarization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One of the main challenges with existing knowledge graphs is their incompleteness: many of the links between entities in the graph are missing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This has inspired substantial work in the field of link prediction, ie the task of inferring missing links in knowledge graphs.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Until recently, many approaches to link prediction have been based on different factorizations of a 3-moded binary tensor representation of the training triples [12,17,23,22].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such approaches are shallow and linear, with limited expressiveness.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, attempts to increase expressiveness with additional fully connected layers and non-linearities often lead to overfitting [12,17].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For this reason, Dettmers et al introduce ConvE, a model that uses 2D convolutions over reshaped and concatenated entity and relation embeddings [3].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They motivate the use of convolutions by being parameter efficient and fast to compute on a GPU, as well as having various robust methods from computer vision to prevent overfitting.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Even though results achieved by ConvE are impressive, it is highly unintuitive that convolution -particularly 2D convolution -should be effective for extracting information from 1D entity and relation embeddings.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this paper, we introduce HypER, a model that uses a hypernetwork [5] to generate convolutional filter weights for each relation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A hypernetwork is an approach by which one network generates weights for another network, that can be used to enable weight-sharing across layers and to dynamically synthesize weights given an input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our context, we generate relation-specific filter weights to process input entities, and also achieve multi-task knowledge sharing across relations in the knowledge graph.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our proposed HypER model uses a hypernetwork to generate a set of 1D relation-specific filters to process the subject entity embeddings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This simplifies the interaction between subject entity and relation embeddings compared to ConvE, in which a global set of 2D filters are convolved over reshaped and concatenated subject entity and relation embeddings, which is unintuitive as it suggests the presence of 2D structure in word embeddings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, interaction between subject and relation in ConvE depends on an arbitrary choice about how they are reshaped and concatenated.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In contrast, HypER's hypernetwork generates relation-specific filters, and thus extracts relation-specific features from the subject entity embedding.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This necessitates no 2D reshaping, and allows entity and relation to interact more completely, rather than only around the concatenation boundary.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We show that this simplified approach, in addition to improving link prediction performance, can be understood in terms of tensor factorization, thus placing HypER within a well established family of factorization models.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The apparent obscurity of using convolution within word embeddings is thereby explained as simply a convenient computational means of introducing sparsity and parameter tying.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "proposing a new model for link prediction (HypER) which achieves state-ofthe-art performance across all standard datasets; -showing that the benefit of using convolutional instead of fully connected layers is due to restricting the number of dimensions that interact (ie explicit regularization), rather than finding higher dimensional structure in the embeddings (as implied by ConvE); and showing that HypER in fact falls within a broad class of tensor factorization models despite the use of convolution, which serves to provide a good tradeoff between expressiveness and number of parameters to learn.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Numerous matrix factorization approaches to link prediction have been proposed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "An early model, RESCAL [12], tackles the link prediction task by optimizing a scoring function containing a bilinear product between vectors for each of the subject and object entities and a full rank matrix for each relation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DistMult [23] can be viewed as a special case of RESCAL with a diagonal matrix per relation type, which limits the linear transformation performed on entity vectors to a stretch.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "ComplEx [22] extends DistMult to the complex domain.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "TransE [1] is an affine model that represents a relation as a translation operation between subject and object entity vectors.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A somewhat separate line of link prediction research introduces Relational Graph Convolutional Networks (RGCNs) [15].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "RGCNs use a convolution operator to capture locality information in graphs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The model closest to our own and which we draw inspiration from, is ConvE [3], where a convolution operation is performed on the subject entity vector and the relation vector, after they are each reshaped to a matrix and lengthwise concatenated.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The obtained feature maps are flattened, put through a fully connected layer, and the inner product is taken with all object entity vectors to generate a score for each triple.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Advantages of ConvE over previous approaches include its expressiveness, achieved by using multiple layers of non-linear features, its scalability to large knowledge graphs, and its robustness to overfitting.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, it is not intuitive why convolving across concatenated and reshaped subject entity and relation vectors should be effective.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Interestingly, we find that the differences in moving from ConvE to HypER in fact bring the factorization and convolutional approaches together, since the 1D convolution process is equivalent to multiplication by a highly sparse tensor with tied weights (see Figure 2).",
+              "tag": "Result"
+            },
+            {
+              "sent": "The multiplication of this \"convolutional tensor\" (defined by the relation embedding and hypernetwork) and other weights gives an implicit relation matrix, corresponding to those in eg",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Other than the method of deriving these relation matrices, the key difference to existing factorization approaches is the ReLU non-linearity applied prior to interaction with the object embedding.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Link Prediction",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "In link prediction, the aim is to learn a scoring function \u03c6 that assigns a score s = \u03c6(e 1 , r, e 2 ) \u2208 R to each input triple (e 1 , r, e 2 ), where e 1 , e 2 \u2208 E are subject and object entities and r \u2208 R a relation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The score indicates the strength of prediction that the given triple corresponds to a true fact, with positive scores meaning true and negative scores, false.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Link prediction models typically map entity pair e 1 , e 2 to their corresponding distributed embedding representations e 1 , e 2 \u2208 R de and a score is assigned using a relation-specific function, Table 1.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Scoring functions of state-of-the-art link prediction models, the dimensionality of their relation parameters, and their space complexity. de and dr are the dimensions of entity and relation embeddings respectively, e2 \u2208 C de denotes the complex conjugate of e2, and e 1 , w r \u2208 R dw \u00d7d h denote a 2D reshaping of e1 and wr respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "* is the convolution operator, Fr = vec \u22121 (wrH) the matrix of relation specific convolutional filters, vec is a vectorization of a matrix and vec \u22121 its inverse, f is a non-linear function, and ne and nr respectively denote the number of entities and relations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Hypernetwork Knowledge Graph Embeddings",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "In this work, we propose a novel hypernetwork model for link prediction in knowledge graphs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In summary, the hypernetwork projects a vector embedding of each relation via a fully connected layer, the result of which is reshaped to give a set of convolutional filter weight vectors for each relation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We explain this process in more detail below.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The idea of using convolutions on entity and relation embeddings stems from computer vision, where feature maps reflect patterns in the image such as lines or edges.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Their role in the text domain is harder to interpret, since little is known of the meaning of a single dimension in a word embedding.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We believe convolutional filters have a regularizing effect when applied to word embeddings (compared to the corresponding full tensor), as the filter size restricts which dimensions of embeddings can interact.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This allows nonlinear expressiveness while limiting overfitting by using few parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A visualization of HypER is given in Figure 1.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Scoring Function and Model Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "where the vec \u22121 operator reshapes a vector to a matrix, and non-linearity f is chosen to be a rectified linear unit (ReLU).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the feed-forward pass, the model obtains embeddings for the input triple from the entity and relation embedding matrices E \u2208 R ne\u00d7de and R \u2208 R nr \u00d7dr .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The hypernetwork is a fully connected layer H \u2208 R dr\u00d7l f n f (l f denotes filter length and n f the number of filters per relation, ie output channels of the convolution) that is applied to the relation embedding w r \u2208 R dr .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The result is reshaped to generate a matrix of convolutional filters F r = vec \u22121 (w r H) \u2208 R l f \u00d7n f .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Whilst the overall dimensionality of the filter set is l f n f , the rank is restricted to d r to encourage parameter sharing between relations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Understanding HypER as Tensor Factorization",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Having described the HypER architecture, we can view it as a series of tensor operations by considering the hypernetwork H and weight matrix W as tensors H \u2208 R dr\u00d7l f \u00d7n f and W \u2208 R lm\u00d7n f \u00d7de respectively.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The act of convolving F r = w r \u2297 H over the subject entity embedding e 1 is equivalent to the multiplication of e 1 by a sparse tensor F r within which F r is diagonally duplicated with zeros elsewhere (see Figure 2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The result is multiplied by W to give a vector, which is subject to ReLU before the final dot product with e 2 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Linearity allows the product F r \u2297 W to be considered separately as generating a d e \u00d7 d e matrix for each relation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Further, rather than duplicating entries of F r within F r , we can generalize F r to a relation-agnostic sparse 4 moded tensor F \u2208 R dr\u00d7de\u00d7n f \u00d7lm by replacing entries with d r -dimensional strands of H. Thus, the HypER model can be described explicitly as tensor multiplication of e 1 , e 2 and w r with a core tensor F \u2297W \u2208 R de\u00d7de\u00d7dr , where F is heavily constrained in terms of its number of free variables.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This insight allows HypER to be viewed in a very similar light to the family of factorization approaches to link prediction, such as RESCAL, DistMult and ComplEx.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training Procedure",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "We evaluate our HypER model on the standard link prediction task using the following datasets (see Table 3):",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "FB15k [1] a subset of Freebase, a large database of facts about the real world.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experimental Setup",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Link prediction results for all models across the five datasets are shown in Tables 4, 5 and 6.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "whilst having fewer parameters than the closest comparator ConvE, Hy-pER consistently outperforms all other models across all datasets, thereby achieving state-of-the-art results on the link prediction task; and our filter dimension study suggests that no benefit is gained by convolving over reshaped 2D entity embeddings in comparison with 1D entity embedding vectors and that most information can be extracted with very small convolutional filters (Table 9).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "WN18RR",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "In this work, we introduce HypER, a hypernetwork model for link prediction on knowledge graphs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "HypER generates relation-specific convolutional filters and applies them to subject entity embeddings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The hypernetwork component allows information to be shared between relation vectors, enabling multi-task learning across relations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To our knowledge, HypER is the first link prediction model that creates non-linear interaction between entity and relation embeddings by convolving relation-specific filters over the entity embeddings.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that no benefit is gained from 2D convolutional filters over 1D, dispelling the suggestion that 2D structure exists in entity embeddings implied by ConvE.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also recast HypER in terms of tensor operations showing that, despite the convolution operation, it is closely related to the established family of tensor factorization models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our results suggest that convolution provides a good trade-off between expressiveness and parameter number compared to a dense network.",
+              "tag": "Result"
+            },
+            {
+              "sent": "HypER is fast, robust to overfitting, has relatively few parameters, and achieves state-of-the-art results across almost all metrics on multiple link prediction datasets.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Hypernetwork Knowledge Graph Embeddings"
+}

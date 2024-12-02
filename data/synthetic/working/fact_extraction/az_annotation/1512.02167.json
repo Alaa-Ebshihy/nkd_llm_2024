@@ -1,0 +1,313 @@
+{
+  "paper_id": "1512.02167",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We describe a very simple bag-of-words baseline for visual question answering.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This baseline concatenates the word features from the question and CNN features from the image to predict the answer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When evaluated on the challenging VQA dataset [2], it shows comparable performance to many recent approaches using recurrent neural networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To explore the strength and weakness of the trained model, we also provide an interactive web demo 1 , and open-source code 2 .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Recently, several papers have appeared on arXiv (after CVPR'16 submission deadline) proposing neural network architectures for visual question answering, such as [13,17,5,18,16,3,11,1].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Some of them are derived from the image captioning framework, in which the output of a recurrent neural network (eg, LSTM [16,11,1]) applied to the question sentence is concatenated with visual features from VGG or other CNNs to feed a classifier to predict the answer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Other models integrate visual attention mechanisms [17,13,3] and visualize how the network learns to attend the local image regions relevant to the content of the question.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Interestingly, we notice that in one of the earliest VQA papers [12], the simple baseline Bag-ofwords + image feature (referred to as BOWIMG baseline) outperforms the LSTM-based models on a synthesized visual QA dataset built up on top of the image captions of COCO dataset [9].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For the recent much larger COCO VQA dataset [2], the BOWIMG baseline performs worse than the LSTM-based models [2].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we carefully implement the BOWIMG baseline model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We call it iBOWIMG to avoid confusion with the implementation in [2].",
+              "tag": "Method"
+            },
+            {
+              "sent": "With proper setup and training, this simple baseline model shows comparable performance to many recent recurrent network-based approaches for visual QA.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Further analysis shows that the baseline learns to correlate the informative words in the question sentence and visual concepts in the image with the answer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, such correlations can be used to compute reasonable spatial attention map with the help of the CAM technique proposed in [20].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The source code and the visual QA demo based on the trained model are publicly available.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the demo, iBOWIMG baseline gives answers to any question relevant to the given images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Playing with the visual QA models interactively could reveal the strengths and weakness of the trained model.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "iBOWIMG for Visual Question Answering",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "In most of the recent proposed models, visual QA is simplified to a classification task: the number of the different answers in the training set is the number of the final classes the models need to learn to predict.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The general pipeline of those models is that the word feature extracted from the question sentence is concatenated with the visual feature extracted from the image, then they are fed into a softmax layer to predict the answer class.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The visual feature is usually taken from the top of the VGG network or GoogLeNet, while the word features of the question sentence are usually the popular LSTM-based features [12,2].",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In our iBOWIMG model, we simply use naive bag-of-words as the text feature, and use the deep features from GoogLeNet [14] as the visual features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 1 shows the framework of the iBOWIMG model, which can be implemented in Torch with no more than 10 lines of code.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The input question is first converted to a one-hot vector, which is transformed to word feature via a word embedding layer and then is concatenated with the image feature from CNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The combined feature is sent to the softmax layer to predict the answer class, which essentially is a multi-class logistic regression model.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "The code is implemented in Torch.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The training takes about 10 hours on a single GPU NVIDIA Titan Black.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Benchmark Performance",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Since this VQA dataset is rather new, the publicly available models evaluated on the dataset are all from non-peer reviewed arXiv papers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We include the performance of the models available at the time of writing (Dec.5, 2015) [2,6,1,13,16,11].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that some models are evaluated on either test-dev or test-standard for either OpenEnded or MultipleChoice track.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Except for these IMG, BOW, BOWIMG baselines provided in the [2], all the compared methods use either deep or recursive neural networks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, our iBOWIMG baseline shows comparable performances against these much more complex models, except for DPPnet [11] that is about 1.5% better.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training Details",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Though our model could be considered as the simplest baseline so far for visual there are several model parameters to tune: 1) the number of epochs to train.",
+              "tag": "Method"
+            },
+            {
+              "sent": "2) the learning rate and weight clip.",
+              "tag": "Method"
+            },
+            {
+              "sent": "3) the threshold for removing less frequent question word and answer classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We iterate to search the best value of each model parameter separately on the val2014 subset B. In our best model, there are 5,746 words in the dictionary of question sentence, 5,216 classes of answers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The specific model parameters can be found in the source code.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Understanding the Visual QA model",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "From the comparisons above, we can see that our baseline model performs as well as the recurrent neural network models on the VQA dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, due to its simplicity, the behavior of the model could be easily interpreted, demonstrating what it learned for visual QA.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Essentially, the BOWIMG baseline model learns to memorize the correlation between the answer class and the informative words in the question sentence along with the visual feature.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We split the learned weights of softmax into two parts, one part for the word feature and the other part for the visual feature.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Interactive Visual QA Demo",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "Question answering is essentially an interactive activity, thus it would be good to make the trained models able to interact with people in real time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Aided by the simplicity of the baseline model, we built a web demo that people could type question about a given image and our AI system powered by iBOWIMG will reply the most possible answers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Here the deep feature of the are extracted beforehand.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 4 shows a snapshot of the demo.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "People could play with the demo to see the strength and weakness of VQA model.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Concluding Remarks",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "For visual question answering on COCO dataset, our implementation of a simple baseline achieves comparable performance to several recently proposed recurrent neural network-based approaches.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "To reach the correct prediction, the baseline captures the correlation between the informative words in the question and the answer, and that between image contents and the answer.",
+              "tag": "Other"
+            },
+            {
+              "sent": "How to move beyond this, from memorizing the correlations to actual reasoning and understanding of the question and image, is a goal for future research.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Simple Baseline for Visual Question Answering"
+}

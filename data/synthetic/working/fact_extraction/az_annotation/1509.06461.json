@@ -1,0 +1,562 @@
+{
+  "paper_id": "1509.06461",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "The popular Q-learning algorithm is known to overestimate action values under certain conditions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It was not previously known whether, in practice, such overestimations are common, whether they harm performance, and whether they can generally be prevented.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we answer all these questions affirmatively.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, we first show that the recent DQN algorithm, which combines Q-learning with a deep neural network, suffers from substantial overestimations in some games in the Atari 2600 domain.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We then show that the idea behind the Double Q-learning algorithm, which was introduced in a tabular setting, can be generalized to work with large-scale function approximation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We propose a specific adaptation to the DQN algorithm and show that the resulting algorithm not only reduces the observed overestimations, as hypothesized, but that this also leads to much better performance on several games.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Background",
+      "selected_sentences": [
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Estimates for the optimal action values can be learned using Q-learning (Watkins, 1989), a form of temporal difference learning (Sutton, 1988).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most interesting problems are too large to learn all action values in all states separately.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead, we can learn a parameterized value function Q(s, a; \u03b8 t ).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The standard Q-learning update for the parameters after taking action A t in state S t and observing the immediate reward R t+1 and resulting state S t+1 is then",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Deep Q Networks",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Double Q-learning",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "The max operator in standard Q-learning and DQN, in (2) and (3), uses the same values both to select and to evaluate an action.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This makes it more likely to select overestimated values, resulting in overoptimistic value estimates.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To prevent this, we can decouple the selection from the evaluation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is the idea behind Double Q-learning (van Hasselt, 2010).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "The Double Q-learning error can then be written as",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Overoptimism due to estimation errors",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Q-learning's overestimations were first investigated by Thrun and Schwartz (1993), who showed that if the action values contain random errors uniformly distributed in an interval [\u2212 , ] then each target is overestimated up to \u03b3 m\u22121 m+1 , where m is the number of actions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition, Thrun and Schwartz give a concrete example in which these overestimations even asymptotically lead to sub-optimal policies, and show the overestimations manifest themselves in a small toy problem when using function approximation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Later van Hasselt (2010) argued that noise in the environment can lead to overestimations even when using tabular representation, and proposed Double Q-learning as a solution.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "In this section we demonstrate more generally that estimation errors of any kind can induce an upward bias, regardless of whether these errors are due to environmental noise, function approximation, non-stationarity, or any other source.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is important, because in practice any method will incur some inaccuracies during learning, simply due to the fact that the true values are initially unknown.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Under the same conditions, the lower bound on the absolute error of the Double Q-learning estimate is zero.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that we did not need to assume that estimation errors for different actions are independent.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This theorem shows that even if the value estimates are on average correct, estimation errors of any source can drive the estimates up and away from the true optimal values.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "The lower bound in Theorem 1 decreases with the number of actions.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This is an artifact of considering the lower bound, which requires very specific values to be attained.",
+              "tag": "Result"
+            },
+            {
+              "sent": "More typically, the overoptimism increases with the number of actions as shown in Figure 1.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Q-learning's overestimations there indeed increase with the number of actions, while Double Q-learning is unbiased.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As another example, if for all actions Q * (s, a) = V * (s) and the estimation errors",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "The middle column of plots in Figure 2 shows estimated action value functions for all 10 actions (green lines), as functions of state, along with the maximum action value in each state (black dashed line).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Although the true value function is the same for all actions, the approximations differ because we have supplied different sets of sampled states. 1 The maximum is often higher than the ground truth shown in purple on the left.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is confirmed in the right plots, which shows the difference between the black and purple curves in orange.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The orange line is almost always positive, indicating an upward bias.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The right plots also show the estimates from Double Q-learning in blue 2 , which are on average much closer to zero.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This demonstrates that Double Qlearning indeed can successfully reduce the overoptimism of Q-learning.",
+              "tag": "Other"
+            }
+          ]
+        },
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "In contrast to van Hasselt (2010) we did not use a statistical argument to find overestimations, the process to obtain Figure 2 is fully deterministic.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In contrast to Thrun and Schwartz (1993), we did not rely on inflexible function approximation with irreducible asymptotic errors; the bottom row shows that a function that is flexible enough to cover all samples leads to high overestimations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This indicates that the overestimations can occur quite generally.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "In the examples above, overestimations occur even when assuming we have samples of the true action value at certain states.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The value estimates can further deteriorate if we bootstrap off of action values that are already overoptimistic, since this causes overestimations to propagate throughout our estimates.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Although uniformly overestimating values might not hurt the resulting policy, in practice overestimation errors will differ for different states and actions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Overestimation combined with bootstrapping then has the pernicious effect of propagating the wrong relative information about which states are more valuable than others, directly affecting the quality of the learned policies.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Average error",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Double DQN",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Empirical results",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "In this section, we analyze the overestimations of DQN and show that Double DQN improves over DQN both in terms of value accuracy and in terms of policy quality.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To further test the robustness of the approach we additionally evaluate the algorithms with random starts generated from expert human trajectories, as proposed by Nair et al (2015).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "Our testbed consists of Atari 2600 games, using the Arcade Learning Environment (Bellemare et al, 2013).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The goal is for a single algorithm, with a fixed set of hyperparameters, to learn to play each of the games separately from interaction given only the screen pixels as input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is a demanding testbed: not only are the inputs high-dimensional, the game visuals and game mechanics vary substantially between games.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Good solutions must therefore rely heavily on the learning algorithm -it is not practically feasible to overfit the domain by relying only on tuning.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results on overoptimism",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "Figure 3 shows examples of DQN's overestimations in six Atari games.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DQN and Double DQN were both trained under the exact conditions described by .",
+              "tag": "Method"
+            },
+            {
+              "sent": "DQN is consistently and sometimes vastly overoptimistic about the value of the current greedy policy, as can be seen by comparing the orange learning curves in the top row of plots to the straight orange lines, which represent the actual discounted value of the best learned policy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More precisely, the (averaged) value estimates are computed regularly during training with full evaluation phases of length T = 125, 000 steps as The ground truth averaged values are obtained by running the best learned policies for several episodes and computing the actual cumulative rewards.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Without overestimations we would expect these quantities to match up (ie, the curve to match the straight line at the right of each plot).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Instead, the learning curves of DQN consistently end up much higher than the true values.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The learning curves for Double DQN, shown in blue, are much closer to the blue straight line representing the true value of the final policy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that the blue straight line is often higher than the orange straight line.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This indicates that Double DQN does not just produce more accurate value estimates but also better policies.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "More extreme overestimations are shown in the middle two plots, where DQN is highly unstable on the games Asterix and Wizard of Wor.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Notice the log scale for the values on the y-axis.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The bottom two plots shows the corresponding scores for these two games.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Notice that the increases in value estimates for DQN in the middle plots coincide with decreasing scores in bottom plots.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Again, this indicates that the overestimations are harming the quality of the resulting policies.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "If seen in isolation, one might perhaps be tempted to think the observed instability is related to inherent instability problems of off-policy learning with function approximation (Baird, 1995;Tsitsiklis and Van Roy, 1997;Sutton et al, 2008;Maei, 2011;Sutton et al, 2015).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "However, we see that learning is much more stable with Double DQN, suggesting that the cause for these instabilities is in fact Qlearning's overoptimism.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Figure 3 only shows a few examples, but overestimations were observed for DQN in all 49 tested Atari games, albeit in varying amounts.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Quality of the learned policies",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "Overoptimism does not always adversely affect the quality of the learned policy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, DQN achieves optimal behavior in Pong despite slightly overestimating the policy value.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Nevertheless, reducing overestimations can significantly benefit the stability of learning; we see clear examples of this in Figure 3.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We now assess more generally how much Double DQN helps in terms of policy quality by evaluating on all 49 games that DQN was tested on.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As described by  each evaluation episode starts by executing a special no-op action that does not affect the environment up to 30 times, to provide different starting points for the agent.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Some exploration during evaluation provides additional randomization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For Double DQN we used the exact same hyper-parameters as for DQN,  to allow for a controlled experiment focused just on reducing overestimations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The learned policies are evaluated for 5 mins of emulator time (18,000 frames) with angreedy policy where = 0.05.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The scores are averaged over 100 episodes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The only difference between Double DQN and DQN is the target, using Y DoubleDQN t rather than Y DQN .",
+              "tag": "Method"
+            },
+            {
+              "sent": "This evaluation is somewhat adversarial, as the used hyperparameters were tuned for DQN but not for Double DQN.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Robustness to Human starts",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "For this evaluation we include a tuned version of Double DQN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Some tuning is appropriate because the hyperparameters were tuned for DQN, which is a different algorithm.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the tuned version of Double DQN, we increased the number of frames between each two copies of the target network from 10,000 to 30,000, to reduce overestimations further because immediately after each switch DQN and Double DQN 0 % 1 0 0 % 2 0 0 % 3 0 0 % 4 0 0 % 5 0 0 % 1 0 0 0 % 1 5 0 0 % 2 0 0 0 % 2 5 0 0 % 5 0 0 0 % 7 5 0 0 %  , eight games additional games were tested.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These are indicated with stars and a bold font.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion",
+      "selected_sentences": [
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "First, we have shown why Q-learning can be overoptimistic in large-scale problems, even if these are deterministic, due to the inherent estimation errors of learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, by analyzing the value estimates on Atari games we have shown that these overestimations are more common and severe in practice than previously acknowledged.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Third, we have shown that Double Q-learning can be used at scale to successfully reduce this overoptimism, resulting in more stable and reliable learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Fourth, we have proposed a specific implementation called Double DQN, that uses the existing architecture and deep neural network of the DQN algorithm without requiring additional networks or parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we have shown that Double DQN finds better policies, obtaining new state-ofthe-art results on the Atari 2600 domain.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Consider a state s in which all the true optimal action values are equal at Q * (s, a) = V * (s) for some V * (s).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let Qt be arbitrary value estimates that are on the whole unbiased in the sense that a (Qt(s, a) \u2212 V * (s)) = 0, but that are not all zero, such that 1 m a (Qt(s, a) \u2212 V * (s)) 2 = C for some C > 0, where m \u2265 2 is the number of actions in s.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Under these conditions, maxa Qt(s, a) \u2265 V * (s) + C m\u22121 .",
+              "tag": "Result"
+            },
+            {
+              "sent": "Under the same conditions, the lower bound on the absolute error of the Double Q-learning estimate is zero.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": ", and therefore (using the constraint a a = 0) we also have that",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "We can now combine these relations to compute an upper-bound on the sum of squares for all a: m a=1",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "This contradicts the assumption that m a=1 2 a < mC, and therefore maxa a \u2265 C m\u22121 for all settings of that satisfy the constraints.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can check that the lower-bound is tight by setting , for i > 1.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "Experimental Details for the Atari 2600 Domain",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Network Architecture",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Hyper-parameters",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Supplementary Results in the Atari 2600 Domain",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Deep Reinforcement Learning with Double Q-learning"
+}

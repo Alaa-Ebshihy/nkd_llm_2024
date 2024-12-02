@@ -1,0 +1,313 @@
+{
+  "paper_id": "1603.06042",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We introduce a globally normalized transition-based neural network model that achieves state-of-the-art part-ofspeech tagging, dependency parsing and sentence compression results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our model is a simple feed-forward neural network that operates on a task-specific transition system, yet achieves comparable or better accuracies than recurrent models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We discuss the importance of global as opposed to local normalization: a key insight is that the label bias problem implies that globally normalized models can be strictly more expressive than locally normalized models.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this work we demonstrate that simple feed-forward networks without any recurrence can achieve comparable or better accuracies than LSTMs, as long as they are globally normalized.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model, described in detail in Section 2, uses a transition system (Nivre, 2006) and feature embeddings as introduced by * On leave from Columbia University.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We do not use any recurrence, but perform beam search for maintaining multiple hypotheses and introduce global normalization with a conditional random field (CRF) objective (Bottou et al, 1997;Le Cun et al, 1998;Lafferty et al, 2001;Collobert et al, 2011) to overcome the label bias problem that locally normalized models suffer from.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since we use beam inference, we approximate the partition function by summing over the elements in the beam, and use early updates (Collins and Roark, 2004;.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compute gradients based on this approximate global normalization and perform full backpropagation training of all neural network parameters based on the CRF loss.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In Section 3 we revisit the label bias problem and the implication that globally normalized models are strictly more expressive than locally normalized models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Lookahead features can partially mitigate this discrepancy, but cannot fully compensate for it-a point to which we return later.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To empirically demonstrate the effectiveness of global normalization, we evaluate our model on part-of-speech tagging, syntactic dependency parsing and sentence compression (Section 4).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model achieves state-of-the-art accuracy on all of these tasks, matching or outperforming LSTMs while being significantly faster.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Our ablation experiments show that we outperform  and  because we do global backpropagation training of all model parameters, while they fix the neural network parameters when training the global part of their model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also outperform  despite using a smaller beam.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To shed additional light on the label bias problem in practice, we provide a sentence compression example where the local model completely fails.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then demonstrate that a globally normalized parsing model without any lookahead features is almost as accurate as our best model, while a locally normalized model loses more than 10% absolute in accuracy because it cannot effectively incorporate evidence as it becomes available.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "At its core, our model is an incremental transitionbased parser (Nivre, 2006).",
+              "tag": "Method"
+            },
+            {
+              "sent": "To apply it to different tasks we only need to adjust the transition system and the input features.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Transition System",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Global vs. Local Normalization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Training",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "The Label Bias Problem",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "This section gives a formal perspective on the label bias problem, through a proof that globally normalized models are strictly more expressive than locally normalized models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The theorem was originally proved 5 by Smith and Johnson (2007).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Global Models can be Strictly More Expressive than Local Models Consider a tagging problem",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "To demonstrate the flexibility and modeling power of our approach, we provide experimental results on a diverse set of structured prediction tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We apply our approach to POS tagging, syntactic dependency parsing, and sentence compression.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Part of Speech Tagging",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Data & Evaluation.",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model Configuration.",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results.",
+      "selected_sentences": [
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "It additionally also has transition features of the word, cluster and character n-gram up to length 3 on both endpoints of the transition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The results for  were solicited from the authors.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our local model already compares favorably against these methods on average.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using beam search with a locally normalized model does not help, but with global normalization it leads to a 7% reduction in relative error, empirically demonstrating the effect of label bias.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The set of character ngrams feature is very important, increasing average accuracy on the CoNLL'09 datasets by about 0.5% absolute.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This shows that characterlevel modeling can also be done with a simple feed-forward network without recurrence.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Dependency Parsing",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results. Tables",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Sentence Compression",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Data &",
+      "selected_sentences": [
+        {
+          "par_id": 70,
+          "sentences": [
+            {
+              "sent": "Table 4 shows our sentence compression results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our globally normalized model again significantly outperforms the local model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Beam search with a locally normalized model suffers from severe label bias issues that we discuss on a concrete example in Section 5. We also compare to the sentence compression system from Filippova et al (2015), a 3-layer stacked LSTM which uses dependency label information.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The LSTM and our global model perform on par on both the automatic evaluation as well as the human ratings, but our model is roughly 100\u00d7 faster.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Related Neural CRF Work",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Related Transition-Based Parsing Work",
+      "selected_sentences": [
+        {
+          "par_id": 74,
+          "sentences": [
+            {
+              "sent": "For early work on neural-networks for transition-based parsing, see Henderson (2003;2004).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our work is closest to the work of ,  and Watanabe and Sumita (2015); in these approaches global normalization is added to the local model of Chen and Manning (2014).",
+              "tag": "Other"
+            }
+          ]
+        },
+        {
+          "par_id": 75,
+          "sentences": [
+            {
+              "sent": "Empirically,  achieves the best performance, even though their model keeps the parameters of the locally normalized neural network fixed and only trains a perceptron that uses the activations as features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Their model is therefore limited in its ability to revise the predictions of the locally normalized model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In  2015) perform full backpropagation training like us, but even with a much larger beam, their performance is significantly lower than ours.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also apply our model to two additional tasks, while they experiment only with dependency parsing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, Watanabe and Sumita (2015) introduce recurrent components and additional techniques like maxviolation updates for a corresponding constituency parsing model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In contrast, our model does not require any recurrence or specialized training.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Label Bias in Practice",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Globally Normalized Transition-Based Neural Networks"
+}

@@ -1,0 +1,736 @@
+{
+  "paper_id": "1803.02188",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "In this work we use deep learning to establish dense correspondences between a 3D object model and an image \"in the wild\".",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce 'DenseReg', a fully-convolutional neural network (FCNN) that densely regresses at every foreground pixel a pair of UV template coordinates in a single feedforward pass.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To train DenseReg we construct a supervision signal by combining 3D deformable model fitting and 2D landmark annotations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We define the regression task in terms of the intrinsic, UV coordinates of a 3D deformable model that is brought into correspondence with image instances at training time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A host of other objectrelated tasks (eg part segmentation, landmark localization) are shown to be by-products of this task, and to largely improve thanks to its introduction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We obtain highly-accurate regression results by combining ideas from semantic segmentation with regression networks, yielding a 'quantized regression' architecture that first obtains a quantized estimate of position through classification, and refines it through regression of the residual.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that such networks can boost the performance of existing state-of-the-art systems for pose estimation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Firstly, we show that our system can serve as an initialization for Statistical Deformable Models, as well as an element of cascaded architectures that jointly localize landmarks and estimate dense correspondences.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We also show that the obtained dense correspondence can act as a source of privileged information that complements and extends the pure landmark",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "In this work we push further the envelope of tasks that can be addressed by CNNs, and consider a task that lies at the end of the 'location detail' spectrum.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Rather than characterizing the region, or a few select points that relate to an object, we aim at establishing a dense correspondence between 2D and 3D surface coordinates, where the surface represents a template (or atlas) for a visual category, such as the human face or body.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We show that this task can be successfully addressed in an entirely feedforward manner by employing a discriminatively-trained CNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 1: We introduce a fully convolutional neural network that regresses from the image to a \"canonical\", deformation-free parameterization of the shape surface, effectively yielding a dense 2D-to-3D surface correspondence field.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The system is depicted for dense correspondence between template shapes of a): human face b): human body.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In order to accomplish this we exploit the availability of manual landmark annotations \"in-the-wild\" in order to fit a 3D template; this provides us with a dense correspondence field, from the image domain to the 2-dimensional, U \u2212 V parameterization of the surface.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then train a fully convolutional network that densely regresses from the image pixels to this U \u2212 V coordinate space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This combines the fine-grained discrimative power of statistical deformable models with the \"in the wild\" operation of fully-convolutional neural networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We draw inspiration from recent successes of object detection at the task of bounding box regression (Ren et al, 2015), and introduce a method that blends classification and regression to accurately regress the 2D template coordinates of every foreground pixel.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "As we show experimentally, the proposed feedforward architecture outperforms substantially more involved systems developped in particular for facial landmark localization while also outperforming the results of systems trained on lower-granularity tasks, such as facial part segmentation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can also seamlessly integrate this method with iterative, deformable modelbased algorithms to obtain results that constitute the current state-of-the-art on large-scale, challenging facial landmark localization benchmarks.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Furthermore, we show that by exploiting the established dense shape correspondence one can substantially improve the performance of CNNs trained for articulated body pose estimation and facial landmark localization and accelerate their training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, recent CNN-based body and facial pose estimation works only implicitly capture shape-based eg through cascading (Newell et al, 2016).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, we further exploit shape for CNN training by introducing an auxiliary dense correspondence supervision signal that acts like a source of 'Privileged Information' (Vapnik and Vashist, 2009;LopezPaz et al, 2015;Chen et al, 2017).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "We introduce the task of dense shape regression in the setting of CNNs, and exploit the notion of a deformation-free UV-space to construct target groundtruth signals (Sec.3).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We propose a carefully-designed fully-convolutional shape regression system that exploits ideas from semantic segmentation and dense regression networks.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "Our quantized regression architecture (Sec.4) is shown to substantially outperform simpler baselines that consider the task as a plain regression problem.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use dense shape regression to jointly tackle a multitude of problems, such as landmark localization or semantic segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, the template coordinates allow us to transfer to an image multiple annotations constructed on a single template system, and thereby tackle multiple problems through a single network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the regressed shape coordinates for the initialization of statistical deformable models; systematic evaluations on facial analysis benchmarks show that this yields substantial performance improvements on tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show that a cascaded architecture that jointly regresses dense correspondences and sparse landmarks leads to improved localization in both articulated body pose estimation and facial landmark localization.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "We demonstrate the generic nature of the method by applying it to the task of estimating dense correspondence in other object, such as the human ear.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A preliminary version of the paper has appeared in CVPR 2017 (G\u00fcler et al, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The present version bears substantial novelties and extended experiments.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The most important novelty is the design of end-to-end deep networks for joint dense shape correspondence estimation and articulated body pose estimation, where we demonstrate that dense correspondence largely improves the performance of articulated pose estimation.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "The rest of the manuscript is summarized as follows: In Section 3 we present the idea of establishing dense correspondences between the normalized 3D model space of a deformable object and 2D images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In Section 4 we present a deep learning framework for establishing dense correspondences using Deep Convolutional Neural Networks (DCNNs) and in particular a quantized regression approach tailored to the task.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the same section we also present DCNN frameworks for joint articulated pose estimation and dense shape correspondence estimation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We present experiments in Section 5 and conclude in Section 6.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Previous work",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Approaches that rely on Statistical Deformabe Models (SDMs), such as Active Appearance Models (AAMs) or 3D Morphable Models (3DMMs) aim at explicitly recovering dense correspondences between a deformationfree template and the observed image, rather than trying to discard them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This allows to both represent shaperelated information (eg for facial expression analysis) and also to obtain invariant decisions after registration (eg for identification).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Explicitly representing shape can have substantial performance benefits, as is witnessed in the majority of facial analysis tasks requiring detailed face information eg identification (Taigman et al, 2014), landmark localisation (Sagonas et al, 2016), 3D pose estimation, as well as 3D face reconstruction \"in-the-wild\" (Jourabloo and Liu, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However alignment-based methods are limited in two respects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Firstly they require an initialization from external systems, which can become increasingly challenging for elaborate SDMs: both AAMs and 3DMMs require at least a bounding box as initialization and 3DMMs may further require position of specific facial landmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, the problem of fitting a 3DMM of human body is even more challenging requiring further assumptions (Lassner et al, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In general, SDM fitting requires iterative, time-demanding optimization algorithms, especially when the initialisation is far from the solution (Booth et al, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The advent of Deep Learning has made it possible to replace the iterative optimization task with iterative regression problems (Trigeorgis et al, 2016), but this does not alleviate the need for initialization and multiple iterations.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Instead, as we show in the following, the present work shows that a feedforward CNN can jointly deliver detection and landmark localization by the introduction of an appropriate supervision signal, the introduction of a customized regression architecture, and combining dense supervision with modern cascaded architectures.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "From Statistical Deformable Models to Network Supervision",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Supervision for the face template",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "We exploit the availability of facial landmark annotations \"in the wild\", to fit the template face to the image by obtaining a coordinate transformation for each vertex x j .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the fittings provided by (Zhu et al, 2016) which were fit using a modified 3DMM implementation (Romdhani and Vetter, 2005).",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, for the purpose of this paper, we require a per-pixel estimate of the location in UV space on our template mesh and thus do not require an estimate of the projection or model parameters as required by other 3D landmark recovery methods (Jourabloo and Liu, 2016;Zhu et al, 2016).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Supervision for the human body template",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "We use the recently proposed \"Unite the People\" (UP) dataset (Lassner et al, 2017), which provides a 3D deformable human shape model (Loper et al, 2015) in correspondence with images from LSP (Johnson and Everingham, 2010), MPII (Andriluka et al, 2014a), andFashionPose (Dantone et al, 2013) datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dataset is obtained by solving an optimization problem of (Bogo et al, 2016) to fit the surface given annotated landmarks and manually obtained segmentation masks for human bodies.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The fits are filtered through crowdsourcing by manual elimination bad samples resulting into a total of 8515 images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In order to handle the complex geometry of the human shape, we manually partition the surface into 25 patches each of which is isomorphic to the plane.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each vertex on the mesh is assigned a patch label, I.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We establish a deformation-free coordinate system for each patch by applying multidimensional-scaling to corresponding vertices.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is followed by a normalization to obtain fields U, V \u2208 [0, 1].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The I ,U and V fields on the SMPL model (Loper et al, 2015) is presented in Figure 3.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Quantized Regression",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "One can phrase this problem as a generic regression task and attack it with the powerful machinery of CNNs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unfortunately, the best performance that we could obtain this way was quite underwhelming, apparently due to the task's complexity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our approach is to quantize and estimate the quantization error separately for each quantized value.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead of directly regressing u, the quantized regression approach lets us solve a set of easier sub-problems, yielding improved regression results.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "For the human bodies, the regions are modeled by hand and for the facial regions, we use a simple geometric approach: We tesselate the template's surface with a cartesian grid, by uniformly and separately quantizing the u h and u v coordinates into K bins, where K is a design parameter.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For any image that is brought into correspondence with the template domain, this induces a discrete labelling, which can be recovered by training a CNN for classification.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "We propose to combine powerful classification results with a regression problem that will yield a refined correspondence estimate.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this, we compute the residual between the desired and quantized U \u2212 V coordinates and add a separate module that tries to regress it.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We train a separate regressor per facial region, and at any pixel only penalize the regressor loss for the responsible face region.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We can interpret this form as a 'hard' version of a mixture of regression experts (Jordan and Jacobs, 1994).",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Quantized Regression as Mixture of Experts",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Effect of Quantization to Regression Performance",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "Compared to plain regression of the coordinates, the proposed quantized regression method achieves much better results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In Figure 6 we report results of an experiment that evaluates the contribution of the q-r branches separately for different granularities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The results for the quantized branch are evaluated by transforming the discrete horzintal/vertical label into the center of the region corresponding to the quantized horizontal/vertical value respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results show the merit of adopting the classification branch, as the finely quantized results(K=40,60) yield better coordinate estimates with respect to the non-quantized alternative (K=1).",
+              "tag": "Result"
+            },
+            {
+              "sent": "After K=40, we observe an increase in the failure rate for the quantized branch.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The experiment reveals that the proposed quantized regression outperforms both nonquantized and the best of only-quantized alternatives.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For the human shape, the partitioning can be considered as the quantization.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Supervisory Signals for Faces and Bodies",
+      "selected_sentences": [
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "4.4 A DenseReg Cascade for end-to-end dense shape regression and articulated pose estimation Current algorithms for landmark localization and human pose estimation commonly address the learning problem in the form of a multi-class classification task, where each landmark defines its own class and the remainder of the image is labelled as background.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Even though simple and effective, this training strategy provides a particularly sparse positive supervision signal, which asks a CNN to call everything other than a particular landmark a negative.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We can intuitively say that our method simplifies this training 'riddle', by providing information about dense correspondence between two surfaces.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This fits with the 'Privileged Information' paradigm of (Vapnik and Vashist, 2009) where an 'Intelligent Teacher' provides additional information during training that helps 'understand' why a given decision is taken.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a simple example, classifying a pixel as being a 'knee' landmark can potentially be assisted by having dense correspondence maps, that help the network solve the problem in a coarse-to-fine manner.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Rather than rely on semantic supervision signals we rely on dense shape-level supervision.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Hence, motivated from the above we propose endto-end trainable cascaded architectures which estimate dense correspondences and then these are used to improve articulated pose estimation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The architecture, coined DenseReg cascade, is depicted in Figure 7.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this particular, architecture the first network (which is in a form of hourglass) is used for dense shape regression.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The output of the dense shape regression network is passed as privileged information in the second network which performs articulated body/face pose estimation.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "Herein, we evaluate the performance of the proposed method (referred to as DenseReg) on various face-related tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the following sections, we first describe the training setup (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "5.1) and then present extensive quantitative results on (i) semantic segmentation (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "5.2), (ii) landmark localization on static images (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "5.4), (iv) dense correspondence on human bodies (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "5.5), and (v) human ear landmark localization (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Due to space constraints, we refer to the supplementary material for additional qualitative results, experiments on monocular depth estimation and further analysis of experimental results.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training Setup",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Training Databases for Bodies",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CNN Training for DenseReg",
+      "selected_sentences": [
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "We have used two different network architectures for our experiments.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, in order to be directly comparable to the DeepLab-v2 network in semantic segmentation experiments we first used a ResNet101 (He et al, 2016b) architecture with dilated convolutions ( atrous ) (Chen et al, 2015;Mallat, 1999), such that the stride of the CNN is 8 and (b) an Hourglass-type network Newell et al (2016).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use bilinear interpolation to upscale both the q and r branches before the losses.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The losses are applied at the input image scale and back-propagated through interpolation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We apply a weight to the smooth L1 loss layers to balance their contribution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiments, we have used a weight of 40 for quantized (d = 0.1) and a weight of 70 for nonquantized regression, which are determined by a coarse cross validation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CNN Training for DenseReg Cascade",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Semantic Segmentation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Landmark Localization on Static Images",
+      "selected_sentences": [
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "Herein, we evaluate the landmark localization performance of DenseReg as well as the performance obtained by employing DenseReg as an initialization for deformable models (Papandreou and Maragos, 2008;Tzimiropoulos and Pantic, 2014;Antonakos et al, 2015;Trigeorgis et al, 2016) trained for the specific task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the second scenario, we provide a slightly improved initialization with very small computational cost by reconstructing the detected landmarks with a PCA shape model that is constructed from ground-truth annotations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Deformable Tracking",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Dense Correspondence for the Human Body",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Joints Localisation on MPII & LSP",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Ear Landmark Localization",
+      "selected_sentences": [
+        {
+          "par_id": 69,
+          "sentences": [
+            {
+              "sent": "We have also performed experiments on the human ear.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We employ the 602 images and sparse landmark annotations that were generated in a semi-supervised manner by Zhou et al (Zhou et al, 2016).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Due to the lack of a 3D model of the human ear, we apply Thin Plate Splines to bring the images into dense correspondence and obtain the deformation-free space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We perform landmark localization following the same procedure as in Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Quantitative results are detailed in the supplementary material, where we compare DenseReg, DenseReg + AAM and DenseReg + MDM with alternative DPM detector based initializations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe that DenseReg results are highly accurate and clearly outperforms the DPM based alternative even without a deformable model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Examples for dense human ear correspondence estimated by our system are presented in Figure 13.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 5: Joints Localisation Accuracy on LSP dataset.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Ear Shape Regression",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 71,
+          "sentences": [
+            {
+              "sent": "We propose a fully-convolutional regression approach for establishing dense correspondence fields between objects in natural images and three-dimensional object templates.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We demonstrate that the correspondence inFigure",
+              "tag": "Result"
+            },
+            {
+              "sent": "14: Deformation-free space for the template ear shape.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 72,
+          "sentences": [
+            {
+              "sent": "formation can successfully be utilised on problems that can be geometrically represented on the template shape.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, we unify the problems of dense shape regression and articulated pose of estimation of deformable objects, by proposing the first, to the best of our knowledge, end-to-end trainable architecture that performance dense shape estimation and face landmark/body part localization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Throughout the paper, we focus on face and body shapes, where applications are abundant and benchmarks allow a fair comparison.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We show that using our dense regression method out-of-the-box outperforms a state-of-the-art semantic segmentation approach for the task of face-part segmentation, while when used as an initialisation for SDMs, we obtain the state-of-the-art results on the challenging 300W landmark localization challenge.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We demonstrate the generality of our method by performing experiments on the human body and human ear shapes.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We believe that our method will find ubiquitous use, since it can be readily used for face-related tasks and can be easily integrated into many other correspondence problems.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Figure15 demonstrated the hourglass architecture Newell et al ( 2016) we used with some modifications.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network is consisted by three type of modules: 1) the convolution module (blue), 2) the down sampling module (read) and 3) the up sampling module.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The whole hourglass is constructed with a list convolution modules at 4 different scales with corresponding down/up sampling modules between those convolution modules.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are also bilateral connection between layers of the same scale.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The composition of each type of modules are shown in the figure too.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The down sampling module is just a 3 \u00d7 3 max pooling layer and the up sampling module is using a 3 \u00d7 3 atrous layer following by a 3 \u00d7 3 convolution layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The majority of the parameters are lies in the convolution module.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The original hourglass uses a chain of 3 convolution layers as its convolution module, while replacing that with the inception-v2 type module shows slight improvement on body pose estimation and obvious improvement on training speed.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "DenseReg: Fully Convolutional Dense Shape Regression In-the-Wild"
+}

@@ -1,0 +1,732 @@
+{
+  "paper_id": "1711.00199",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Estimating the 6D pose of known objects is important for robots to interact with the real world.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The problem is challenging due to the variety of objects as well as the complexity of a scene caused by clutter and occlusions between objects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we introduce PoseCNN, a new Convolutional Neural Network for 6D object pose estimation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "PoseCNN estimates the 3D translation of an object by localizing its center in the image and predicting its distance from the camera.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The 3D rotation of the object is estimated by regressing to a quaternion representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also introduce a novel loss function that enables PoseCNN to handle symmetric objects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, we contribute a large scale video dataset for 6D object pose estimation named the YCBVideo dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our dataset provides accurate 6D poses of 21 objects from the YCB dataset observed in 92 videos with 133,827 frames.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We conduct extensive experiments on our YCBVideo dataset and the OccludedLINEMOD dataset to show that PoseCNN is highly robust to occlusions, can handle symmetric objects, and provide accurate pose estimation using only color images as input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When using depth data to further refine the poses, our approach achieves state-of-the-art results on the challenging OccludedLINEMOD dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our code and dataset are available at https://rse-lab.cs.washington.edu/projects/posecnn/.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "I. INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recognizing objects and estimating their poses in 3D has a wide range of applications in robotic tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For instance, recognizing the 3D location and orientation of objects is important for robot manipulation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is also useful in humanrobot interaction tasks such as learning from demonstration.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the problem is challenging due to the variety of objects in the real world.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They have different 3D shapes, and their appearances on images are affected by lighting conditions, clutter in the scene and occlusions between objects.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this work, we propose a generic framework for 6D object pose estimation where we attempt to overcome the limitations of existing methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce a novel Convolutional Neural Network (CNN) for end-to-end 6D pose estimation named PoseCNN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A key idea behind PoseCNN is to decouple the pose estimation task into different components, which enables the network to explicitly model the dependencies and independencies between them.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, PoseCNN performs three related tasks as illustrated in Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, it predicts an object label for each pixel in the input image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, it estimates the 2D pixel coordinates of the object center by predicting a unit vector from each pixel towards the center.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Using the semantic labels, image pixels associated with an object vote on the object center location in the image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, the network also estimates the distance of the object center.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Assuming known camera intrinsics, estimation of the 2D object center and its distance enables us to recover its 3D translation T. Finally, the 3D Rotation R is estimated by regressing convolutional features extracted inside the bounding box of the object to a quaternion representation of R. As we will show, the 2D center voting followed by rotation regression to estimate R and T can be applied to textured/texture-less objects and is robust to occlusions since the network is trained to vote on object centers even when they are occluded.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "We evaluate our method on the OccludedLINEMOD dataset [17], a benchmark dataset for 6D pose estimation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On this challenging dataset, PoseCNN achieves state-of-theart results for both color only and RGBD pose estimation (we use depth images in the Iterative Closest Point (ICP) algorithm for pose refinement).",
+              "tag": "Method"
+            },
+            {
+              "sent": "To thoroughly evaluate our method, we additionally collected a large scale RGBD video dataset named YCBVideo, which contains 6D poses of 21 objects from the YCB object set [5] in 92 videos with a total of 133,827 frames.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Objects in the dataset exhibit different symmetries and are arranged in various poses and spatial configurations, generating severe occlusions between them.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "\u2022 We propose a novel convolutional neural network for 6D object pose estimation named PoseCNN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our network achieves end-to-end 6D pose estimation and is very robust to occlusions between objects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "\u2022 We introduce ShapeMatchLoss, a new training loss function for pose estimation of symmetric objects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "\u2022 We contribute a large scale RGBD video dataset for 6D object pose estimation, where we provide 6D pose annotations for 21 YCB objects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper is organized as follows.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "After discussing related work, we introduce PoseCNN for 6D object pose estimation, followed by experimental results and a conclusion.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "II. RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "6D object pose estimation methods in the literature can be roughly classified into template-based methods and featurebased methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In template-based methods, a rigid template is constructed and used to scan different locations in the input image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "At each location, a similarity score is computed, and the best match is obtained by comparing these similarity scores [12,13,6].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In 6D pose estimation, a template is usually obtained by rendering the corresponding 3D model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, 2D object detection methods are used as template matching and augmented for 6D pose estimation, especially with deep learning-based object detectors [28,23,16,29].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Templatebased methods are useful in detecting texture-less objects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, they cannot handle occlusions between objects very well, since the template will have low similarity score if the object is occluded.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "III. POSECNN",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Given an input image, the task of 6D object pose estimation is to estimate the rigid transformation from the object coordinate system O to the camera coordinate system C.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We assume that the 3D model of the object is available and the object coordinate system is defined in the 3D space of the model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The rigid transformation here consists of an SE(3) transform containing a 3D rotation R and a 3D translation T, where R specifies the rotation angles around the X-axis, Y -axis and Zaxis of the object coordinate system O, and T is the coordinate of the origin of O in the camera coordinate system C.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the imaging process, T determines the object location and scale in the image, while R affects the image appearance of the object according to the 3D shape and texture of the object.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since these two parameters have distinct visual properties, we propose a convolutional neural network architecture that internally decouples the estimation of R and T.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "B. Semantic Labeling",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "In order to detect objects in images, we resort to semantic labeling, where the network classifies each image pixel into an object class.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared to recent 6D pose estimation methods that resort to object detection with bounding boxes [  29], semantic labeling provides richer information about the objects and handles occlusions better.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "C. 3D Translation Estimation",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "As illustrated in Figure 3, the 3D translation T = (T x , T y , T z ) T is the coordinate of the object origin in the camera coordinate system.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A naive way of estimating T is to directly regress the image features to T. However, this approach is not generalizable since objects can appear in object coordinate camera coordinate Figure 3. Illustration of the object coordinate system and the camera coordinate system.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The 3D translation can be estimated by localizing the 2D center of the object and estimating the 3D center distance from the camera.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Also, it cannot handle multiple object instances in the same category.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, we propose to estimate the 3D translation by localizing the 2D object center in the image and estimating object distance from the camera.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To see, suppose the projection of T on the image is c = (c x , c y ) T .",
+              "tag": "Method"
+            },
+            {
+              "sent": "If the network can localize c in the image and estimate the depth T z , then we can recover T x and T y according to the following projection equation assuming a pinhole camera:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "D. 3D Rotation Regression",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "The lowest part of Figure 2 shows the 3D rotation regression branch.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Using the object bounding boxes predicted from the Hough voting layer, we utilize two RoI pooling layers [11] to \"crop and pool\" the visual features generated by the first stage of the network for the 3D rotation regression.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The pooled feature maps are added together and fed into three FullyConnected (FC) layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first two FC layers have dimension 4096, and the last FC layer has dimension 4 \u00d7 n with n the number of object classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For each class, the last FC layer outputs a 3D rotation represented by a quaternion.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "To train the quaternion regression, we propose two loss functions, one of which is specifically designed to handle symmetric objects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first loss, called PoseLoss (PLOSS), operates in the 3D model space and measures the average squared distance between points on the correct model pose and their corresponding points on the model using the estimated orientation.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "where M denotes the set of 3D model points and m is the number of points.",
+              "tag": "Method"
+            },
+            {
+              "sent": "R(q) and R(q) indicate the rotation matrices computed from the the estimated quaternion and the ground truth quaternion, respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This loss has its unique minimum when the estimated orientation is identical to the ground truth orientation 1 .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unfortunately, PLOSS does not handle symmetric objects appropriately, since a symmetric object can have multiple correct 3D rotations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Using such a loss function on symmetric objects unnecessarily penalizes the network for regressing to one of the alternative 3D rotations, thereby giving possibly inconsistent training signals.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "While PLOSS could potentially be modified to handle symmetric objects by manually specifying object symmetries and then considering all correct orientations as ground truth options, we here introduce ShapeMatchLoss (SLOSS), a loss function that does not require the specification of symmetries.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "IV. THE YCB-VIDEO DATASET",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A. 6D Pose Annotation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B. Dataset Characteristics",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "The objects we used are a subset of 21 of the YCB objects [5] as shown in Figure 5, selected due to high-quality 3D models and good visibility in depth.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The videos are collected using an Asus Xtion Pro Live RGBD camera in fast-cropping mode, which provides RGB images at a resolution of 640x480 at 30 FPS by capturing a 1280x960 image locally on the device and transmitting only the center region over USB.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This results in higher effective resolution of RGB images at the cost of a  lower FOV, but given the minimum range of the depth sensor this was an acceptable trade-off.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The full dataset comprises 133,827 images, two full orders of magnitude larger than the LINEMOD dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For more statistics relating to the dataset, see Table I.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 6 shows one annotation example in our dataset where we render the 3D models according to the annotated ground truth pose.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that our annotation accuracy suffers from several sources of error, including the rolling shutter of the RGB sensor, inaccuracies in the object models, slight asynchrony between RGB and depth sensors, and uncertainties in the intrinsic and extrinsic parameters of the cameras.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A. Datasets",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "In our YCBVideo dataset, we use 80 videos for training, and test on 2,949 key frames extracted from the rest 12 test videos.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also evaluate our method on the OccludedLINEMOD dataset [17].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The authors of [17] selected one video with 1,214 frames from the original LINEMOD dataset [13], and annotated ground truth poses for eight objects in that video: Ape, Can, Cat, Driller, Duck, Eggbox, Glue and Holepuncher.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are significant occlusions between objects in this video sequence, which makes this dataset challenging.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "B. Evaluation Metrics",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "C. Implementation Details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "D. Baselines",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "Since the stateof-the-art 6D pose estimation methods mostly rely on regressing image pixels to 3D object coordinates [3,4,21], we implement a variation of our network for 3D object coordinate regression for comparison.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this network, instead of regressing to center direction and depth as in Figure 2, we regress each pixel to its 3D coordinate in the object coordinate system.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We can use the same architecture since each pixel still regresses to three variables for each class.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we remove the 3D rotation regression branch.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Using the semantic labeling results and 3D object coordinate regression results, the 6D pose is recovered using the pre-emptive RANSAC as in [4].",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "The 6D pose estimated from our network can be refined when depth is available.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the Iterative Closest Point (ICP) algorithm to refine the 6D pose.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we employ ICP with projective data association and a point-plane residual term.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We render a predicted point cloud given the 3D model and an estimated pose, and assume that each observed depth value is associated with the predicted depth value at the same pixel location.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The residual for each pixel is then the smallest distance from the observed point in 3D to the plane defined by the rendered point in 3D and its normal.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Points with residuals above a specified threshold are rejected and the remaining residuals are minimized using gradient descent.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Semantic labels from the network are used to crop the observed points from the depth image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since ICP is not robust to local minimums, we refinement multiple poses by perturbing the estimated pose from the network, and then select the best refined pose using the alignment metric proposed in [33].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "E. Analysis on the Rotation Regress Losses",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "F. Results on the YCB-Video Dataset",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "Table II and Figure 8(a) presents detailed evaluation for all the 21 objects in the YCBVideo dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show the area under the accuracy-threshold curve using both the ADD metric and the ADDS metric, where we vary the threshold for the average distance and then compute the pose accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The maximum threshold is set to 10cm.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can see that i) By only using color images, our network significantly outperforms the 3D coordinate regression network combined with the pre-emptive RANSAC algorithm for 6D pose estimation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When there are errors in the 3D coordinate regression results, the estimated 6D pose can drift far away from the ground truth pose.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While in our network, the center localization helps to constrain the 3D translation estimation even if the object is occluded. ii) Refining the poses with ICP significantly improves the performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "PoseCNN with ICP achieves superior performance compared to the 3D coordinate regression network when using depth images.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The initial pose in ICP is critical for convergence.",
+              "tag": "Result"
+            },
+            {
+              "sent": "PoseCNN provides better initial 6D poses for ICP refinement. iii) We can see that some objects are more difficult to handle such as the tuna fish can that is small and with less texture.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The network is also confused by the large clamp and the extra large clamp since they have the same appearance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The 3D coordinate regression network cannot handle symmetric objects very well such as the banana and the bowl.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 9 displays some 6D pose estimation results on the YCBVideo dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can see that the center prediction is quite accurate even if the center is occluded by another object.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our network with color only is already able to provide good 6D pose estimation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "With ICP refinement, the accuracy of the 6D pose is further improved.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "G. Results on the OccludedLINEMOD Dataset",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "The OccludedLINEMOD dataset is challenging due to significant occlusions between objects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first conduct experiments using color images only.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 8(b) shows the accuracythreshold curves with reprojection error for 7 objects in the dataset, where we compare PoseCNN with [29] that achieves the current state-of-the-art result on this dataset using color images as input.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our method significantly outperforms [29] by a large margin, especially when the reprojection error threshold is small.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results show that PoseCNN is able to correctly localize the target object even under severe occlusions.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "By refining the poses using depth images in ICP, our method  also outperforms the state-of-the-art methods using RGBD data as input.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table III summarizes the pose estimation accuracy on the OccludedLINEMOD dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The most improvement comes from the two symmetric objects \"Eggbox\" and \"Glue\".",
+              "tag": "Result"
+            },
+            {
+              "sent": "By using our ShapeMatchLoss for training, PoseCNN is able to correctly estimate the 6D pose of the two objects with respect to symmetry.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also present the result of PoseCNN using color only in Table III.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These accuracies are much lower since the threshold here is usually smaller than 2cm.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is very challenging for color-based methods to obtain 6D poses within such small threshold when there are occlusions between objects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 9 shows two examples of the 6D pose estimation results on the OccludedLINEMOD dataset.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "VI. CONCLUSIONS",
+      "selected_sentences": [
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "In this work, we introduce PoseCNN, a convolutional neural network for 6D object pose estimation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "PoseCNN decouples the estimation of 3D rotation and 3D translation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It estimates the 3D translation by localizing the object center and predicting the center distance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By regressing each pixel to a unit vector towards the object center, the center can be estimated robustly independent of scale.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More importantly, pixels vote the object center even if it is occluded by other objects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The 3D rotation is predicted by regressing to a quaternion representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Two new loss functions are introduced for rotation estimation, with the ShapeMatchLoss designed for symmetric objects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a result, PoseCNN is able to handle occlusion and symmetric objects in cluttered scenes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also introduce a large scale video dataset for 6D object pose estimation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our results are extremely encouraging in that they indicate that it is feasible to accurately estimate the 6D pose of objects in cluttered scenes using vision data only.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This opens the path to using cameras with resolution and field of view that goes far beyond currently used depth camera systems.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We note that the SLOSS sometimes results in local minimums in the pose space similar to ICP.",
+              "tag": "Other"
+            },
+            {
+              "sent": "It would be interesting to explore more efficient way in handle symmetric objects in 6D pose estimation in the future.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "PoseCNN: A Convolutional Neural Network for 6D Object Pose Estimation in Cluttered Scenes"
+}

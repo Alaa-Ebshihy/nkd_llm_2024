@@ -1,0 +1,473 @@
+{
+  "paper_id": "1707.02786",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "For years, recursive neural networks (RvNNs) have been shown to be suitable for representing text into fixed-length vectors and achieved good performance on several natural language processing tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the main drawback of RvNNs is that they require structured input, which makes data preparation and model implementation hard.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose Gumbel TreeLSTM, a novel tree-structured long short-term memory architecture that learns how to compose task-specific tree structures only from plain text data efficiently.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model uses StraightThrough GumbelSoftmax estimator to decide the parent node among candidates dynamically and to calculate gradients of the discrete decision.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate the proposed model on natural language inference and sentiment analysis, and show that our model outperforms or is at least comparable to previous models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also find that our model converges significantly faster than other models.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Techniques for mapping natural language into vector space have received a lot of attention, due to their capability of representing ambiguous semantics of natural language using dense vectors.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among them, methods of learning representations of words, eg word2vec (Mikolov et al 2013) or GloVe (Pennington, Socher, and Manning 2014), are relatively well-studied empirically and theoretically (Baroni, Dinu, and Kruszewski 2014;Levy and Goldberg 2014), and some of them became typical choices to consider when initializing word representations for better performance at downstream tasks.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Meanwhile, research on sentence representation is still in active progress, and accordingly various architecturesdesigned with different intuition and tailored for different tasks-are being proposed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the midst of them, three architectures are most frequently used in obtaining sentence representation from words.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Convolutional neural networks (CNNs) (Kim 2014;Kalchbrenner, Grefenstette, and Blunsom 2014) utilize local distribution of words to encode sentences, similar to n-gram models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recurrent neural networks (RNNs) (Dai and Le 2015;Kiros et al 2015;Hill, Cho, and Korhonen 2016) encode sentences by reading words in sequential order.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recursive neural networks Copyright c 2018, Association for the Advancement of Artificial Intelligence (www.aaai.org).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "(RvNNs 1 ) (Socher et al 2013;Irsoy and Cardie 2014;Bowman et al 2016), on which this paper focuses, rely on structured input (eg parse tree) to encode sentences, based on the intuition that there is significant semantics in the hierarchical structure of words.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is also notable that RvNNs are generalization of RNNs, as linear chain structures on which RNNs operate are equivalent to left-or right-skewed trees.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose Gumbel TreeLSTM, which is a novel RvNN architecture that does not require structured data and learns to compose task-specific tree structures without explicit guidance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our Gumbel TreeLSTM model is based on tree-structured long short-term memory (TreeLSTM) architecture (Tai, Socher, and Manning 2015;Zhu, Sobihani, and Guo 2015), which is one of the most renowned variants of RvNN.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "To learn how to compose task-specific tree structures without depending on structured input, our model introduces composition query vector that measures validity of a composition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Using validity scores computed by the composition query vector, our model recursively selects compositions until only a single representation remains.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use StraightThrough (ST) GumbelSoftmax estimator (Jang, Gu, and Poole 2017;Maddison, Mnih, and Teh 2017) to sample compositions in the training phase.",
+              "tag": "Method"
+            },
+            {
+              "sent": "ST GumbelSoftmax estimator relaxes the discrete sampling operation to be continuous in the backward pass, thus our model can be trained via the standard backpropagation.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Also, since the computation is performed layer-wise, our model is easy to implement and naturally supports batched computation.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "From experiments on natural language inference and sentiment analysis tasks, we find that our proposed model outperforms or is at least comparable to previous sentence encoder models and converges significantly faster than them.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "\u2022 We designed a novel sentence encoder architecture that learns to compose task-specific trees from plain text data.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "\u2022 We showed from experiments that the proposed architecture outperforms or is competitive to state-of-the-art models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also observed that our model converges faster than others.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "There have been several works that aim to learn hierarchical latent structure of text by recursively composing words into sentence representation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Some of them carry unsupervised learning on structures by making composition operations soft.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "To the best of our knowledge, gated recursive convolutional neural network (grConv) (Cho et al 2014) is the first model of its kind and used as an encoder for neural machine translation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The grConv architecture uses gating mechanism to control the information flow from children to parent. grConv and its variants are also applied to sentence classification tasks (Chen et al 2015;Zhao, Lu, and Poupart 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Neural tree indexer (NTI) (Munkhdalai and Yu 2017b) utilizes soft hierarchical structures by using TreeLSTM instead of grConv.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "In the research area outside the RvNN, compositionality in vector space also has been a longstanding subject (Plate 1995;Mitchell and Lapata 2010;Grefenstette and Sadrzadeh 2011;Zanzotto and Dell'Arciprete 2012, to name a few).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "And more recently, there exist works aiming to learn hierarchical latent structure from unstructured data (Chung, Ahn, and Bengio 2017;Kim et al 2017).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model Description",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Our proposed architecture is built based on the treestructured long short-term memory network architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We introduce several additional components into the TreeLSTM architecture to allow the model to dynamically compose tree structure in a bottom-up manner and to effectively encode a sentence into a vector.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section, we describe the components of our model in detail.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Tree-LSTM",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Tree-structured long short-term memory network (TreeLSTM) (Tai, Socher, and Manning 2015;Zhu, Sobihani, and Guo 2015) is an elegant variant of RvNN, where it controls information flow from children to parent using similar mechanism to long short-term memory (LSTM) (Hochreiter and Schmidhuber 1997).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "TreeLSTM introduces cell state in computing parent representation, which assists each cell to capture distant vertical dependencies.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Gumbel-Softmax",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "where \u03c4 is a temperature parameter; as \u03c4 diminishes to zero, a sample from the GumbelSoftmax distribution becomes cold and resembles the one-hot sample.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "StraightThrough (ST) GumbelSoftmax estimator (Jang, Gu, and Poole 2017), whose name reminds of StraightThrough estimator (STE) (Bengio, L\u00e9onard, and Courville 2013), is a discrete version of the continuous GumbelSoftmax estimator.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similar to the STE, it maintains sparsity by taking different paths in the forward and backward propagation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Obviously ST estimators are biased, however they perform well in practice, according to several previous works (Chung, Ahn, and Bengio 2017;Gu, Im, and Li 2017) and our own result.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Gumbel Tree-LSTM",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "This procedure is repeated until the model reaches N -th layer and only a single node is left.",
+              "tag": "Other"
+            },
+            {
+              "sent": "It is notable that the property of selecting the best node pair at each stage resembles that of easy-first parsing (Goldberg and Elhadad 2010).",
+              "tag": "Result"
+            },
+            {
+              "sent": "For implementation-wise details, please see the supplementary material.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then the validity score of each candidate is computed using the query vector q (denoted as v 1 , v 2 , v 3 ).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the training time, the model samples a parent node among candidates weighted on v 1 , v 2 , v 3 , using ST GumbelSoftmax estimator, and in the testing time the model selects the candidate with the highest validity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At layer t + 1 (the top layer), the representation of the selected candidate ('the cat') is used as a parent, and the rest are copied from those of layer t ('sat', 'on').",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "In the training phase, the model samples a parent from candidates weighted on v i , using the ST GumbelSoftmax estimator described above.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since the continuous GumbelSoftmax function is used in the backward pass, the error backpropagation signal safely passes through the sampling operation, hence the model is able to learn to construct the task-specific tree structures that minimize the loss by backpropagation.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "SPINN (Bowman et al 2016) addresses this issue by using the tracking LSTM which sequentially reads input words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The tracking LSTM makes the SPINN model hybrid, where the model takes advantage of both tree-structured composition and sequential reading.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, the tracking LSTM is not applicable to our model, since our model does not use shift-reduce parsing or maintain a stack.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the tracking LSTM's stead, our model applies an LSTM on input representations to give information about previous words to each leaf node:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "We evaluate performance of the proposed Gumbel TreeLSTM model on two tasks: natural language inference and sentiment analysis.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The implementation is made publicly available. 2",
+              "tag": "Method"
+            },
+            {
+              "sent": "The detailed experimental settings are described in the supplementary material.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Natural Language Inference",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "Natural language inference (NLI) is a task of predicting the relationship between two sentences (hypothesis The SNLI dataset is composed of about 550,000 sentences, each of which is binary-parsed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, since our model operate on plain text, we do not use the parse tree information in both training and testing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The classifier architecture used in our SNLI experiments follows (Mou et al 2016;Chen et al 2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given the premise sentence vector (h pre ) and the hypothesis sentence vector (h hyp ) which are encoded by the proposed Gumbel TreeLSTM model, the probability of relationship r \u2208 {entailment, contradiction, neutral} is computed by the following equations:",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "Secondly, comparing ours with other models, we find that our 100D and 300D model outperform all other models of similar numbers of parameters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our 600D model achieves the accuracy of 86.0%, which is comparable to that of the state-of-the-art model (Nie and Bansal 2017), while using far less parameters.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "It is also worth noting that our models converge much faster than other models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "All of our models converged within a few hours on a machine with NVIDIA Titan Xp GPU.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Sentiment Analysis",
+      "selected_sentences": [
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "In addition, from the fact that our models substantially outperform all other RvNN-based models, we conjecture that task-specific tree structures built by our model help encode sentences into vectors more efficiently than constituency-based or dependency-based parse trees do.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Qualitative Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 72,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose Gumbel TreeLSTM, a novel TreeLSTM-based architecture that learns to compose taskspecific tree structures.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our model introduces the composition query vector to compute validity of the candidate parents and selects the appropriate parent according to validity scores.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In training time, the model samples the parent from candidates using ST GumbelSoftmax estimator, hence it is able to be trained by standard backpropagation while maintaining its property of discretely determining the computation path in forward propagation.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 73,
+          "sentences": [
+            {
+              "sent": "From experiments, we validate that our model outperforms all other RvNN models and is competitive to state-ofthe-art models, and also observed that our model converges faster than other complex models.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The result poses an important question: what is the optimal input structure for RvNN?",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We empirically showed that the optimal structure might differ per task, and investigating task-specific latent tree structures could be an interesting future research direction.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Learning to Compose Task-Specific Tree Structures"
+}

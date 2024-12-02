@@ -1,0 +1,775 @@
+{
+  "paper_id": "1706.06978",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Click-through rate prediction is an essential task in industrial applications, such as online advertising.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently deep learning based models have been proposed, which follow a similar Embed-ding&MLP paradigm.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In these methods large scale sparse input features are first mapped into low dimensional embedding vectors, and then transformed into fixed-length vectors in a group-wise manner, finally concatenated together to fed into a multilayer perceptron (MLP) to learn the nonlinear relations among features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this way, user features are compressed into a fixed-length representation vector, in regardless of what candidate ads are.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The use of fixed-length vector will be a bottleneck, which brings difficulty for Embedding&MLP methods to capture user's diverse interests effectively from rich historical behaviors.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose a novel model: Deep Interest Network (DIN) which tackles this challenge by designing a local activation unit to adaptively learn the representation of user interests from historical behaviors with respect to a certain ad.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This representation vector varies over different ads, improving the expressive ability of model greatly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Besides, we develop two techniques: mini-batch aware regularization and data adaptive activation function which can help training industrial deep networks with hundreds of millions of parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments on two public datasets as well as an Alibaba real production dataset with over 2 billion samples demonstrate the effectiveness of proposed approaches, which achieve superior performance compared with state-of-the-art methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "DIN now has been successfully deployed in the online display advertising system in Alibaba, serving the main traffic.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "In cost-per-click (CPC) advertising system, advertisements are ranked by the eCPM (effective cost per mille), which is the product of the bid price and CTR (click-through rate), and CTR needs to be predicted by the system.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hence, the performance of CTR prediction model has a direct impact on the final revenue and plays a key role in the advertising system.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Modeling CTR prediction has received much attention from both research and industry community.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Recently, inspired by the success of deep learning in computer vision [14] and natural language processing [1], deep learning based methods have been proposed for CTR prediction task [3,4,21,26].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "These methods follow a similar Embedding&MLP paradigm: large scale sparse input features are first mapped into low dimensional embedding vectors, and then transformed into fixed-length vectors in a group-wise manner, finally concatenated together to fed into fully connected layers (also known as multilayer perceptron, MLP) to learn the nonlinear relations among features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared with commonly used logistic regression model [19], these deep learning methods can reduce a lot of feature engineering jobs and enhance the model capability greatly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For simplicity, we name these methods Embedding&MLP in this paper, which now have become popular on CTR prediction task.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "However, the user representation vector with a limited dimension in Embedding&MLP methods will be a bottleneck to express user's diverse interests.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Take display advertising in e-commerce site as an example.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Users might be interested in different kinds of goods simultaneously when visiting the e-commerce site.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "That is to say, user interests are diverse.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "When it comes to CTR prediction task, user interests are usually captured from user behavior data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Embedding&MLP methods learn the representation of all interests for a certain user by transforming the embedding vectors of user behaviors into a fixed-length vector, which is in an euclidean space where all users' representation vectors are.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In other words, diverse interests of the user are compressed into a fixed-length vector, which limits the expressive ability of Embedding&MLP methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To make the representation capable enough for expressing user's diverse interests, the dimension of the fixed-length vector needs to be largely expanded.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unfortunately, it will dramatically enlarge the size of learning parameters and aggravate the risk of overfitting under limited data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Besides, it adds the burden of computation and storage, which may not be tolerated for an industrial online system.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "On the other hand, it is not necessary to compress all the diverse interests of a certain user into the same vector when predicting a candidate ad because only part of user's interests will influence his/her action (to click or not to click).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, a female swimmer will click a recommended goggle mostly due to the bought of bathing suit rather than the shoes in her last week's shopping list.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Motivated by this, we propose a novel model: Deep Interest Network (DIN), which adaptively calculates the representation vector of user interests by taking into consideration the relevance of historical behaviors given a candidate ad.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By introducing a local activation unit, DIN pays attentions to the related user interests by soft-searching for relevant parts of historical behaviors and takes a weighted sum pooling to obtain the representation of user interests with respect to the candidate ad.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Behaviors with higher relevance to the candidate ad get higher activated weights and dominate the representation of user interests.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We visualize this phenomenon in the experiment section.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In this way, the representation vector of user interests varies over different ads, which improves the expressive ability of model under limited dimension and enables DIN to better capture user's diverse interests.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Training industrial deep networks with large scale sparse features is of great challenge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, SGD based optimization methods only update those parameters of sparse features appearing in each mini-batch.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, adding with traditional \u2113 2 regularization, the computation turns to be unacceptable, which needs to calculate L2-norm over the whole parameters (with size scaling up to billions in our situation) for each mini-batch.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we develop a novel mini-batch aware regularization where only parameters of non-zero features appearing in each mini-batch participate in the calculation of L2-norm, making the computation acceptable.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Besides, we design a data adaptive activation function, which generalizes commonly used PReLU [12] by adaptively adjusting the rectified point w.r.t. distribution of inputs and is shown to be helpful for training industrial networks with sparse features.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "\u2022 We point out the limit of using  is publicly available.",
+              "tag": "Other"
+            },
+            {
+              "sent": "The proposed approaches have been deployed in the commercial display advertising system in Alibaba, one of world's largest advertising platform, contributing significant improvement to the business.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper we focus on the CTR prediction modeling in the scenario of display advertising in e-commerce industry.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Methods discussed here can be applied in similar scenarios with rich user behaviors, such as personalized recommendation in e-commerce sites, feeds ranking in social networks etc",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RELATEDWORK",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Deep Crossing [21], Wide&Deep Learning [4] and YouTube Recommendation CTR model [3] extend LSPLM and FM by replacing the transformation function with complex MLP network, which enhances the model capability greatly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "PNN [5] tries to capture high-order feature interactions by involving a product layer after embedding layer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DeepFM [10] imposes a factorization machines as \"wide\" module in Wide&Deep [4] with no need of feature engineering.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Overall, these methods follow a similar model structure with combination of embedding layer (for learning the dense representation of sparse features) and MLP (for learning the combination relations of features automatically).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This kind of CTR prediction model reduces the manual feature engineering jobs greatly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our base model follows this kind of model structure.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However in applications with rich user behaviors, features are often contained with variable-length list of ids, eg, searched terms or watched videos in YouTube recommender system [3].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These models often transform corresponding list of embedding vectors into a fixed-length vector via sum/average pooling, which causes loss of information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The proposed DIN tackles it by adaptively learning the representation vector w.r.t. given ad, improving the expressive ability of model.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Attention mechanism originates from Neural Machine Translation (NMT) field [1].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "NMT takes a weighted sum of all the annotations to get an expected annotation and focuses only on information relevant to the generation of next target word.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A recent work, DeepIntent [26] applies attention in the context of search advertising.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similar to NMT, they use RNN [24] to model text, then learn one global hidden vector to help paying attention on the key words in each query.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is shown that the use of attention can help capturing the main intent of query or ad.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DIN designs a local activation unit to soft-search for relevant user behaviors and takes a weighted sum pooling to obtain the adaptive representation of user interests with respect to a given ad.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The user representation vector varies over different ads, which is different from DeepIntent in which there is no interaction between ad and user.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "We make code publicly available, and further show how to successfully deploy DIN in one of the world's largest advertising systems with novel developed techniques for training large scale deep networks with hundreds of millions of parameters.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "BACKGROUND",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "DEEP INTEREST NETWORK",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Feature Representation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Base Model(Embedding&MLP)",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "Most of the popular model structures [3,4,21] share a similar Embedding&MLP paradigm, which we refer to as base model, as shown in the left of Figure 2. It consists of several parts: Embedding layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As the inputs are high dimensional binary vectors, embedding layer is used to transform them into low dimensional dense representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the i-th feature group of t i , let W i = [w i 1 , ..., w i j , ...,",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "(1) Two most commonly used pooling layers are sum pooling and average pooling, which apply element-wise sum/average operations to the list of embedding vectors.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Both embedding and pooling layers operate in a group-wise manner, mapping the original sparse features into multiple fixedlength representation vectors.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then all the vectors are concatenated together to obtain the overall representation vector for the instance.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Given the concatenated dense representation vector, fully connected layers are used to learn the combination of features automatically.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently developed methods [4,5,10] focus on designing structures of MLP for better information extraction.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "The structure of Deep Interest Network",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "Base model obtains a fixed-length representation vector of user interests by pooling all the embedding vectors over the user behavior feature group, as Eq.(1).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This representation vector stays the same for a given user, in regardless of what candidate ads are.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this way, the user representation vector with a limited dimension will be a bottleneck to express user's diverse interests.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To make it capable enough, an easy method is to expand the dimension of embedding vector, which unfortunately will increase the size of learning parameters heavily.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It will lead to overfitting under limited training data and add the burden of computation and storage, which may not be tolerated for an industrial online system.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "Is there an elegant way to represent user's diverse interests in one vector under limited dimension?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The local activation characteristic of user interests gives us inspiration to design a novel model named deep interest network(DIN).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Imagine when the young mother mentioned above in section 3 visits the e-commerce site, she finds the displayed new handbag cute and clicks it.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Let's dissect the driving force of click action.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The displayed ad hits the related interests of this young mother by soft-searching her historical behaviors and finding that she had browsed similar goods of tote bag and leather handbag recently.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In other words, behaviors related to displayed ad greatly contribute to the click action.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DIN simulates this process by paying attention to the representation of locally activated interests w.r.t.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead of expressing all user's diverse interests with the same vector, DIN adaptively calculate the representation vector of user interests by taking into consideration the relevance of historical behaviors w.r.t.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This representation vector varies over different ads.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "The right part of Figure 2 illustrates the architecture of DIN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Compared with base model, DIN introduces a novel designed local activation unit and maintains the other structures the same.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, activation units are applied on the user behavior features, which performs as a weighted sum pooling to adaptively calculate user representation v U given a candidate ad A, as shown in Eq.( 3)",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "TRAINING TECHNIQUES",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "In the advertising system in Alibaba, numbers of goods and users scale up to hundreds of millions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Practically, training industrial deep networks with large scale sparse input features is of great challenge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section, we introduce two important techniques which are proven to be helpful in practice.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Mini-batch Aware Regularization",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "Overfitting is a critical challenge for training industrial networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, with addition of fine-grained features, such as features of goods_ids with dimensionality of 0.6 billion (including visited_\u0434oods_ids of user and \u0434oods_id of ad as described in Table 1), model performance falls rapidly after the first epoch during training without regularization, as the dark green line shown in Figure 4 in later section 6.5.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is not practical to directly apply traditional regularization methods, such as \u2113 2 and \u2113 1 regularization, on training networks with sparse inputs and hundreds of millions of parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Take \u2113 2 regularization as an example.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Only parameters of non-zero sparse features appearing in each mini-batch needs to be updated in the scenario of SGD based optimization methods without regularization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, when adding \u2113 2 regularization it needs to calculate L2-norm over the whole parameters for each mini-batch, which leads to extremely heavy computations and is unacceptable with parameters scaling up to hundreds of millions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we introduce an efficient mini-batch aware regularizer, which only calculates the L2-norm over the parameters of sparse features appearing in each mini-batch and makes the computation possible.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In fact, it is the embedding dictionary that contributes most of the parameters for CTR networks and arises the difficulty of heavy computation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let W \u2208 R D\u00d7K denote parameters of the whole embedding dictionary, with D as the dimensionality of the embedding vector and K as the dimensionality of feature space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Expand the \u2113 2 regularization on W over samples",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Data Adaptive Activation Function",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "EXPERIMENTS",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "In this section, we present our experiments in detail, including datasets, evaluation metric, experimental setup, model comparison and the corresponding analysis.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments on two public datasets with user behaviors as well as a dataset collected from the display advertising system in Alibaba demonstrate the effectiveness of proposed approach which outperforms state-of-the-art methods on the CTR prediction task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Both the public datasets and experiment codes are made available 1 .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Datasets and Experimental Setup",
+      "selected_sentences": [
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "We collected traffic logs from the online display advertising system in Alibaba, of which two weeks' samples are used for training and samples of the following day for testing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The size of training and testing set is about 2 billions and 0.14 billion respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For all the deep models, the dimensionality of embedding vector is 12 for the whole 16 groups of features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Layers of MLP is set by 192 \u00d7 200 \u00d7 80 \u00d7 2. Due to the huge size of data, we set the mini-batch size to be 5000 and use Adam [15] as the optimizer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We apply exponential decay, in which learning rate starts at 0.001 and decay rate is set to 0.9.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "The statistics of all the above datasets is shown in Table 2. Volume of Alibaba Dataset is much larger than both Amazon and MovieLens, which brings more challenges.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Competitors",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "Logistic regression (LR) is a widely used shallow model before deep networks for CTR prediction task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We implement it as a weak baseline.",
+              "tag": "Method"
+            },
+            {
+              "sent": "BaseModel follows the Embedding&MLP architecture and is the base of most of subsequently developed deep networks for CTR modeling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It acts as a strong baseline for our model comparison.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Metrics",
+      "selected_sentences": [
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "In CTR prediction field, AUC is a widely used metric [8].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It measures the goodness of order by ranking all the ads with predicted CTR, including intra-user and inter-user orders.",
+              "tag": "Method"
+            },
+            {
+              "sent": "An variation of user weighted AUC is introduced in [7,13] which measures the goodness of intra-user order by averaging AUC over users and is shown to be more relevant to online performance in display advertising system.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adapt this metric in our experiments.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For simplicity, we still refer it as AUC.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Performance of regularization",
+      "selected_sentences": [
+        {
+          "par_id": 58,
+          "sentences": [
+            {
+              "sent": "As the dimension of features in both Amazon Dataset and MovieLens Dataset is not high (about 0.1 million), all the deep models including our proposed DIN do not meet grave problem of overfitting.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, when it comes to the Alibaba dataset from the online advertising system which contains higher dimensional sparse features, overfitting turns to be a big challenge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, when training deep models with fine-grained features (eg, features of \u0434oods_ids with dimension of 0.6 billion in Table 1), serious overfitting occurs after the first epoch without any regularization, which causes the model performance to drop rapidly, as the dark green line shown in Figure 4. For this reason, we conduct careful experiments to check the performance of several commonly used regularizations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Result from online A/B testing",
+      "selected_sentences": [
+        {
+          "par_id": 61,
+          "sentences": [
+            {
+              "sent": "Careful online A/B testing in the display advertising system in Alibaba was conducted from 2017-05 to 2017-06.",
+              "tag": "Result"
+            },
+            {
+              "sent": "During almost a month's testing, DIN trained with the proposed regularizer and activation function contributes up to 10.0% CTR and 3.8% RPM(Revenue Per Mille) promotion 4 compared with the introduced BaseModel, the last version of our online-serving model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is a significant improvement and demonstrates the effectiveness of our proposed approaches.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Now DIN has been deployed online and serves the main traffic.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is worth mentioning that online serving of industrial deep networks is not an easy job with hundreds of millions of users visiting our system everyday.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Even worse, at traffic peak our system serves more than 1 million users per second.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is required to make realtime CTR predictions with high throughput and low latency.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, in our real system we need to predict hundreds of ads for each visitor in less than 10 milliseconds.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In our practice, several important techniques are deployed for accelerating online serving of industrial deep networks under the CPUGPU architecture: i) request batching which merges adjacent requests from CPU to take advantage of GPU power, ii) GPU memory optimization which improves the access pattern to reduce wasted transactions in GPU memory, iii) concurrent kernel computation which allows execution of matrix computations to be processed with multiple CUDA kernels concurrently.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In all, optimization of these techniques doubles the QPS (Query Per Second) capacity of a single machine practically.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Online serving of DIN also benefits from this.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Visualization of DIN",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CONCLUSIONS",
+      "selected_sentences": [
+        {
+          "par_id": 64,
+          "sentences": [
+            {
+              "sent": "In this paper, we focus on the task of CTR prediction modeling in the scenario of display advertising in e-commerce industry with rich user behavior data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The use of fixed-length representation in traditional deep CTR models is a bottleneck for capturing the diversity of user interests.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To improve the expressive ability of model, a novel approach named DIN is designed to activate related user behaviors and obtain an adaptive representation vector for user interests which varies over different ads.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Besides two novel techniques are introduced to help training industrial deep networks and further improve the performance of DIN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They can be easily generalized to other industrial deep learning tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DIN now has been deployed in the online display advertising system in Alibaba.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Deep Interest Network for Click-Through Rate Prediction"
+}

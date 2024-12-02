@@ -1,0 +1,555 @@
+{
+  "paper_id": "1511.06038",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Recent advances in neural variational inference have spawned a renaissance in deep latent variable models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper we introduce a generic variational inference framework for generative and conditional models of text.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While traditional variational methods derive an analytic approximation for the intractable distributions over latent variables, here we construct an inference network conditioned on the discrete text input to provide the variational distribution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We validate this framework on two very different text modelling applications, generative document modelling and supervised question answering.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our neural variational document model combines a continuous stochastic document representation with a bagof-words generative model and achieves the lowest reported perplexities on two standard test corpora.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The neural answer selection model employs a stochastic representation layer within an attention mechanism to extract the semantics between a question and answer pair.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On two question answering benchmarks this model exceeds all previous published benchmarks.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Probabilistic generative models underpin many successful applications within the field of natural language processing (NLP).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Their popularity stems from their ability to use unlabelled data effectively, to incorporate abundant linguistic features, and to learn interpretable dependencies among data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However these successes are tempered by the fact that as the structure of such generative models becomes deeper and more complex, true Bayesian inference becomes intractable due to the high dimensional integrals required.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Markov chain Monte Carlo (MCMC) (Neal, 1993;Andrieu Proceedings of the 33 rd International Conference on Machine Learning, New York, NY, USA, 2016. et al, 2003) and variational inference (Jordan et al, 1999;Attias, 2000;Beal, 2003) are the standard approaches for approximating these integrals.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However the computational cost of the former results in impractical training for the large and deep neural networks which are now fashionable, and the latter is conventionally confined due to the underestimation of posterior variance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The lack of effective and efficient inference methods hinders our ability to create highly expressive models of text, especially in the situation where the model is non-conjugate.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper introduces a neural variational framework for generative models of text, inspired by the variational autoencoder (Rezende et al, 2014;.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The principle idea is to build an inference network, implemented by a deep neural network conditioned on text, to approximate the intractable distributions over the latent variables.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead of providing an analytic approximation, as in traditional variational Bayes, neural variational inference learns to model the posterior probability, thus endowing the model with strong generalisation abilities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Due to the flexibility of deep neural networks, the inference network is capable of learning complicated non-linear distributions and processing structured inputs such as word sequences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Inference networks can be designed as, but not restricted to, multilayer perceptrons (MLP), convolutional neural networks (CNN), and recurrent neural networks (RNN), approaches which are rarely used in conventional generative models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By using the reparameterisation method (Rezende et al, 2014;, the inference network is trained through back-propagating unbiased and low variance gradients w.r.t. the latent variables.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Within this framework, we propose a Neural Variational Document Model (NVDM) for document modelling and a Neural Answer Selection Model (NASM) for question answering, a task that selects the sentences that correctly answer a factoid question from a set of candidate sentences.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "The NVDM (Figure 1) is an unsupervised generative model of text which aims to extract a continuous semantic latent variable for each document.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This model can be interpreted as a variational auto-encoder: an MLP encoder (inference q (h|X) (Inference Network) X p(X|h) network) compresses the bag-of-words document representation into a continuous latent distribution, and a softmax decoder (generative model) reconstructs the document by generating the words independently.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A primary feature of NVDM is that each word is generated directly from a dense continuous document representation instead of the more common binary semantic vector (Hinton & Salakhutdinov, 2009;Larochelle & Lauly, 2012;Srivastava et al, 2013;.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our experiments demonstrate that our neural document model achieves the stateof-the-art perplexities on the 20NewsGroups and RCV1-v2.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "The NASM (Figure 2) is a supervised conditional model which imbues LSTMs (Hochreiter & Schmidhuber, 1997) with a latent stochastic attention mechanism to model the semantics of question-answer pairs and predict their relatedness.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The attention model is designed to focus on the phrases of an answer that are strongly connected to the question semantics and is modelled by a latent distribution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This mechanism allows the model to deal with the ambiguity inherent in the task and learns pair-specific representations that are more effective at predicting answer matches, rather than independent embeddings of question and answer sentences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Bayesian inference provides a natural safeguard against overfitting, especially as the training sets available for this task are small.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The experiments show that the LSTM with a latent stochastic attention mechanism learns an effective attention model and outperforms both previously published results, and our own strong nonstochastic attention baselines.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In summary, we demonstrate the effectiveness of neural variational inference for text processing on two diverse tasks.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "These models are simple, expressive and can be trained efficiently with the highly scalable stochastic gradient back-propagation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our neural variational framework is suitable for both unsupervised and supervised learning tasks, and can be generalised to incorporate any type of neural networks.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Neural Variational Inference Framework",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Latent variable modelling is popular in many NLP problems, but it is non-trivial to carry out effective and efficient inference for models with complex and deep structure.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section we introduce a generic neural variational inference framework that we apply to both the unsupervised NVDM and supervised NASM in the follow sections.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "We define a generative model with a latent variable h, which can be considered as the stochastic units in deep neural networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We designate the observed parent and child nodes of h as x and y respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, the joint distribution of the generative model is p \u03b8 (x, y) = h p \u03b8 (y|h)p \u03b8 (h|x)p(x), and the variational lower bound L is derived as:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "3. Parameterise the variational distribution over the latent variable: \u00b5 = l 1 (\u03c0), log \u03c3 = l 2 (\u03c0).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Here we only discuss the scenario where the latent variables are continuous and the parameterised diagonal Gaussian is employed as the variational distribution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However the framework is also suitable for discrete units, and the only modification needed is to replace the Gaussian with a multinomial parameterised by the outputs of a softmax function.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Though the reparameterisation trick for continuous variables is not applicable for this case, a policy gradient approach  can help to alleviate the high variance problem during stochastic estimation. proposed a variational inference framework for semi-supervised learning, but the prior distribution over the hidden variable p(h) remains as the standard Gaussian prior, while we apply a conditional parameterised Gaussian distribution, which is jointly learned with the variational distribution.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Neural Variational Document Model",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "The Neural Variational Document Model (Figure 1) is a simple instance of unsupervised learning where a continuous hidden variable h \u2208 R K , which generates all the words in a document independently, is introduced to represent its semantic content.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let X \u2208 R |V | be the bag-of-words representation of a document and x i \u2208 R |V | be the one-hot representation of the word at position i.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "As an unsupervised generative model, we could interpret NVDM as a variational autoencoder: an MLP encoder q(h|X) compresses document representations into continuous hidden vectors (X \u2192 h); a softmax decoder p(X|h) = N i=1 p(x i |h) reconstructs the documents by independently generating the words (h \u2192 {x i }).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To maximise the log-likelihood log h p(X|h)p(h) of documents, we derive the lower bound:",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Neural Answer Selection Model",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "Answer sentence selection is a question answering paradigm where a model must identify the correct sentences answering a factual question from a set of candidate sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Assume a question q is associated with a set of answer sentences {a 1 , a 2 , ..., a n }, together with their judgements {y 1 , y 2 , ..., y n }, where y m = 1 if the answer a m is correct and y m = 0 otherwise.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is a classification task where we treat each training data point as a triple (q, a, y) while predicting y for the unlabelled question-answer pair (q, a).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "The Neural Answer Selection Model (Figure 2) is a supervised model that learns the question and answer representations and predicts their relatedness.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It employs two different LSTMs to embed raw question inputs q and answer inputs a.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let s q (j) and s a (i) be the state outputs of the two LSTMs, and i, j be the positions of the states.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Conventionally, the last state outputs s q (|q|) and s a (|a|), as the independent question and answer representations, can be used for relatedness prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In NASM, however, we aim to learn pair-specific representations through a latent attention mechanism, which is more effective for pair relatedness prediction.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "NASM applies an attention model to focus on the words in the answer sentence that are prominent for predicting the answer matched to the current question.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead of using a deterministic question vector, such as s q (|q|), NASM employs a latent distribution p \u03b8 (h|q) to model the question semantics, which is a parameterised diagonal Gaussian N (h|\u00b5(q), diag(\u03c3 2 (q))).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, the attention model extracts a context vector c(a, h) by iteratively attending to the answer tokens based on the stochastic vector h \u223c p \u03b8 (h|q).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In doing so the model is able to adapt to the ambiguity inherent in questions and obtain salient information through attention.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Compared to its deterministic counterpart (applying s q (|q|) as the question semantics), the stochastic units incorporated into NASM allow multi-modal attention distributions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Further, by marginalising over the latent variables, NASM is more robust against overfitting, which is important for small question answering training sets.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Dataset & Setup for Document Modelling",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments on Document Modelling",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "The final two columns present the perplexity achieved by each topic model on the 20NewsGroups and RCV1-v2 datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In document modelling, perplexity is computed by exp(\u2212 1",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Dataset & Setup for Answer Sentence Selection",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "In order to investigate the effectiveness of our NASM model we also implemented two strong baseline modelsa vanilla LSTM model (LSTM) and an LSTM model with a deterministic attention mechanism (LSTM+Att).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The former directly applies the QA matching function (Eq.",
+              "tag": "Method"
+            },
+            {
+              "sent": "15) on the independent question and answer representations which are the last state outputs s q (|q|) and s a (|a|) from the question and answer LSTM models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The latter adds an attention model to learn pair-specific representation for prediction on the basis of the vanilla LSTM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, LSTM+Att is the deterministic counterpart of NASM, which has the same neural network architecture as NASM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The only difference is that it replaces the stochastic units h with deterministic ones, and no inference network is required to carry out stochastic estimation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following previous work, for each of our models we also add a lexical overlap feature by combining a co-occurrence word count feature with the probability generated from the neural model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "MAP and MRR are adopted as the evaluation metrics for this task.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on Answer Sentence Selection",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Table 4 compares the results of our models with current state-of-the-art models on both answer selection datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The LSTM+Att performs slightly better than the vanilla LSTM model, and our NASM improves the results further.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Since the QASent dataset is biased towards lexical overlapping features, after combining with a co-occurrence word count feature, our best model NASM outperforms all the previous models, including both neural network based models and classifiers with a set of hand-crafted features (eg",
+              "tag": "Result"
+            },
+            {
+              "sent": "Similarly, on the Wik-iQA dataset, all of our models outperform the previous distributional models by a large margin.",
+              "tag": "Result"
+            },
+            {
+              "sent": "By including a word count feature, our models improve further and achieve the state-of-the-art.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Notably, on both datasets, our two LSTMbased models have set strong baselines and NASM works even better, which demonstrates the effectiveness of introducing stochastic units to model question semantics in this answer sentence selection task.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "As shown in the experiments, neural variational inference brings consistent improvements on the performance of both NLP tasks.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The basic intuition is that the latent distributions grant the ability to sum over all the possibilities in terms of semantics.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "From the perspective of optimisation, one of the most important reasons is that Bayesian learning guards against overfitting.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "Training an inference network to approximate the variational distribution was first proposed in the context of Helmholtz machines (Hinton & Zemel, 1994;Hinton et al, 1995;Dayan & Hinton, 1996), but applications of these directed generative models come up against the problem of establishing low variance gradient estimators.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent advances in neural variational inference mitigate this problem by reparameterising the continuous random variables (Rezende et al, 2014;, using control variates  or approximating the posterior with importance sampling (Bornschein & Bengio, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The instantiations of these ideas (Gregor et al, 2015;Ba et al, 2015) have demonstrated strong performance on the tasks of image processing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The recent variants of generative auto-encoder (Louizos et al, 2015;Makhzani et al, 2015) are also very competitive.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Tang & Salakhutdinov (2013) applies the similar idea of introducing stochastic units for expression classification, but its inference is carried out by Monte Carlo EM algorithm with the reliance on importance sampling, which is less efficient and lack of scalability.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "Another class of neural generative models make use of the autoregressive assumption (Larochelle & Murray, 2011;Uria et al, 2014;Germain et al, 2015;Gregor et al, 2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Applications of these models on document modelling achieve significant improvements on generating documents, compared to conventional probabilistic topic models (Hofmann, 1999;Blei et al, 2003) and also the RBMs (Hinton & Salakhutdinov, 2009;Srivastava et al, 2013).",
+              "tag": "Method"
+            },
+            {
+              "sent": "While these models that use binary semantic vectors, our NVDM employs dense continuous document representations which are both expressive and easy to train.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The semantic word vector model (Maas et al, 2011) also employs a continuous semantic vector to generate words, but the model is trained by MAP inference which does not permit the calculation of the posterior distribution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A very similar idea to NVDM is Bowman et al (2015), which employs VAE to generate sentences from a continuous space.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "Apart from the work mentioned above, there is other interesting work on question answering with deep neural networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One of the popular streams is mapping factoid questions with answer triples in the knowledge base (Bordes et al, 2014a;b;Yih et al, 2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, Weston et al (2015); Sukhbaatar et al (2015); Kumar et al (2015) further exploit memory networks, where long-term memories act as dynamic knowledge bases.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another attention-based model (Hermann et al, 2015) applies the attentive network to help read and comprehend for long articles.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 57,
+          "sentences": [
+            {
+              "sent": "This paper introduced a deep neural variational inference framework for generative models of text.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We experimented on two diverse tasks, document modelling and question answer selection tasks to demonstrate the effectiveness of this framework, where in both cases our models achieve state of the art performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Apart from the promising results, our model also has the advantages of (1) simple, expressive, and efficient when training with the SGVB algorithm;",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Neural Variational Inference for Text Processing"
+}

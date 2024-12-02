@@ -1,0 +1,549 @@
+{
+  "paper_id": "1511.06581",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "In recent years there have been many successes of using deep representations in reinforcement learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Still, many of these applications use conventional architectures, such as convolutional networks, LSTMs, or auto-encoders.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we present a new neural network architecture for model-free reinforcement learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our dueling network represents two separate estimators: one for the state value function and one for the state-dependent action advantage function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The main benefit of this factoring is to generalize learning across actions without imposing any change to the underlying reinforcement learning algorithm.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our results show that this architecture leads to better policy evaluation in the presence of many similar-valued actions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, the dueling architecture enables our RL agent to outperform the state-of-the-art on the Atari 2600 domain.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Over the past years, deep learning has contributed to dramatic advances in scalability and performance of machine learning (LeCun et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One exciting application is the sequential decision-making setting of reinforcement learning (RL) and control.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Notable examples include deep Q-learning (Mnih et al, 2015), deep visuomotor policies (Levine et al, 2015), attention with recurrent networks (Ba et al, 2015), and model predictive control with embeddings (Watter et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Other recent successes include massively parallel frameworks (Nair et al, 2015) and expert move prediction in the game of Go (Maddison et al, 2015), which produced policies matching those of Monte Carlo tree search programs, and squarely beaten a professional player when combined with search (Silver et al, 2016).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "In spite of this, most of the approaches for RL use standard neural networks, such as convolutional networks, MLPs, LSTMs and autoencoders.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The focus in these recent advances has been on designing improved control and RL algorithms, or simply on incorporating existing neural network architectures into RL methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Here, we take an alternative but complementary approach of focusing primarily on innovating a neural network architecture that is better suited for model-free RL.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This approach has the benefit that the new network can be easily combined with existing and future algorithms for RL.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "That is, this paper advances a new network (Figure 1), but uses already published algorithms.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "The proposed network architecture, which we name the dueling architecture, explicitly separates the representation of state values and (state-dependent) action advantages.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dueling architecture consists of two streams that represent the value and advantage functions, while sharing a common  convolutional feature learning module.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The two streams are combined via a special aggregating layer to produce an estimate of the state-action value function Q as shown in Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dueling network should be understood as a single Q network with two streams that replaces the popular single-stream Q network in existing algorithms such as Deep QNetworks (DQN; Mnih et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dueling network automatically produces separate estimates of the state value function and advantage function, without any extra supervision.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In the experiments, we demonstrate that the dueling architecture can more quickly identify the correct action during policy evaluation as redundant or similar actions are added to the learning problem.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "We also evaluate the gains brought in by the dueling architecture on the challenging Atari 2600 testbed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Here, an RL agent with the same structure and hyper-parameters must be able to play 57 different games by observing image pixels and game scores only.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results illustrate vast improvements over the single-stream baselines of Mnih et al (2015) and van Hasselt et al (2015).",
+              "tag": "Result"
+            },
+            {
+              "sent": "The combination of prioritized replay (Schaul et al, 2016) with the proposed dueling network results in the new state-of-the-art for this popular domain.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "The dueling architecture represents both the value V (s) and advantage A(s, a) functions with a single deep model whose output combines the two to produce a state-action value Q(s, a).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Unlike in advantage updating, the representation and algorithm are decoupled by construction.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Consequently, the dueling architecture can be used in combination with a myriad of model free RL algorithms.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "There have been several attempts at playing Atari with deep reinforcement learning, including  et al (2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The results of Schaul et al (2016) are the current published state-of-the-art.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Background",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Deep Q-networks",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Double Deep Q-networks",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "The previous section described the main components of DQN as presented in (Mnih et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this paper, we use the improved Double DQN (DDQN) learning algorithm of van Hasselt et al (2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Q-learning and DQN, the max operator uses the same values to both select and evaluate an action.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This can therefore lead to overoptimistic value estimates (van Hasselt, 2010).",
+              "tag": "Method"
+            },
+            {
+              "sent": "To mitigate this problem, DDQN uses the following target:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Prioritized Replay",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "A recent innovation in prioritized experience replay (Schaul et al, 2016) built on top of DDQN and further improved the state-of-the-art.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Their key idea was to increase the replay probability of experience tuples that have a high expected learning progress (as measured via the proxy of absolute TD-error).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This led to both faster learning and to better final policy quality across most games of the Atari benchmark suite, as compared to uniform experience replay.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "To strengthen the claim that our dueling architecture is complementary to algorithmic innovations, we show that it improves performance for both the uniform and the prioritized replay baselines (for which we picked the easier to implement rank-based variant), with the resulting prioritized dueling variant holding the new state-of-the-art.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "The Dueling Network Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "The key insight behind our new architecture, as illustrated in Figure 2, is that for many states, it is unnecessary to estimate the value of each action choice.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, in the Enduro game setting, knowing whether to move left or right only matters when a collision is eminent.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In some states, it is of paramount importance to know which action to take, but in many other states the choice of action has no repercussion on what happens.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For bootstrapping based algorithms, however, the estimation of state values is of great importance for every state.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "To bring this insight to fruition, we design a single Qnetwork architecture, as illustrated in Figure 1, which we refer to as the dueling network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The lower layers of the dueling network are convolutional as in the original DQNs (Mnih et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, instead of following the convolutional layers with a single sequence of fully connected layers, we instead use two sequences (or streams) of fully connected layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The streams are constructed such that they have they have the capability of providing separate estimates of the value and advantage functions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, the two streams are combined to produce a single output Q function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As in (Mnih et al, 2015), the output of the network is a set of Q values, one for each action.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "As the dueling architecture shares the same input-output interface with standard Q networks, we can recycle all learning algorithms with Q networks (eg, DDQN and SARSA) to train the dueling architecture.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "We now show the practical performance of the dueling network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We start with a simple policy evaluation task and then show larger scale results for learning policies for general Atari game-playing.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Policy evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "We start by measuring the performance of the dueling architecture on a policy evaluation task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We choose this par-ticular task because it is very useful for evaluating network architectures, as it is devoid of confounding factors such as the choice of exploration strategy, and the interaction between policy improvement and policy evaluation.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "In this experiment, we employ temporal difference learning (without eligibility traces, ie, \u03bb = 0) to learn Q values.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More specifically, given a behavior policy \u03c0, we seek to estimate the state-action value Q \u03c0 (\u2022, \u2022) by optimizing the sequence of costs of equation ( 4), with target",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 57,
+          "sentences": [
+            {
+              "sent": "The results show that with 5 actions, both architectures converge at about the same speed.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, when we increase the number of actions, the dueling architecture performs better than the traditional Q-network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the dueling network, the stream V (s; \u03b8, \u03b2) learns a general value that is shared across many similar actions at s, hence leading to faster convergence.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is a very promising result be- cause many control tasks with large action spaces have this property, and consequently we should expect that the dueling network will often lead to much faster convergence than a traditional single stream network.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In the following section, we will indeed see that the dueling network results in substantial gains in performance in a wide-range of Atari games.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "General Atari Game-Playing",
+      "selected_sentences": [
+        {
+          "par_id": 61,
+          "sentences": [
+            {
+              "sent": "Our network architecture has the same low-level convolutional structure of DQN (Mnih et al, 2015;van Hasselt et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are 3 convolutional layers followed by 2 fully-connected layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first convolutional layer has 32 8 \u00d7 8 filters with stride 4, the second 64 4 \u00d7 4 filters with stride 2, and the third and final convolutional layer consists 64 3 \u00d7 3 filters with stride 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 1, the dueling network splits into two streams of fully connected layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The value and advantage streams both have a fullyconnected layer with 512 units.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The final hidden layers of the value and advantage streams are both fully-connected with the value stream having one output and the advantage as many outputs as there are valid actions 2 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We combine the value and advantage streams using the module described by Equation ( 9).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Rectifier non-linearities (Fukushima, 1980) are inserted between all adjacent layers.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 72,
+          "sentences": [
+            {
+              "sent": "The dueling architecture can be easily combined with other algorithmic improvements.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, prioritization of the experience replay has been shown to significantly improve performance of Atari games (Schaul et al, 2016).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, as prioritization and the dueling architecture address very different aspects of the learning process, their combination is promising.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "So in our final experiment, we investigate the integration of the dueling architecture with prioritized experience replay.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the prioritized variant of DDQN (Prior.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Single) as the new baseline algorithm, which replaces with the uniform sampling of the experi-  ence tuples by rank-based prioritized sampling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We keep all the parameters of the prioritized replay as described in (Schaul et al, 2016), namely a priority exponent of 0.7, and an annealing schedule on the importance sampling exponent from 0.5 to 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We combine this baseline with our dueling architecture (as above), and again use gradient clipping (Prior.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 74,
+          "sentences": [
+            {
+              "sent": "When evaluated on all 57 Atari games, our prioritized dueling agent performs significantly better than both the prioritized baseline agent and the dueling agent alone.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The full mean and median performance against the human performance percentage is shown in Table 1.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When initializing the games using up to 30 no-ops action, we observe mean and median scores of 591% and 172% respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The direct comparison between the prioritized baseline and prioritized dueling versions, using the metric described in Equation 10, is presented in Figure 5.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion",
+      "selected_sentences": [
+        {
+          "par_id": 79,
+          "sentences": [
+            {
+              "sent": "The advantage of the dueling architecture lies partly in its ability to learn the state-value function efficiently.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With every update of the Q values in the dueling architecture, the value stream V is updated -this contrasts with the updates in a single-stream architecture where only the value for one of the actions is updated, the values for all other actions remain untouched.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This more frequent updating of the value stream in our approach allocates more resources to V , and thus allows for better approximation of the state values, which in turn need to be accurate for temporaldifference-based methods like Q-learning to work (Sutton & Barto, 1998).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This phenomenon is reflected in the experiments, where the advantage of the dueling architecture over single-stream Q networks grows when the number of actions is large.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 81,
+          "sentences": [
+            {
+              "sent": "For example, after training with DDQN on the game of Seaquest, the average action gap (the gap between the Q values of the best and the second best action in a given state) across visited states is roughly 0.04, whereas the average state value across those states is about 15.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This difference in scales can lead to small amounts of noise in the updates can lead to reorderings of the actions, and thus make the nearly greedy policy switch abruptly.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The dueling ar-chitecture with its separate advantage stream is robust to such effects.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 82,
+          "sentences": [
+            {
+              "sent": "We introduced a new neural network architecture that decouples value and advantage in deep Q-networks, while sharing a common feature learning module.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Dueling Network Architectures for Deep Reinforcement Learning"
+}

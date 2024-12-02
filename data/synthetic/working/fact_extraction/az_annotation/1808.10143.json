@@ -1,0 +1,467 @@
+{
+  "paper_id": "1808.10143",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "This paper proposes a state-of-the-art recurrent neural network (RNN) language model that combines probability distributions computed not only from a final RNN layer but also from middle layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our proposed method raises the expressive power of a language model based on the matrix factorization interpretation of language modeling introduced by Yang et al ( 2018).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The proposed method improves the current state-of-the-art language model and achieves the best score on the Penn Treebank and WikiText-2, which are the standard benchmark datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, we indicate our proposed method contributes to two application tasks: machine translation and headline generation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Neural network language models have played a central role in recent natural language processing (NLP) advances.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, neural encoderdecoder models, which were successfully applied to various natural language generation tasks including machine translation , summarization (Rush et al, 2015), and dialogue (Wen et al, 2015), can be interpreted as conditional neural language models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Neural language models also positively influence syntactic parsing (Dyer et al, 2016;Choe and Charniak, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, such word embedding methods as Skipgram (Mikolov et al, 2013) and vLBL (Mnih and Kavukcuoglu, 2013) originated from neural language models designed to handle much larger vocabulary and data sizes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Neural language models can also be used as contextualized word representations (Peters et al, 2018).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, language modeling is a good benchmark task for investigating the general frameworks of neural methods in NLP field.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Previous researches demonstrated that RNN language models achieve high performance by using several regularizations and selecting appropriate hyperparameters (Melis et al, 2018;Merity et al, 2018).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, Yang et al (2018) proved that existing RNN language models have low expressive power due to the Softmax bottleneck, which means the output matrix of RNN language models is low rank when we interpret the training of RNN language models as a matrix factorization problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To solve the Softmax bottleneck, Yang et al (2018) proposed Mixture of Softmaxes (MoS), which increases the rank of the matrix by combining multiple probability distributions computed from the encoded fixed-length vector.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "In this study, we propose Direct Output Connection (DOC) as a generalization of MoS.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For stacked RNNs, DOC computes the probability distributions from the middle layers including input embeddings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition to raising the rank, the proposed method helps weaken the vanishing gradient problem in backpropagation because DOC provides a shortcut connection to the output.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "We conduct experiments on standard benchmark datasets for language modeling: the Penn Treebank and WikiText-2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our experiments demonstrate that DOC outperforms MoS and achieves state-of-theart perplexities on each dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, we investigate the effect of DOC on two applications: machine translation and headline generation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We indicate that DOC can improve the performance of an encoder-decoder with an attention mechanism, which is a strong baseline for such applications.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, we conduct an experiment on the Penn Treebank constituency parsing task to investigate the effectiveness of DOC.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RNN Language Model",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "3 Language Modeling as Matrix Factorization Yang et al (2018) indicated that the training of language models can be interpreted as a matrix factorization problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section, we briefly introduce their description.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Let word sequence w 1:t be context c t .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we can regard a natural language as a finite set of the pairs of a context and its conditional probability distribution: L = {(c 1 , P * (X|c 1 )), ..., (c U , P * (X|c U ))}, where U is the number of possible contexts and X \u2208 {0, 1} V is a variable representing a onehot vector of a word.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Here, we consider matrix A \u2208 R U \u00d7V that represents the true log probability distributions and matrix H \u2208 R U \u00d7D h N that contains the hidden states of the final RNN layer for each context c t :",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Equation 6 indicates that training RNN language models can also be interpreted as a matrix factorization problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In most cases, the rank of matrix HW is D h N because D h N is smaller than V and U in common RNN language models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, an RNN language model cannot express true distributions if D h N is much smaller than rank(A ).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Yang et al (2018) also argued that rank(A ) is as high as vocabulary size V based on the following two assumptions:",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Proposed Method: Direct Output Connection",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "To construct a high-rank matrix, Yang et al (2018) proposed Mixture of Softmaxes (MoS).",
+              "tag": "Method"
+            },
+            {
+              "sent": "MoS computes multiple probability distributions from the hidden state of final RNN layer h N and regards the weighted average of the probability distributions as the final distribution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this study, we propose Direct Output Connection (DOC), which is a generalization method of MoS.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DOC computes probability distributions from the middle layers in addition to the final layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In other words, DOC directly connects the middle layers to the output.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on Language Modeling",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "We used the Penn Treebank (PTB) (Marcus et al, 1993) and WikiText-2 (Merity et al, 2017) datasets, which are the standard benchmark datasets for the word-level language modeling task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Mikolov et al (2010) and Merity et al (2017) respectively published preprocessed PTB 3 and WikiText-2 4 datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We used these preprocessed datasets for fair comparisons with previous studies.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Hyperparameters",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "Table 3 shows the perplexities of AWDLSTM with DOC on the PTB dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "D 3 of AWDLSTM is 400. represents the number of probability distributions from hidden state h n t .",
+              "tag": "Method"
+            },
+            {
+              "sent": "To find the best combination, we varied the number of probability distributions from each layer by fixing their total to 20: J = 20.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, the top row of Table 3 shows the perplexity of AWDLSTM with MoS reported in Yang et al (2018) for comparison.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 3 indicates that language models using middle layers outperformed one using only the final layer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition, Table 3 shows that increasing the distributions from the final layer (i 3 = 20) degraded the score from the language model with i 3 = 15 (the top row of Table 3).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Thus, to obtain a superior language model, we should not increase the number of distributions from the final layer; we should instead use the middle layers, as with our proposed DOC.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "Tables 7 and 8 respectively show the perplexities of AWDLSTMDOC and previous studies on PTB and WikiText-2 8 .",
+              "tag": "Result"
+            },
+            {
+              "sent": "These tables show that AWDLSTMDOC achieved the best perplexity.",
+              "tag": "Result"
+            },
+            {
+              "sent": "AWDLSTMDOC improved the perplexity by almost 2.0 on PTB and 3.5 on WikiText-2 from the state-of-the-art scores.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The ensemble technique provided further improvement, as described in previous studies (Zaremba et al, 2014;, and improved the perplexity by at least 4 points on both datasets.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Finally, the ensemble of the repeated finetuning models achieved 47.17 on the PTB test and 53.09 on the WikiText-2 test.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "The middle part shows that AWDLSTMDOC also outperformed AWDLSTM and AWDLSTMMoS in the ensemble setting.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition, we can improve the performance by exchanging the base parser with a stronger one.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In fact, we achieved 94.29 F1 score by reranking the candidates from retrained Recurrent Neural Network Grammars (RNNG) (Dyer et al, 2016) 13 , that achieved 91.2 F1 score in our configuration.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, the lowest row of the middle part indicates the result by reranking the candidates from the retrained neural encoder-decoder based parser (Suzuki et al, 2018).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our base parser has two different parts from Suzuki et al (2018).",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, we used the sum of the hidden states of the forward and backward RNNs as the hidden layer for each RNN 14 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, we tied the embedding matrix to the weight matrix to compute the probability distributions in the decoder.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The retrained parser achieved 93.12 F1 score.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, we achieved 94.47 F1 score by reranking its candidates with AWDLSTMDOC.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We expect that we can achieve even better score by replacing the base parser with the current state-of-the-art one (Kitaev and Klein, 2018).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 58,
+          "sentences": [
+            {
+              "sent": "As described in Section 3, Yang et al (2018) interpreted training language modeling as matrix factorization and improved performance by computing multiple probability distributions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this study, we generalized their approach to use the middle layers of RNNs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, our proposed method, DOC, achieved the state-of-the-art score on the standard benchmark datasets.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on Application Tasks",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Dataset",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "We conducted experiments on machine translation and headline generation tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For machine translation, we used two kinds of sentence pairs (EnglishGerman and EnglishFrench) in the IWSLT 2016 dataset 9 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The training set respectively contains about 189K and 208K sentence pairs of EnglishGerman and EnglishFrench.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We experimented in four settings: from English to German (EnDe), its reverse (DeEn), from English to French (EnFr), and its reverse (FrEn).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Encoder-Decoder Model",
+      "selected_sentences": [
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "For the base model, we adopted an encoder-decoder with an attention mechanism described in Kiyono et al (2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The encoder consists of a 2-layer bidirectional LSTM, and the decoder consists of a 2-layer LSTM with attention proposed by Luong et al (2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We interpreted the layer after computing the attention as the 3rd layer of the decoder.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We refer to this encoder-decoder as EncDec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the hyperparameters, we followed the setting of Kiyono et al (2017) except for the sizes of hidden states and embeddings. translation and 400 for headline generation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We constructed a vocabulary set by using BytePairEncoding 10 (BPE) (Sennrich et al, 2016).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We set the number of BPE merge operations at 16K for the machine translation and 5K for the headline generation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on Constituency Parsing",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Models",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "We proposed Direct Output Connection (DOC), a generalization method of MoS introduced by Yang et al (2018).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DOC raises the expressive power of RNN language models and improves quality of the model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "DOC outperformed MoS and achieved the best perplexities on the standard benchmark datasets of language modeling: PTB and WikiText-2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, we investigated its effectiveness on machine translation and headline generation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our results show that DOC also improved the performance of EncDec and using a middle layer positively affected such application tasks.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Direct Output Connection for a High-Rank Language Model"
+}

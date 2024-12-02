@@ -1,0 +1,766 @@
+{
+  "paper_id": "1611.05431",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We present a simple, highly modularized network architecture for image classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our network is constructed by repeating a building block that aggregates a set of transformations with the same topology.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our simple design results in a homogeneous, multi-branch architecture that has only a few hyper-parameters to set.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This strategy exposes a new dimension, which we call \"cardinality\" (the size of the set of transformations), as an essential factor in addition to the dimensions of depth and width.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the ImageNet-1K dataset, we empirically show that even under the restricted condition of maintaining complexity, increasing cardinality is able to improve classification accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, increasing cardinality is more effective than going deeper or wider when we increase the capacity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our models, named ResNeXt, are the foundations of our entry to the ILSVRC 2016 classification task in which we secured 2nd place.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We further investigate ResNeXt on an ImageNet-5K set and the COCO detection set, also showing better results than its ResNet counterpart.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The code and models are publicly available online 1 .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Designing architectures becomes increasingly difficult with the growing number of hyper-parameters (width 2 , filter sizes, strides, etc), especially when there are many layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The VGG-nets [36] exhibit a simple yet effective strategy of constructing very deep networks: stacking build-   [14].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Right: A block of ResNeXt with cardinality = 32, with roughly the same complexity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A layer is shown as (# in channels, filter size, # out channels).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "ing blocks of the same shape.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This strategy is inherited by ResNets [14] which stack modules of the same topology.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This simple rule reduces the free choices of hyperparameters, and depth is exposed as an essential dimension in neural networks.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Moreover, we argue that the simplicity of this rule may reduce the risk of over-adapting the hyperparameters to a specific dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The robustness of VGGnets and ResNets has been proven by various visual recognition tasks [7,10,9,28,31,14] and by non-visual tasks involving speech [42,30] and language [4,41,20].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Despite good accuracy, the realization of Inception models has been accompanied with a series of complicating fac-tors -the filter numbers and sizes are tailored for each individual transformation, and the modules are customized stage-by-stage.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although careful combinations of these components yield excellent neural network recipes, it is in general unclear how to adapt the Inception architectures to new datasets/tasks, especially when there are many factors and hyper-parameters to be designed.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In this paper, we present a simple architecture which adopts VGG/ResNets' strategy of repeating layers, while exploiting the split-transform-merge strategy in an easy, extensible way.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A module in our network performs a set of transformations, each on a low-dimensional embedding, whose outputs are aggregated by summation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We pursuit a simple realization of this idea -the transformations to be aggregated are all of the same topology (eg, Figure 1 (right)).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This design allows us to extend to any large number of transformations without specialized designs.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "We empirically demonstrate that our aggregated transformations outperform the original ResNet module, even under the restricted condition of maintaining computational complexity and model size -eg, Figure 1(right) is designed to keep the FLOPs complexity and number of parameters of Figure 1(left).",
+              "tag": "Result"
+            },
+            {
+              "sent": "We emphasize that while it is relatively easy to increase accuracy by increasing capacity (going deeper or wider), methods that increase accuracy while maintaining (or reducing) complexity are rare in the literature.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "Our method indicates that cardinality (the size of the set of transformations) is a concrete, measurable dimension that is of central importance, in addition to the dimensions of width and depth.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Experiments demonstrate that increasing cardinality is a more effective way of gaining accuracy than going deeper or wider, especially when depth and width starts to give diminishing returns for existing models.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Our neural networks, named ResNeXt (suggesting the next dimension), outperform ResNet-101/152 [14], ResNet-200 [15], Inception-v3 [39], and InceptionResNet-v2 [37] on the ImageNet classification dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In particular, a 101-layer ResNeXt is able to achieve better accuracy than ResNet-200 [15] but has only 50% complexity.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, ResNeXt exhibits considerably simpler designs than all Inception models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "ResNeXt was the foundation of our submission to the ILSVRC 2016 classification task, in which we secured second place.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper further evaluates ResNeXt on a larger ImageNet-5K set and the COCO object detection dataset [27], showing consistently better accuracy than its ResNet counterparts.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We expect that ResNeXt will also generalize well to other visual (and non-visual) recognition tasks.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "The Inception models [38,17,39,37] are successful multi-branch architectures where each branch is carefully customized.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "ResNets [14] can be thought of as two-branch networks where one branch is the identity mapping.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Deep neural decision forests [22] are tree-patterned multi-branch networks with learned splitting functions.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Decomposition (at spatial [6,18] and/or channel [6,21,16] level) is a widely adopted technique to reduce redundancy of deep convolutional networks and accelerate/compress them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Ioannou et al [16] present a \"root\"-patterned network for reducing computation, and branches in the root are realized by grouped convolutions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These methods [6,18,21,16] have shown elegant compromise of accuracy with lower complexity and smaller model sizes.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Instead of compression, our method is an architecture that empirically shows stronger representational power.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Averaging a set of independently trained networks is an effective solution to improving accuracy [24], widely adopted in recognition competitions [33].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Veit et al [40] interpret a single ResNet as an ensemble of shallower networks, which results from ResNet's additive behaviors [15].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our method harnesses additions to aggregate a set of transformations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But we argue that it is imprecise to view our method as ensembling, because the members to be aggregated are trained jointly, not independently.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Template",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "These blocks have the same topology, and are subject to two simple rules inspired by VGG/ResNets: (i) if producing spatial maps of the same size, the blocks share the same hyper-parameters (width and filter sizes), and (ii) each time when the spatial map is downsampled by a factor of 2, the width of the blocks is multiplied by a factor of 2. The second rule ensures that the computational complexity, in terms of FLOPs (floating-point operations, in # of multiply-adds), is roughly the same for all blocks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With these two rules, we only need to design a template module, and all modules in a network can be determined accordingly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "So these two rules greatly narrow down the design space and allow us to focus on a few key factors.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The networks constructed by these rules are in Table 1.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Revisiting Simple Neurons",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Aggregated Transformations",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "Given the above analysis of a simple neuron, we consider replacing the elementary transformation (w i x i ) with a more generic function, which in itself can also be a network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast to \"Network-inNetwork\" [26] that turns out to increase the dimension of depth, we show that our \"Network-inNeuron\" expands along a new dimension.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "Formally, we present aggregated transformations as:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "where T i (x) can be an arbitrary function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Analogous to a simple neuron, T i should project x into an (optionally lowdimensional) embedding and then transform it.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Eqn.(2), C is the size of the set of transformations to be aggregated.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We refer to C as cardinality [2].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In Eqn.(2) C is in a position similar to D in Eqn.( 1), but C need not equal D and can be an arbitrary number.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While the dimension of width is related to the number of simple transformations (inner product), we argue that the dimension of cardinality controls the number of more complex transformations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We show by experiments that cardinality is an essential dimension and can be more effective than the dimensions of width and depth.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "In this paper, we consider a simple way of designing the transformation functions: all T i 's have the same topology.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This extends the VGG-style strategy of repeating layers of the same shape, which is helpful for isolating a few factors and extending to any large number of transformations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We set the individual transformation T i to be the bottleneckshaped architecture [14], as illustrated in Figure 1 (right).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this case, the first 1\u00d71 layer in each T i produces the lowdimensional embedding.",
+              "tag": "Method"
+            },
+            {
+              "sent": ", implemented as grouped convolutions [24].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Notations in bold text highlight the reformulation changes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A layer is denoted as (# input channels, filter size, # output channels).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "The aggregated transformation in Eqn.( 2) serves as the residual function [14] (Figure 1 right):",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model Capacity",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "Because we adopt the two rules in Sec.",
+              "tag": "Result"
+            },
+            {
+              "sent": "3.1, the above approximate equality is valid between a ResNet bottleneck block and our ResNeXt on all stages (except for the subsampling layers where the feature maps size changes).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 1 compares the original ResNet-50 and our ResNeXt-50 that is of similar capacity. 5 We note that the complexity can only be preserved approximately, but the difference of the complexity is minor and does not bias our results.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Implementation details",
+      "selected_sentences": [
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "Our implementation follows [14] and the publicly available code of fb.resnet.torch",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the ImageNet dataset, the input image is 224\u00d7224 randomly cropped from a resized image using the scale and aspect ratio augmentation of [38] implemented by [11].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The shortcuts are identity connections except for those increasing dimensions which are projections (type B in [14]).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Downsampling of conv3, 4, and 5 is done by stride-2 convolutions in the 3\u00d73 layer of the first block in each stage, as suggested in [11].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use SGD with a mini-batch size of 256 on 8 GPUs (32 per GPU).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The weight decay is 0.0001 and the momentum is 0.9.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We start from a learning rate of 0.1, and divide it by 10 for three times using the schedule in [11].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adopt the weight initialization of [13].",
+              "tag": "Method"
+            },
+            {
+              "sent": "In all ablation comparisons, we evaluate the error on the single 224\u00d7224 center crop from an image whose shorter side is 256.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on ImageNet-1K",
+      "selected_sentences": [
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "We first evaluate the trade-off between cardinality C and bottleneck width, under preserved complexity as listed in Table 2. Table 3 shows the results and Figure 5 shows the curves of error vs. epochs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Comparing with ResNet-50 (Table 3 top and Figure 5 left), the 32\u00d74d ResNeXt-50 has a validation error of 22.2%, which is 1.7% lower than the ResNet baseline's 23.9%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "With cardinality C increasing from 1 to 32 while keeping complexity, the error rate keeps reducing.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Furthermore, the 32\u00d74d ResNeXt also has a much lower training error than the ResNet counterpart, suggesting that the gains are not from regularization but from stronger representations.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "Table 3 also suggests that with complexity preserved, increasing cardinality at the price of reducing width starts to show saturating accuracy when the bottleneck width is  small.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We argue that it is not worthwhile to keep reducing width in such a trade-off.",
+              "tag": "Method"
+            },
+            {
+              "sent": "So we adopt a bottleneck width no smaller than 4d in the following.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "Next we investigate increasing complexity by increasing cardinality C or increasing depth or width.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The following comparison can also be viewed as with reference to 2\u00d7 FLOPs of the ResNet-101 baseline.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare the following variants that have \u223c15 billion FLOPs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "(i) Going deeper to 200 layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adopt the ResNet-200 [15] implemented in [11].",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "(ii) Going wider by increasing the bottleneck width.",
+              "tag": "Result"
+            },
+            {
+              "sent": "(iii) Increasing cardinality by doubling C. Table 4 shows that increasing complexity by 2\u00d7 consistently reduces error vs. the ResNet-101 baseline (22.0%).",
+              "tag": "Result"
+            },
+            {
+              "sent": "But the improvement is small when going deeper (ResNet-200, by 0.3%) or wider (wider ResNet-101, by 0.7%).",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "On the contrary, increasing cardinality C shows much Removing shortcuts from the ResNeXt-50 increases the error by 3.9 points to 26.1%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Removing shortcuts from its ResNet-50 counterpart is much worse (31.2%).",
+              "tag": "Result"
+            },
+            {
+              "sent": "These comparisons suggest that the residual connections are helpful for optimization, whereas aggregated transformations are stronger representations, as shown by the fact that they perform consistently better than their counterparts with or without residual connections.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "Training the 2\u00d7complexity model (64\u00d74d ResNeXt-101) takes 1.7s per mini-batch and 10 days total on 8 GPUs.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "Table 5 shows more results of single-crop testing on the ImageNet validation set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition to testing a 224\u00d7224 crop, we also evaluate a 320\u00d7320 crop following [15].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our results compare favorably with ResNet, Inception-v3/v4, and InceptionResNet-v2, achieving a single-crop top-5 error rate of 4.4%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition, our architecture design is much simpler than all Inception models, and requires considerably fewer hyper-parameters to be set by hand.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "ResNeXt is the foundation of our entries to the ILSVRC 2016 classification task, in which we achieved 2 nd place.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We note that many models (including ours) start to get saturated on this dataset after using multi-scale and/or multicrop testing.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We had a single-model top-1/top-5 error rates of 17.7%/3.7% using the multi-scale dense testing in [14], on par with InceptionResNet-v2's single-model results of 17.8%/3.7%",
+              "tag": "Method"
+            },
+            {
+              "sent": "We had an ensemble result of 3.03% top-5 error on the test set, on par with the winner's 2.99% and Inception-v4/InceptionResNet-v2's 3.08% [37].",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on ImageNet-5K",
+      "selected_sentences": [
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "The performance on ImageNet-1K appears to saturate.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But we argue that this is not because of the capability of the models but because of the complexity of the dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Next we evaluate our models on a larger ImageNet subset that has 5000 categories.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 57,
+          "sentences": [
+            {
+              "sent": "Our 5K dataset is a subset of the full ImageNet-22K set [33].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The 5000 categories consist of the original ImageNet-1K categories and additional 4000 categories that have the largest number of images in the full ImageNet set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The 5K set has 6.8 million images, about 5\u00d7 of the 1K set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There is no official train/val split available, so we opt to evaluate on the original ImageNet-1K validation set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On this 1K-class val set, the models can be evaluated as a 5K-way classification task (all labels predicted to be the other 4K classes are automatically erroneous) or as a 1K-way classification task (softmax is applied only on the 1K classes) at test time.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on CIFAR",
+      "selected_sentences": [
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "We compare two cases of increasing complexity based on the above baseline: (i) increase cardinality and fix all widths, or (ii) increase width of the bottleneck and fix cardinality = 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We train and evaluate a series of networks under these changes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 7 shows the comparisons of test error rates vs. model sizes.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We find that increasing cardinality is more effective than increasing width, consistent to what we have observed on ImageNet-1K.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 7 shows the results and model sizes, comparing with the Wide ResNet [43] which is the best published record.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our model with a similar model size (34.4M) shows results better than Wide ResNet.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our larger method achieves 3.58% test error (average of 10 runs) on CIFAR-10 and 17.31% on CIFAR-100.",
+              "tag": "Result"
+            },
+            {
+              "sent": "To the best of our knowledge, these are the state-of-the-art results (with similar data augmentation) in the literature including unpublished technical reports.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on COCO object detection",
+      "selected_sentences": [
+        {
+          "par_id": 61,
+          "sentences": [
+            {
+              "sent": "Next we evaluate the generalizability on the COCO object detection set [27].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We train the models on the 80k training set plus a 35k val subset and evaluate on a 5k val subset (called minival), following [1].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate the COCOstyle Average Precision (AP) as well as AP@IoU=0.5 [27].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adopt the basic Faster RCNN [32] and follow [14] to plug ResNet/ResNeXt into it.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The models are pre-trained on ImageNet-1K and fine-tuned on the detection set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Implementation details are in the appendix.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "On the 50-layer baseline, ResNeXt improves AP@0.5 by 2.1% and AP by 1.0%, without increasing complexity.",
+              "tag": "Result"
+            },
+            {
+              "sent": "ResNeXt shows smaller improvements on the 101-layer baseline.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We conjecture that more training data will lead to a larger gap, as observed on the ImageNet-5K set.",
+              "tag": "Other"
+            }
+          ]
+        },
+        {
+          "par_id": 63,
+          "sentences": [
+            {
+              "sent": "It is also worth noting that recently ResNeXt has been adopted in Mask RCNN [12] that achieves state-of-the-art results on COCO instance segmentation and object detection tasks.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A. Implementation Details: CIFAR",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B. Implementation Details: Object Detection",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Aggregated Residual Transformations for Deep Neural Networks"
+}

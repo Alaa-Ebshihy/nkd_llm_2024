@@ -1,0 +1,405 @@
+{
+  "paper_id": "1805.08237",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "The rise of neural networks, and particularly recurrent neural networks, has produced significant advances in part-ofspeech tagging accuracy (Zeman et al, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One characteristic common among these models is the presence of rich initial word encodings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These encodings typically are composed of a recurrent character-based representation with learned and pre-trained word embeddings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, these encodings do not consider a context wider than a single word and it is only through subsequent recurrent layers that word or sub-word information interacts.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we investigate models that use recurrent neural networks with sentence-level context for initial character and word-based representations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular we show that optimal results are obtained by integrating these context sensitive representations through synchronized training with a meta-model that learns to combine their states.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We present results on part-of-speech and morphological tagging with state-of-the-art performance on a number of languages.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Morphosyntactic tagging accuracy has seen dramatic improvements through the adoption of recurrent neural networks-specifically BiLSTMs (Schuster and Paliwal, 1997;Graves and Schmidhuber, 2005) to create sentence-level context sensitive encodings of words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A successful recipe is to first create an initial context insensitive word representation, which usually has three main parts: 1) A dynamically trained word embedding; 2) a fixed pre-trained word-embedding, induced from a large corpus; and 3) a sub-word character model, which itself is usually the final state of a recurrent model that ingests one character at a time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such word/sub-word models originated with Plank et al (2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, Dozat et al (2017) used precisely such a context insensitive word representation as input to a BiLSTM in order to obtain context sensitive word encodings used to predict partof-speech tags.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The Dozat et al model had the highest accuracy of all participating systems in the CoNLL 2017 shared task (Zeman et al, 2017).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "In such a model, sub-word character-based representations only interact indirectly via subsequent recurrent layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, consider the sentence I had shingles, which is a painful disease.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Context insensitive character and word representations may have learned that for unknown or infrequent words like 'shingles', 's' and more so 'es' is a common way to end a plural noun.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is up to the subsequent BiLSTM layer to override this once it sees the singular verb is to the right.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Note that this differs from traditional linear models where word and sub-word representations are directly concatenated with similar features in the surrounding context (Gim\u00e9nez and Marquez, 2004).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this paper we aim to investigate to what extent having initial sub-word and word context insensitive representations affects performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We propose a novel model where we learn context sensitive initial character and word representations through two separate sentence-level recurrent models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These are then combined via a metaBiLSTM model that builds a unified representation of each word that is then used for syntactic tagging.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Critically, while each of these three models-character, word and meta-are trained synchronously, they are ultimately separate models using different network configurations, training hyperparameters and loss functions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Empirically, we found this optimal as it allowed control over the fact that each representation has a different learning capacity.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "We tested the system on the 2017 CoNLL shared task data sets and gain improvements compared to the top performing systems for the majority of languages for part-of-speech and morphological tagging.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As we will see, a pattern emerged where gains were largest for morphologically rich languages, especially those in the Slavic family group.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also applied the approach to the benchmark English PTB data, where our model achieved 97.9 using the standard train/dev/test split, which constitutes a relative reduction in error of 12% over the previous best system.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "The idea of using a recurrent layer over characters to induce a complementary view of a word has occurred in numerous papers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Perhaps the earliest is Santos and Zadrozny (2014) who compare character-based LSTM encodings to tradi-tional word-based embeddings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Ling et al (2015) take this a step further and combine the word embeddings with a recurrent character encoding of the word-instead of just relying on one or the other.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Alberti et al (2017) use a sentencelevel character LSTM encoding for parsing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Peters et al (2018) show that contextual embeddings using character convolutions improve accuracy for number of NLP tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Plank et al (2016) is probably the jumping-off point for most current architectures for tagging models with recurrent neural networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, they used a combined word embedding and recurrent character encoding as the initial input to a BiLSTM that generated context sensitive word encodings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Though, like most previous studies, these initial encodings were context insensitive and relied on subsequent layers to encode sentence-level interactions.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Finally, Dozat et al (2017) showed that subword/word combination representations lead to state-of-the-art morphosyntactic tagging accuracy across a number of languages in the CoNLL 2017 shared task (Zeman et al, 2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Their word representation consisted of three parts: 1) A dynamically trained word embedding; 2) a fixed pretrained word embedding; 3) a character LSTM encoding that summed the final state of the recurrent model with vector constructed using an attention mechanism over all character states.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Again, the initial representations are all context insensitive.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As this model is currently the state-of-the-art in morphosyntactic tagging, it will serve as a baseline during our discussion and experiments.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Models",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Sentence-based Character Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Word-based Character Model",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "To investigate whether a sentence sensitive character model is better than a character model where the context is restricted to the characters of a word, we reimplemented the word-based character model of Dozat et al (2017) as shown in Figure 1a.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This model uses the final state of a unidirectional LSTM over the characters of the word, combined with the attention mechanism of Cao and Rei (2016) over all characters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We refer the reader to those works for more details.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Critically, however, all the information fed to this representation comes from the word itself, and not a wider sentence-level context.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Sentence-based Word Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Meta-BiLSTM: Model Combination",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "Given initial word encodings, both character and word-based, a common strategy is to pass these through a sentence-level BiLSTM to create context sensitive encodings, eg, this is precisely what Plank et al (2016) and Dozat et al (2017) do.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, we found that if we trained each of the character-based and word-based encodings with their own loss, and combined them using an additional metaBiLSTM model, we obtained optimal performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the metaBiLSTM model, we concatenate the output, for each word, of its context sensitive character and word-based encodings, and put this through another BiLSTM to create an additional combined context sensitive encoding.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is followed by a final MLP whose output is passed to a linear layer for tag prediction.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training Schema",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments and Results",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experimental Setup",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Data Sets",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "As input to our system-for both part-ofspeech tagging and morphological tagging-we use the output of the UDPipe-base baseline system (Straka and Strakov\u00e1, 2017) which provides segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The segmentation differs from the gold segmentation and impacts accuracy negatively for a number of languages.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Most of the top performing systems for part-of-speech tagging used as input UDPipe to obtain the segmentation for the input data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For morphology, the top system for most languages (IMS) used its own segmentation (Bj\u00f6rkelund et al, 2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the evaluation, we used the official evaluation script (Zeman et al, 2017).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Part-of-Speech Tagging Results",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "In this section, we present the results of the application of our model to part-of-speech tagging.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our first experiment, we used our model in the setting of the CoNLL 2017 Shared Task to annotate words with XPOS 3 tags (Zeman et al, 2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare our results against the top systems of the CoNLL 2017 Shared Task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 2 contains the results of this task for the large treebanks.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Part-of-Speech Tagging on WSJ",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Morphological Tagging Results",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "In addition to the XPOS tagging experiments, we performed experiments with morphological tagging.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This annotation was part of the CONLL 2017 Shared Task and the objective was to predict a bundle of morphological features for each token in the text.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model treats the morphological bundle as one tag making the problem equivalent to a sequential tagging problem.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "Given the fact that Dozat et al (2017) obtained the best results in part-of-speech tagging by a significant margin in the CoNLL 2017 Shared Task, it would be expected that their model would also perform significantly well in morphological tagging since the tasks are very similar.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since they did not participate in this particular challenge, we decided to reimplement their system to serve",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Ablation Study",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Impact of the Training Schema",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Impact of the Sentence-based Character Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Concatenation Strategies for the Context-Sensitive Character Encodings",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "We presented an approach to morphosyntactic tagging that combines context-sensitive initial character and word encodings with a metaBiLSTM layer to obtain state-of-the art accuracies for a wide variety of languages.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Morphosyntactic Tagging with a Meta-BiLSTM Model over Context Sensitive Token Encodings"
+}

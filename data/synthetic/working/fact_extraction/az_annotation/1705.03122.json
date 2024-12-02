@@ -1,0 +1,565 @@
+{
+  "paper_id": "1705.03122",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "The prevalent approach to sequence to sequence learning maps an input sequence to a variable length output sequence via recurrent neural networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce an architecture based entirely on convolutional neural networks. 1",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared to recurrent models, computations over all elements can be fully parallelized during training to better exploit the GPU hardware and optimization is easier since the number of non-linearities is fixed and independent of the input length.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our use of gated linear units eases gradient propagation and we equip each decoder layer with a separate attention module.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We outperform the accuracy of the deep LSTM setup of Wu et al (2016) on both WMT'14 EnglishGerman and WMT'14 EnglishFrench translation at an order of magnitude faster speed, both on GPU and CPU.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Sequence to sequence learning has been successful in many tasks such as machine translation, speech recognition (Sutskever et al, 2014;Chorowski et al, 2015) and text summarization (Rush et al, 2015;Nallapati et al, 2016;Shen et al, 2016) amongst others.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The dominant approach to date encodes the input sequence with a series of bi-directional recurrent neural networks (RNN) and generates a variable length output with another set of decoder RNNs, both of which interface via a soft-attention mechanism (Bahdanau et al, 2014;Luong et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In machine translation, this architecture has been demonstrated to outperform traditional phrase-based models by large margins (Sennrich et al, 2016b;Zhou et al, 2016;Wu et al, 2016;\u00a72).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Convolutional neural networks are less common for sequence modeling, despite several advantages (Waibel et al, 1989;LeCun & Bengio, 1995).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared to recurrent layers, convolutions create representations for fixed size contexts, however, the effective context size of the network can easily be made larger by stacking several layers on top of each other.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This allows to precisely control the maximum length of dependencies to be modeled.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Convolutional networks do not depend on the computations of the previous time step and therefore allow parallelization over every element in a sequence.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This contrasts with RNNs which maintain a hidden state of the entire past that prevents parallel computation within a sequence.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Multi-layer convolutional neural networks create hierarchical representations over the input sequence in which nearby input elements interact at lower layers while distant elements interact at higher layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hierarchical structure provides a shorter path to capture long-range dependencies compared to the chain structure modeled by recurrent networks, eg we can obtain a feature representation capturing relationships within a window of n words by applying only O( n k ) convolutional operations for kernels of width k, compared to a linear number O(n) for recurrent neural networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Inputs to a convolutional network are fed through a constant number of kernels and non-linearities, whereas recurrent networks apply up to n operations and non-linearities to the first word and only a single set of operations to the last word.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Fixing the number of nonlinearities applied to the inputs also eases learning.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Recent work has applied convolutional neural networks to sequence modeling such as Bradbury et al (2016) who introduce recurrent pooling between a succession of convolutional layers or Kalchbrenner et al (2016) who tackle neural translation without attention.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, none of these approaches has been demonstrated improvements over state of the art results on large benchmark datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Gated convolutions have been previously explored for machine translation by Meng et al (2015) but their evaluation was restricted to a small dataset and the model was used in tandem with a traditional count-based model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Architec-tures which are partially convolutional have shown strong performance on larger tasks but their decoder is still recurrent (Gehring et al, 2016).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "In this paper we propose an architecture for sequence to sequence modeling that is entirely convolutional.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model is equipped with gated linear units (Dauphin et al, 2016) and residual connections (He et al, 2015a).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also use attention in every decoder layer and demonstrate that each attention layer only adds a negligible amount of overhead.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The combination of these choices enables us to tackle large scale problems ( \u00a73).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "We evaluate our approach on several large datasets for machine translation as well as summarization and compare to the current best architectures reported in the literature.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On WMT'16 EnglishRomanian translation we achieve a new state of the art, outperforming the previous best result by 1.9 BLEU.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On WMT'14 EnglishGerman we outperform the strong LSTM setup of Wu et al (2016) by 0.5 BLEU and on WMT'14 EnglishFrench we outperform the likelihood trained system of Wu et al (2016) by 1.6 BLEU.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, our model can translate unseen sentences at an order of magnitude faster speed than Wu et al (2016) on GPU and CPU hardware ( \u00a74, \u00a75).",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Recurrent Sequence to Sequence Learning",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Sequence to sequence modeling has been synonymous with recurrent neural network based encoder-decoder architectures (Sutskever et al, 2014;Bahdanau et al, 2014).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The encoder RNN processes an input sequence x = (x 1 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", x m ) of m elements and returns state representations z = (z 1 . . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The decoder RNN takes z and generates the output sequence y = (y 1 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", y n ) left to right, one element at a time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To generate output y i+1 , the decoder computes a new hidden state h i+1 based on the previous state h i , an embedding g i of the previous target language word y i , as well as a conditional input c i derived from the encoder output z.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Based on this generic formulation, various encoder-decoder architectures have been proposed, which differ mainly in the conditional input and the type of RNN.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A Convolutional Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Next we introduce a fully convolutional architecture for sequence to sequence modeling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead of relying on RNNs to compute intermediate encoder states z and decoder states h we use convolutional neural networks (CNN).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Position Embeddings",
+      "selected_sentences": [
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "Recurrent models typically do not use explicit position embeddings since they can learn where they are in the sequence through the recurrent hidden state computation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our setting, the use of position embeddings requires only a simple addition to the input word embeddings which is a negligible overhead.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Convolutional Block Structure",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Both encoder and decoder networks share a simple block structure that computes intermediate states based on a fixed number of input elements.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We denote the output of the lth block as h l = (h l 1 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", h l n ) for the decoder network, and z l = (z l 1 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", z l m ) for the encoder network; we refer to blocks and layers interchangeably.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each block contains a one dimensional convolution followed by a non-linearity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For a decoder network with a single block and kernel width k, each resulting state h 1 i contains information over k input elements.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Stacking several blocks on top of each other increases the number of input elements represented in a state.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For instance, stacking 6 blocks with k = 5 results in an input field of 25 elements, ie each output depends on 25 inputs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Non-linearities allow the networks to exploit the full input field, or to focus on fewer elements if needed.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Multi-step Attention",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "We introduce a separate attention mechanism for each decoder layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To compute the attention, we combine the current decoder state h l i with an embedding of the previous target element g i :",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "which are input to h l i .",
+              "tag": "Method"
+            },
+            {
+              "sent": "This makes it easier for the model to take into account which previous inputs have been attended to already compared to recurrent nets where this information is in the recurrent state and needs to survive several non-linearities.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Overall, our attention mechanism considers which words we previously attended to (Yang et al, 2016) and performs multiple attention 'hops' per time step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Appendix \u00a7C, we plot attention scores for a deep decoder and show that at different layers, different portions of the source are attended to.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "Our convolutional architecture also allows to batch the attention computation across all elements of a sequence compared to RNNs (Figure 1, middle).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We batch the computations of each decoder layer individually.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "The multiple attention mechanism ( \u00a73.3) computes a separate source context vector for each decoder layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The computation also takes into account contexts computed for preceding decoder layers of the current time step as well as previous time steps that are within the receptive field of the decoder.",
+              "tag": "Method"
+            },
+            {
+              "sent": "How does multiple attention compare to attention in fewer layers or even only in a single layer as is usual?",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 5 shows that attention in all decoder layers achieves the best validation perplexity (PPL).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, removing more and more attention layers decreases accuracy, both in terms of BLEU as well as PPL.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Normalization Strategy",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "For convolutional decoders with multiple attention, we scale the gradients for the encoder layers by the number of attention mechanisms we use; we exclude source word embeddings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We found this to stabilize learning since the encoder received too much gradient otherwise.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Initialization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model Parameters and Optimization",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "We use 512 hidden units for both encoders and decoders, unless otherwise stated.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All embeddings, including the output produced by the decoder before the final linear layer, have dimensionality 512; we use the same dimensionalities for linear layers mapping between the hidden and embedding sizes ( \u00a73.2).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Evaluation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Recurrent vs. Convolutional Models",
+      "selected_sentences": [
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "The ConvS2S model for this experiment uses 15 layers in the encoder and 15 layers in the decoder, both with 512 hidden units in the first five layers, 768 units in the subsequent four layers, 1024 units in the next 3 layers, all using kernel width 3; the final two layers have 2048 units and 4096 units each but the they are linear mappings with kernel width 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This model has an effective context size of only 25 words, beyond which it cannot access any information on the target size.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our results are based on training with 8 GPUs for about 37 days and batch size 32 on each worker. 6",
+              "tag": "Method"
+            },
+            {
+              "sent": "The same configuration as for WMT'14 EnglishGerman achieves 39.41 BLEU in two weeks on this dataset in an eight GPU setup.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The translations produced by our models often match the length of the references, particularly for the large WMT'14 EnglishFrench task, or are very close for small to medium data sets such as WMT'14 EnglishGerman or WMT'16 EnglishRomanian.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Ensemble Results",
+      "selected_sentences": [
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "Next, we ensemble eight likelihood-trained models for both WMT'14 EnglishGerman and WMT'14 EnglishFrench and compare to previous work which also reported ensemble results.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the former, we also show the result when ensembling 10 models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 2 shows that we outperform the best current ensembles on both datasets.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Generation Speed",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "Next, we evaluate the inference speed of our architecture on the development set of the WMT'14 EnglishFrench task which is the concatenation of newstest2012 and new-stest2013; it comprises 6003 sentences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We measure generation speed both on GPU and CPU hardware.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we measure GPU speed on three generations of Nvidia cards: a GTX-1080ti, an M40 as well as an older K40 card.",
+              "tag": "Method"
+            },
+            {
+              "sent": "CPU timings are measured on one host with 48 hyperthreaded cores (Intel Xeon E5-2680 @ 2.50GHz) with 40 workers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In all settings, we batch up to 128 sentences, composing batches with sentences of equal length.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that the majority of batches is smaller because of the small size of the development set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We experiment with beams of size 5 as well as greedy search, i.e beam of size 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To make generation fast, we do not recompute convolution states that have not changed compared to the previous time step but rather copy (shift) these activations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Kernel size and Depth",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "DUC-2004",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Summarization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion and Future Work",
+      "selected_sentences": [
+        {
+          "par_id": 65,
+          "sentences": [
+            {
+              "sent": "We introduce the first fully convolutional model for sequence to sequence learning that outperforms strong recurrent models on very large benchmark datasets at an order of magnitude faster speed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared to recurrent networks, our convolutional approach allows to discover compositional structure in the sequences more easily since representations are built hierarchically.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model relies on gating and performs multiple attention steps.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 66,
+          "sentences": [
+            {
+              "sent": "We achieve a new state of the art on several public translation benchmark data sets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the WMT'16 EnglishRomanian task we outperform the previous best result by 1.9 BLEU, on WMT'14 EnglishFrench translation we improve over the LSTM model of Wu et al (2016) by 1.6 BLEU in a comparable setting, and on WMT'14 EnglishGerman translation we ouperform the same model by 0.5 BLEU.",
+              "tag": "Other"
+            },
+            {
+              "sent": "In future work, we would like to apply convolutional architectures to other sequence to sequence learning problems which may benefit from learning hierarchical representations as well.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A. Weight Initialization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.1. Forward Pass",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Convolutional Sequence to Sequence Learning"
+}

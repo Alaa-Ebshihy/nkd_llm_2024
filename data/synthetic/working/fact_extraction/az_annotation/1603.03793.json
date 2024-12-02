@@ -1,0 +1,278 @@
+{
+  "paper_id": "1603.03793",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We adapt the greedy stack LSTM dependency parser of Dyer et al (2015) to support a training-with-exploration procedure using dynamic oracles (Goldberg and Nivre, 2013) instead of assuming an error-free action history.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This form of training, which accounts for model predictions at training time, improves parsing accuracies.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We discuss some modifications needed in order to get training with exploration to work well for a probabilistic neural network dependency parser.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Natural language parsing can be formulated as a series of decisions that read words in sequence and incrementally combine them to form syntactic structures; this formalization is known as transitionbased parsing, and is often coupled with a greedy search procedure (Yamada and Matsumoto, 2003;Nivre, 2003;Nivre, 2004;Nivre, 2008).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The literature on transition-based parsing is vast, but all works share in common a classification component that takes into account features of the current parser state 1 and predicts the next action to take conditioned on the state.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The state is of unbounded size.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Dyer et al (2015) presented a parser in which the parser's unbounded state is embedded in a fixeddimensional continuous space using recurrent neural networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Coupled with a recursive tree composition function, the feature representation is able to capture information from the entirety of the state, without resorting to locality assumptions that were common in most other transition-based parsers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The use of a novel stack LSTM data structure allows the parser to maintain a constant time per-state update, and retain an overall linear parsing time.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "The Dyer et al parser was trained to maximize the likelihood of gold-standard transition sequences, given words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At test time, the parser makes greedy decisions according to the learned model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Although this setup obtains very good performance, the training and testing conditions are mismatched in the following way: at training time the historical context of an action is always derived from the gold standard (ie, perfectly correct past actions), but at test time, it will be a model prediction.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this work, we adapt the training criterion so as to explore parser states drawn not only from the training data, but also from the model as it is being learned.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To do so, we use the method of Goldberg and 2013) to dynamically chose an optimal (relative to the final attachment accuracy) action given an imperfect history.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By interpolating between algorithm states sampled from the model and those sampled from the training data, more robust predictions at test time can be made.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that the technique can be used to improve the strong parser of Dyer et al",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Parsing Model and Parameter Learning",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Training with Static Oracles",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Training with Dynamic Oracles",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "In the static oracle case, the parser is trained to predict the best transition to take at each parsing step, assuming all previous transitions were correct.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since the parser is likely to make mistakes at test time and encounter states it has not seen during training, this training criterion is problematic (Daum\u00e9 III et al, 2009;Ross et al, 2011;Goldberg and Nivre, 2013, inter alia).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, we would prefer to train the parser to behave optimally even after making a mistake (under the constraint that it cannot backtrack or fix any previous decision).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We thus need to include in the training examples states that result from wrong parsing decisions, together with the optimal transitions to take in these states.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "2013) provides answers to these questions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While the application of dynamic oracle training is relatively straightforward, some adaptations were needed to accommodate the probabilistic training objective.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These adaptations mostly follow Goldberg (2013).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Dynamic Oracles.",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "In order to expose the parser to configurations that are likely to result from incorrect parsing decisions, we make use of the probabilistic nature of the classifier.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During training, instead of following the gold action, we sample the next transition according to the output distribution the classifier assigns to the current configuration.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Another option, taken by Goldberg and Nivre, is to follow the one-best action predicted by the classifier.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, initial experiments showed that the onebest approach did not work well.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Because the neural network classifier becomes accurate early on in the training process, the one-best action is likely to be correct, and the parser is then exposed to very few error states in its training process.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By sampling from the predicted distribution, we are effectively increasing the chance of straying from the gold path during training, while still focusing on mistakes that receive relatively high parser scores.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We believe further formal analysis of this method will reveal connections to reinforcement learning and, perhaps, other methods for learning complex policies.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Following the same settings of Chen and Manning (2014) and Dyer et al (2015) we report results 4 in the English PTB and Chinese CTB-5.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The score achieved by the dynamic oracle for English is 93.56 UAS.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is remarkable given that the parser uses a completely greedy search procedure.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, the Chinese score establishes the state-of-the-art, using the same settings as Chen and Manning (2014).",
+              "tag": "Method"
+            },
+            {
+              "sent": "A'16-beam is the parser with beam larger than 1 by Andor et al (2016).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Bold numbers indicate the best results among the greedy parsers.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "In order to be able to compare with similar greedy parsers (Yazdani and Henderson, 2015;Andor et al, 2016) 5 we report the performance of the parser on the multilingual treebanks of the CoNLL 2009 shared task (Haji\u010d et al, 2009).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since some of the treebanks contain nonprojective sentences and arc-hybrid does not allow nonprojective trees, we use the pseudo-projective approach (Nivre and Nilsson, 2005).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We used predicted partof-speech tags provided by the CoNLL 2009 shared task organizers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also include results with pretrained word embeddings for English, Chinese, German, and Spanish following the same training setup as Dyer et al (2015); for English and Chinese we used the same pretrained word embeddings as in Table 1, for German we used the monolingual training data from the WMT 2015 dataset and for Spanish we used the Spanish Gigaword version 3. See Table 2.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "Generally, the use of RNNs to conditionally predict actions in sequence given a history is spurring increased interest in training regimens that make the learned model more robust to test-time prediction errors.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "Solutions based on curriculum learning (Bengio et al, 2015), expected loss training (Shen et al, 2015), and reinforcement learning have been proposed (Ranzato et al, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Finally, abandoning greedy search in favor of approximate global search offers an alternative solution to the problems with greedy search (Andor et al, 2016), and has been analyzed as well (Kulesza and Pereira, 2007;Finley and Joachims, 2008), including for parsing (Martins et al, 2009).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Dyer et al (2015) presented stack LSTMs and used them to implement a transition-based dependency parser.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The parser uses a greedy learning strategy which potentially provides very high parsing speed while still achieving state-of-the-art results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We have demonstrated that improvement by training the greedy parser on non-gold outcomes; dynamic oracles improve the stack LSTM parser, achieving 93.56 UAS for English, maintaining greedy search.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Training with Exploration Improves a Greedy Stack LSTM Parser"
+}

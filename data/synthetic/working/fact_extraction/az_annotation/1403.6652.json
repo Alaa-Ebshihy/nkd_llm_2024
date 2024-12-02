@@ -1,0 +1,653 @@
+{
+  "paper_id": "1403.6652",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We present DeepWalk, a novel approach for learning latent representations of vertices in a network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These latent representations encode social relations in a continuous vector space, which is easily exploited by statistical models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DeepWalk generalizes recent advancements in language modeling and unsupervised feature learning (or deep learning) from sequences of words to graphs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DeepWalk uses local information obtained from truncated random walks to learn latent representations by treating walks as the equivalent of sentences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We demonstrate DeepWalk's latent representations on several multi-label network classification tasks for social networks such as BlogCatalog, Flickr, and YouTube.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our results show that DeepWalk outperforms challenging baselines which are allowed a global view of the network, especially in the presence of missing information.",
+              "tag": "Result"
+            },
+            {
+              "sent": "DeepWalk's representations can provide F1 scores up to 10% higher than competing methods when labeled data is sparse.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In some experiments, DeepWalk's representations are able to outperform all baseline methods while using 60% less training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is an online learning algorithm which builds useful incremental results, and is trivially parallelizable.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These qualities make it suitable for a broad class of real world applications such as network classification, and anomaly detection.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "The sparsity of a network representation is both a strength and a weakness.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Sparsity enables the design of efficient discrete algorithms, but can make it harder to generalize in statistical learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Machine learning applications in networks (such as network classification [15,37], content recc The authors, 2014.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is the author's draft of the work.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is posted here for your personal use.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The definitive version was published in KDD'14, http://dx.doi.org/10.1145/2623330.2623732  Our proposed method learns a latent space representation of social interactions in R d .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The learned representation encodes community structure so it can be easily exploited by standard classification methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Here, our method is used on Zachary's Karate network [44] to generate a latent representation in R 2 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note the correspondence between community structure in the input graph and the embedding.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Vertex colors represent a modularity-based clustering of the input graph. ommendation [11], anomaly detection [5], and missing link prediction [22]) must be able to deal with this sparsity in order to survive.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In this paper we introduce deep learning (unsupervised feature learning) [2] techniques, which have proven successful in natural language processing, into network analysis for the first time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We develop an algorithm (DeepWalk) that learns social representations of a graph's vertices, by modeling a stream of short random walks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Social representations are latent features of the vertices that capture neighborhood similarity and community membership.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These latent representations encode social relations in a continuous vector space with a relatively small number of dimensions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DeepWalk generalizes neural language models to process a special language composed of a set of randomly-generated walks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These neural language models have been used to capture the semantic and syntactic structure of human language [6], and even logical analogies [28].",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "To demonstrate DeepWalk's potential in real world sce- narios, we evaluate its performance on challenging multilabel network classification problems in large heterogeneous graphs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the relational classification problem, the links between feature vectors violate the traditional i.i.d.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Techniques to address this problem typically use approximate inference techniques [31,35] to leverage the dependency information to improve classification results.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We distance ourselves from these approaches by learning labelindependent representations of the graph.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our representation quality is not influenced by the choice of labeled vertices, so they can be shared among tasks.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "DeepWalk outperforms other latent representation methods for creating social dimensions [39,41], especially when labeled nodes are scarce.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Strong performance with our representations is possible with very simple linear classifiers (eg",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our representations are general, and can be combined with any classification method (including iterative inference methods).",
+              "tag": "Method"
+            },
+            {
+              "sent": "DeepWalk achieves all of that while being an online algorithm that is trivially parallelizable.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "\u2022 We introduce deep learning as a tool to analyze graphs, to build robust representations that are suitable for statistical modeling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DeepWalk learns structural regularities present within short random walks.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "\u2022 We extensively evaluate our representations on multilabel classification tasks on several social networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show significantly increased classification performance in the presence of label sparsity, getting improvements 5%-10% of Micro F1, on the sparsest problems we consider.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In some cases, DeepWalk's representations can outperform its competitors even when given 60% less training data.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "\u2022 We demonstrate the scalability of our algorithm by building representations of web-scale graphs, (such as YouTube) using a parallel implementation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, we describe the minimal changes necessary to build a streaming version of our approach.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "The rest of the paper is arranged as follows.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In Sections 2 and 3, we discuss the problem formulation of classification in data networks, and how it relates to our work.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In Section 4 we present DeepWalk, our approach for Social Representation Learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We outline ours experiments in Section 5, and present their results in Section 6.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We close with a discussion of related work in Section 7, and our conclusions.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "PROBLEM DEFINITION",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "Using these structural features, we will augment the attributes space to help the classification decision.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These features are general, and can be used with any classification algorithm (including iterative methods).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "However, we believe that the greatest utility of these features is their easy integration with simple machine learning algorithms.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "They scale appropriately in real-world networks, as we will show in Section 6.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "LEARNING SOCIAL REPRESENTATIONS",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "\u2022 Continuous We require latent representations to model partial community membership in continuous space.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition to providing a nuanced view of community membership, a continuous representation has smooth decision boundaries between communities which allows more robust classification.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Random Walks",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "It is this connection to local structure that motivates us to use a stream of short random walks as our basic tool for extracting information from a network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition to capturing community information, using random walks as the basis for our algorithm gives us two other desirable properties.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "First, local exploration is easy to parallelize.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Several random walkers (in different threads, processes, or machines) can simultaneously explore different parts of the same graph.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Secondly, relying on information obtained from short random walks make it possible to accommodate small changes in the graph structure without the need for global recomputation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We can iteratively update the learned model with new random walks from the changed region in time sub-linear to the entire graph.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Connection: Power laws",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Language Modeling",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "Recent work in representation learning has focused on using probabilistic neural networks to build general representations of words which extend the scope of language modeling beyond its original goals.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "Solving the optimization problem from Eq. 2 builds representations that capture the shared similarities in local graph structure between vertices.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Vertices which have similar neighborhoods will acquire similar representations (encoding cocitation similarity), and allowing generalization on machine learning tasks.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "end for 9: end for of our desired properties.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This method generates representations of social networks that are low-dimensional, and exist in a continuous vector space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Its representations encode latent forms of community membership, and because the method outputs useful intermediate representations, it can adapt to changing network topology.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "METHOD",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Overview",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "As in any language modeling algorithm, the only required input is a corpus and a vocabulary V. DeepWalk considers a set of short truncated random walks its own corpus, and the graph vertices as its own vocabulary (V = V ).",
+              "tag": "Method"
+            },
+            {
+              "sent": "While it is beneficial to know the V and the frequency distribution of vertices in the random walks ahead of the training, it is not necessary for the algorithm to work as we will show in 4.2.2.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Algorithm: DeepWalk",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "SkipGram",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Hierarchical Softmax",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Optimization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Parallelizability",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Algorithm Variants",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Streaming",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Non-random walks",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "EXPERIMENTAL DESIGN",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": [
+        {
+          "par_id": 68,
+          "sentences": [
+            {
+              "sent": "\u2022 BlogCatalog [39] is a network of social relationships provided by blogger authors.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The labels represent the topic categories provided by the authors.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Baseline Methods",
+      "selected_sentences": [
+        {
+          "par_id": 77,
+          "sentences": [
+            {
+              "sent": "It has shown surprisingly good performance in real networks, and has been advocated as a sensible relational classification baseline [25].",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "EXPERIMENTS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Multi-Label Classification",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "BlogCatalog",
+      "selected_sentences": [
+        {
+          "par_id": 83,
+          "sentences": [
+            {
+              "sent": "DeepWalk performs consistently better than EdgeCluster, Modularity, and wvRN.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In fact, when trained with only 20% of the nodes labeled, DeepWalk performs better than these approaches when they are given 90% of the data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The performance of SpectralClustering proves much more competitive, but DeepWalk still outperforms when labeled data is sparse on both MacroF1 (TR \u2264 20%) and MicroF1 (TR \u2264 60%).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Flickr",
+      "selected_sentences": [
+        {
+          "par_id": 85,
+          "sentences": [
+            {
+              "sent": "In this experiment we vary the training ratio (TR) on the Flickr network from 1% to 10%.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This corresponds to having approximately 800 to 8,000 nodes labeled for classification in the entire network.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 3 presents our results, which are consistent with the previous experiment.",
+              "tag": "Result"
+            },
+            {
+              "sent": "DeepWalk outperforms all baselines by at least 3% with respect to MicroF1.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Additionally, its MicroF1 performance when only 3% of the graph is labeled beats all other methods even when they have been given 10% of the data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In other words, DeepWalk can outperform the baselines with 60% less training data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It also performs quite well in MacroF1, initially performing close to SpectralClustering, but distancing itself to a 1% improvement.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "YouTube",
+      "selected_sentences": [
+        {
+          "par_id": 86,
+          "sentences": [
+            {
+              "sent": "The YouTube network is considerably larger than the previous ones we have experimented on, and its size prevents two of our baseline methods (SpectralClustering and Modularity) from running on it.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is much closer to a real world graph than those we have previously considered.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 87,
+          "sentences": [
+            {
+              "sent": "The results of varying the training ratio (TR) from 1% to 10% are presented in Table 4.",
+              "tag": "Result"
+            },
+            {
+              "sent": "They show that DeepWalk significantly outperforms the scalable baseline for creating graph representations, EdgeCluster.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When 1% of the labeled nodes are used for test, the MicroF1 improves by 14%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The MacroF1 shows a corresponding 10% increase.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This lead narrows as the training data increases, but DeepWalk ends with a 3% lead in MicroF1, and an impressive 5% improvement in MacroF1.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Parameter Sensitivity",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Effect of Dimensionality",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Effect of sampling frequency",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 97,
+          "sentences": [
+            {
+              "sent": "4. We apply unsupervised representation learning to graphs.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Relational Learning",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Unsupervised Feature Learning",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CONCLUSIONS",
+      "selected_sentences": [
+        {
+          "par_id": 104,
+          "sentences": [
+            {
+              "sent": "We propose DeepWalk, a novel approach for learning latent social representations of vertices.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Using local information from truncated random walks as input, our method learns a representation which encodes structural regularities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments on a variety of different graphs illustrate the effectiveness of our approach on challenging multi-label classification tasks.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 105,
+          "sentences": [
+            {
+              "sent": "As an online algorithm, DeepWalk is also scalable.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our results show that we can create meaningful representations for graphs too large to run spectral methods on.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On such large graphs, our method significantly outperforms other methods designed to operate for sparsity.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also show that our approach is parallelizable, allowing workers to update different parts of the model concurrently.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "DeepWalk: Online Learning of Social Representations"
+}

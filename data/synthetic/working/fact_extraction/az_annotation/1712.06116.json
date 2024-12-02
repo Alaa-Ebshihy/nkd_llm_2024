@@ -1,0 +1,530 @@
+{
+  "paper_id": "1712.06116",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Recent years have witnessed the unprecedented success of deep convolutional neural networks (CNNs) in single image super-resolution (SISR).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, existing CNN-based SISR methods mostly assume that a low-resolution (LR) image is bicubicly downsampled from a high-resolution (HR) image, thus inevitably giving rise to poor performance when the true degradation does not follow this assumption.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, they lack scalability in learning a single model to nonblindly deal with multiple degradations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To address these issues, we propose a general framework with dimensionality stretching strategy that enables a single convolutional super-resolution network to take two key factors of the SISR degradation process, ie, blur kernel and noise level, as input.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Consequently, the super-resolver can handle multiple and even spatially variant degradations, which significantly improves the practicability.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Extensive experimental results on synthetic and real LR images show that the proposed convolutional super-resolution network not only can produce favorable results on multiple degradations but also is computationally efficient, providing a highly effective and scalable solution to practical SISR applications.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Single image super-resolution (SISR) aims to recover a high-resolution (HR) version of a low-resolution (LR) input.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a classical problem, SISR is still an active yet challenging research topic in the field of computer vision due to its ill-poseness nature and high practical values [2].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the typical SISR framework, an LR image y is modeled as the output of the following degradation process:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "SISR methods can be broadly classified into three categories, ie, interpolation-based methods, model-based optimization methods and discriminative learning methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Interpolation-based methods such as nearest-neighbor, bilinear and bicubic interpolators are simple and efficient but have very limited performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By exploiting powerful image priors (eg, the non-local self-similarity prior [11,32], sparsity prior [52] and denoiser prior [4,13,57]), modelbased optimization methods are flexible to reconstruct relative high-quality HR images, but they usually involve a time-consuming optimization procedure.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although the integration of convolutional neural network (CNN) denoiser prior and model-based optimization can improve the efficiency to some extent, it still suffers from the typical drawbacks of model-based optimization methods, eg, it is not in an end-to-end learning manner and involves hand-designed parameters [57].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As an alternative, discriminative learning methods have attracted considerable attentions due to their favorable SISR performance in terms of effectiveness and efficiency.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Notably, recent years have witnessed a dramatic upsurge of using CNN for SISR.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In this paper, we focus on discriminative CNN methods for SISR so as to exploit the merits of CNN, such as the fast speed by parallel computing, high accuracy by end-to-end training, and tremendous advances in training and designing networks [16,18,21,28].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While several SISR models based on discriminative CNN have reported impressive results, they suffer from a common drawback: their models are specialized for a single simplified degradation (eg, bicubic degradation) and lack scalability to handle multiple degradations by using a single model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Because the practical degradation of SISR is much more complex [40,51], the performance of learned CNN models may deteriorate seriously when the assumed degradation deviates from the true one, making them less effective in practical scenarios.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It has been pointed out that the blur kernel plays a vital role for the success of SISR methods and the mismatch of blur kernels will largely deteriorate the final SISR results [12].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, little work has been done on how to design a CNN to address this crucial issue.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given the facts above, it is natural to raise the following questions, which are the focus of our paper: (i) Can we learn a single model to effectively handle multiple and even spatially variant degradations?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "(ii) Is it possible to use synthetic data to train a model with high practicability?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This work aims to make one of the first attempts towards answering these two questions.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "To answer the first question, we revisit and analyze the general model-based SISR methods under the maximum a posteriori (MAP) framework.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Then we argue that one may tackle this issue by taking LR input, blur kernel and noise level as input to CNN but their dimensionality mismatch makes it difficult to design a single convolutional superresolution network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In view of this, we introduce a dimensionality stretching strategy which facilitates the network to handle multiple and even spatially variant degradations with respect to blur kernel and noise.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To the best of our knowledge, there is no attempt to consider both the blur kernel and noise for SISR via training a single CNN model.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "For the second question, we will show that it is possible to learn a practical super-resolver using synthetic data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To this end, a large variety of degradations with different combinations of blur kernels and noise levels are sampled to cover the degradation space.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In a practical scenario, even the degradation is more complex (eg, the noise is nonAWGN), we can select the best fitted degradation model rather than the bicubic degradation to produce a better result.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It turns out that, by choosing a proper degradation, the learned SISR model can yield perceptually convincing results on real LR images.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It should be noted that we make no effort to use specialized network architectures but use the plain CNN as in [9,41].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "\u2022 We propose a simple yet effective and scalable deep CNN framework for SISR.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The proposed model goes beyond the widely-used bicubic degradation assumption and works for multiple and even spatially variant degradations, thus making a substantial step towards developing a practical CNN-based super-resolver for real applications.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "\u2022 We propose a novel dimensionality stretching strategy to address the dimensionality mismatch between LR input image, blur kernel and noise level.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although this strategy is proposed for SISR, it is general and can be extended to other tasks such as deblurring.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "\u2022 We show that the proposed convolutional superresolution network learned from synthetic training data can not only produce competitive results against stateof-the-art SISR methods on synthetic LR images but also give rise to visually plausible results on real LR images.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "The first work of using CNN to solve SISR can be traced back to [8] where a three-layer super-resolution network (SRCNN) was proposed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the extended work [9], the authors investigated the impact of depth on superresolution and empirically showed that the difficulty of training deeper model hinders the performance improvement of CNN super-resolvers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To overcome the training difficulty, Kim et al [24] proposed a very deep superresolution (VDSR) method with residual learning strategy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Interestingly, they showed that VDSR can handle multiple scales super-resolution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By analyzing the relation between CNN and MAP inference, Zhang et al [56] pointed out that CNN mainly model the prior information and they empirically demonstrated that a single model can handle multiple scales super-resolution, image deblocking and image denoising.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While achieving good performance, the above methods take the bicubicly interpolated LR image as input, which not only suffers from high computational cost but also hinders the effective expansion of receptive field.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Although various techniques have been proposed for SISR, the above CNN-based methods are tailored to the widely-used settings of bicubic degradation, neglecting their limited applicability for practical scenarios.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "An interesting line of CNN-based methods which can go beyond bicubic degradation adopt a CNN denoiser to solve SISR via model-based optimization framework [4,34,57].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, the method proposed in [57] can handle the widely-used Gaussian degradation as in [11].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, manually selecting the hyper-parameters for different degradations is not a trivial task [39].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a result, it is desirable to learn a single SISR model which can handle multiple degradations with high practicability.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper attempts to give a positive answer.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Degradation Model",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "Existing literatures have considered two types of downsamplers, including direct downsampler [11,17,36,51,55] and bicubic downsampler [7,12,14,15,47,52].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we consider the bicubic downsampler since when k is delta kernel and the noise level is zero, Eqn.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "(1) turns into the widely-used bicubic degradation model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It should be pointed out that, different from blur kernel and noise which vary in a general degradation model, downsampler is assumed to be fixed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Though blur kernel and noise have been recognized as key factors for the success of SISR and several methods have been proposed to consider those two factors, there has been little effort towards simultaneously considering blur kernel and noise in a single CNN framework.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is a challenging task since the degradation space with respect to blur kernel and noise is rather large (see Figure 1 as an example).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One relevant work is done by Zhang et al [57]; nonetheless, their method is essentially a model-based optimization method and thus suffers from several drawbacks as mentioned previously.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In another related work, Riegler et al [38] exploited the blur kernel information into the SISR model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our method differs from [38] on two major aspects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, our method considers a more general degradation model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, our method exploits a more effective way to parameterize the degradation model.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A Perspective from MAP Framework",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "\u2022 Considering that the MAP framework (Eqn.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "( 3)) can perform generic image super-resolution with the same image prior, it is intuitive to jointly perform denoising and SISR in a unified CNN framework.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, the work [56] indicates that the parameters of the MAP inference mainly model the prior; therefore, CNN has the capacity to deal with multiple degradations via a single model.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Dimensionality Stretching",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Proposed Network",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "The proposed super-resolution network for multiple degradations, denoted by SRMD, is illustrated in Figure 3.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As one can see, the distinctive feature of SRMD is that it takes the concatenated LR image and degradation maps as input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To show the effectiveness of the dimensionality stretching strategy, we resort to plain CNN without complex architectural engineering.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Typically, to super-resolve an LR image with a scale factor of s, SRMD first takes the concatenated LR image and degradation maps of size W \u00d7 H \u00d7 (C + t + 1) as input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then, similar to [24], a cascade of 3 \u00d7 3 convolutional layers are applied to perform the non-linear mapping.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each layer is composed of three types of operations, including Convolution (Conv), Rectified Linear Units (ReLU) [26], and Batch Normalization (BN) [20].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, \"Conv + BN + ReLU\" is adopted for each convolutional layer except the last convolutional layer which consists of a single \"Conv\" operation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, a sub-pixel convolution layer [41] is followed by the last convolutional layer to convert multiple HR subimages of size",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Why not Learn a Blind Model?",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "To enhance the practicability of CNN for SISR, it seems the most straightforward way is to learn a blind model with synthesized training data by different degradations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, such blind model does not perform as well as expected.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, the performance deteriorates seriously when the blur kernel model is complex, eg, motion blur.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This phenomenon can be explained by the following example.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Given an HR image, a blur kernel and corresponding LR image, shifting the HR image to left by one pixel and shifting the blur kernel to right by one pixel would result in the same LR image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, an LR image may correspond to different HR images with pixel shift.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This in turn would aggravate the pixel-wise average problem [29], typically leading to over-smoothed results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, the blind model without specially designed architecture design has inferior generalization ability and performs poorly in real applications.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments 4.1. Training Data Synthesis and Network Training",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments on Bicubic Degradation",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "As mentioned above, instead of handling the bicubic degradation only, our aim is to learn a single network to handle multiple degradations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, in order to show the advantage of the dimensionality stretching strategy, the proposed method is also compared with other CNN-based methods specifically designed for bicubic degradation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on General Degradations",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "In this subsection, we evaluate the performance of the proposed method on general degradations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The degradation settings are given in Table 2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We only consider the isotropic Gaussian blur kernel for an easy comparison.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To further show the scalability of the proposed method, another widely-used degradation [11] which involves 7\u00d77 Gaussian kernel with width 1.6 and direct downsampler with scale factor 3 is also included.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare the proposed method with VDSR, two model-based methods (ie, NCSR [11] and IRCNN [57]), and a cascaded denoisingSISR method (ie, DnCNN [56]+SRMDNF).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on Spatially Variant Degradation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments on Real Images",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "In this paper, we proposed an effective super-resolution network with high scalability of handling multiple degradations via a single model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Different from existing CNNbased SISR methods, the proposed super-resolver takes both LR image and its degradation maps as input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, degradation maps are obtained by a simple dimensionality stretching of the degradation parameters (ie, blur kernel and noise level).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The results on synthetic LR images demonstrated that the proposed super-resolver can not only produce state-of-the-art results on bicubic degradation but also perform favorably on other degradations and even spatially variant degradations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, the results on real LR images showed that the proposed method can reconstruct visually plausible HR images.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "In summary, the proposed super-resolver offers a feasible solution toward practical CNN-based SISR applications.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Learning a Single Convolutional Super-Resolution Network for Multiple Degradations"
+}

@@ -1,0 +1,584 @@
+{
+  "paper_id": "1506.07503",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Recurrent sequence generators conditioned on input data through an attention mechanism have recently shown very good performance on a range of tasks including machine translation, handwriting synthesis [1, 2] and image caption generation [3].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We extend the attention-mechanism with features needed for speech recognition.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that while an adaptation of the model used for machine translation in [2] reaches a competitive 18.7% phoneme error rate (PER) on the TIMIT phoneme recognition task, it can only be applied to utterances which are roughly as long as the ones it was trained on.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We offer a qualitative explanation of this failure and propose a novel and generic method of adding location-awareness to the attention mechanism to alleviate this issue.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The new method yields a model that is robust to long inputs and achieves 18% PER in single utterances and 20% in 10-times longer (repeated) utterances.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, we propose a change to the attention mechanism that prevents it from concentrating too much on single frames, which further reduces PER to 17.6% level.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recently, attention-based recurrent networks have been successfully applied to a wide variety of tasks, such as handwriting synthesis [1], machine translation [2], image caption generation [3] and visual object classification [4]. 1 Such models iteratively process their input by selecting relevant content at every step.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This basic idea significantly extends the applicability range of end-to-end training methods, for instance, making it possible to construct networks with external memory [6,7].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "We introduce extensions to attention-based recurrent networks that make them applicable to speech recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Learning to recognize speech can be viewed as learning to generate a sequence (transcription) given another sequence (speech).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "From this perspective it is similar to machine translation and handwriting synthesis tasks, for which attention-based methods have been found suitable [2,1].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, compared to machine translation, speech recognition principally differs by requesting much longer input sequences (thousands of frames instead of dozens of words), which introduces a challenge of distinguishing similar speech fragments 2 in a single utterance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is also different from handwriting synthesis, since the input sequence is much noisier and does not have as clear structure.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For these reasons speech recognition is an interesting testbed for developing new attention-based architectures capable of processing long and noisy inputs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Application of attention-based models to speech recognition is also an important step toward building fully end-to-end trainable speech recognition systems, which is an active area of research.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The dominant approach is still based on hybrid systems consisting of a deep neural acoustic model, a triphone HMM model and an n-gram language model [8,9].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This requires dictionaries of hand-crafted pronunciation and phoneme lexicons, and a multi-stage training procedure to make the components work together.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Excellent results by an HMM-less recognizer have recently been reported, with the system consisting of a CTC-trained neural network and a language model [10].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Still, the language model was added only at the last stage in that work, thus leaving open a question of how much an acoustic model can benefit from being aware of a language model during training.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this paper, we evaluate attention-based models on a phoneme recognition task using the widelyused TIMIT dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "At each time step in generating an output sequence (phonemes), an attention mechanism selects or weighs the signals produced by a trained feature extraction mechanism at potentially all of the time steps in the input sequence (speech frames).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The weighted feature vector then helps to condition the generation of the next element of the output sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since the utterances in this dataset are rather short (mostly under 5 seconds), we measure the ability of the considered models in recognizing much longer utterances which were created by artificially concatenating the existing utterances.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "We start with a model proposed in [2] for the machine translation task as the baseline.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This model seems entirely vulnerable to the issue of similar speech fragments but despite our expectations it was competitive on the original test set, reaching 18.7% phoneme error rate (PER).",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, its performance degraded quickly with longer, concatenated utterances.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We provide evidence that this model adapted to track the absolute location in the input sequence of the content it is recognizing, a strategy feasible for short utterances from the original test set but inherently unscalable.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "In order to circumvent this undesired behavior, in this paper, we propose to modify the attention mechanism such that it explicitly takes into account both (a) the location of the focus from the previous step, as in [6] and (b) the features of the input sequence, as in [2].",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is achieved by adding as inputs to the attention mechanism auxiliary convolutional features which are extracted by convolving the attention weights from the previous step with trainable filters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that a model with such convolutional features performs significantly better on the considered task (18.0%",
+              "tag": "Result"
+            },
+            {
+              "sent": "More importantly, the model with convolutional features robustly recognized utterances many times longer than the ones from the training set, always staying below 20% PER.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Therefore, the contribution of this work is three-fold.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For one, we present a novel purely neural speech recognition architecture based on an attention mechanism, whose performance is comparable to that of the conventional approaches on the TIMIT dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, we propose a generic method of adding location awareness to the attention mechanism.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Finally, we introduce a modification of the attention mechanism to avoid concentrating the attention on a single frame, and thus avoid obtaining less \"effective training examples\", bringing the PER down to 17.6%.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "General Framework",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "An attention-based recurrent sequence generator (ARSG) is a recurrent neural network that stochastically generates an output sequence (y 1 , . . .",
+              "tag": "Claim"
+            },
+            {
+              "sent": ", y T ) from an input x.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In practice, x is often processed by an encoder which outputs a sequential input representation h = (h 1 , . . .",
+              "tag": "Claim"
+            },
+            {
+              "sent": ", h L ) more suitable for the attention mechanism to work with.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Two steps of the proposed attention-based recurrent sequence generator (ARSG) with a hybrid attention mechanism (computing \u03b1), based on both content (h) and location (previous \u03b1) information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dotted lines correspond to Eq. ( 1), thick solid lines to Eq. ( 2) and dashed lines to Eqs. ( 3)-(4).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Inspired by [6] we distinguish between location-based, content-based and hybrid attention mechanisms.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Attend in Eq. ( 1) describes the most generic, hybrid attention.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "If the term \u03b1 i\u22121 is dropped from Attend arguments, ie, \u03b1 i = Attend(s i\u22121 , h), we call it content-based (see, eg, [2] or [3]).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this case, Attend is often implemented by scoring each element in h separately and normalizing the scores:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Alternatively, a location-based attention mechanism computes the alignment from the generator state and the previous alignment only such that \u03b1 i = Attend(s i\u22121 , \u03b1 i\u22121 ).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For instance, Graves [1] used the location-based attention mechanism using a Gaussian mixture model in his handwriting synthesis model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the case of speech recognition, this type of location-based attention mechanism would have to predict the distance between consequent phonemes using s i\u22121 only, which we expect to be hard due to large variance of this quantity.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "For these limitations associated with both content-based and location-based mechanisms, we argue that a hybrid attention mechanism is a natural candidate for speech recognition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Informally, we would like an attention model that uses the previous alignment \u03b1 i\u22121 to select a short list of elements from h, from which the content-based attention, in Eqs. ( 5)-( 6), will select the relevant ones without confusion.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Proposed Model: ARSG with Convolutional Features",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Score Normalization: Sharpening and Smoothing",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "The other side of the coin is that the use of softmax normalization in Eq. ( 6) prefers to mostly focus on only a single feature vector h j .",
+              "tag": "Result"
+            },
+            {
+              "sent": "This prevents the model from aggregating multiple top-scored frames to form a glimpse g i .",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Sharpening",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "We also propose and investigate a windowing technique.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At each time i, the attention mechanism considers only a subsequence h = (h pi\u2212w , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", h pi+w\u22121 ) of the whole sequence h, where w L is the predefined window width and p i is the median of the alignment \u03b1 i\u22121 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The scores for h j / \u2208 h are not computed, resulting in a lower complexity of O(L + T ).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This windowing technique is similar to taking the top-k frames, and similarly, has the effect of sharpening.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experimental Setup",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "We closely followed the procedure in [16].",
+              "tag": "Method"
+            },
+            {
+              "sent": "All experiments were performed on the TIMIT corpus [19].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We used the train-dev-test split from the Kaldi [20] TIMIT s5 recipe.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We trained on the standard 462 speaker set with all SA utterances removed and used the 50 speaker dev set for early stopping.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We tested on the 24 speaker core test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All networks were trained on 40 mel-scale filterbank features together with the energy in each frame, and first and second temporal differences, yielding in total 123 features per frame.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each feature was rescaled to have zero mean and unit variance over the training set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Networks were trained on the full 61-phone set extended with an extra \"end-of-sequence\" token that was appended to each target sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similarly, we appended an all-zero frame at the end of each input sequence to indicate the end of the utterance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Decoding was performed using the 61+1 phoneme set, while scoring was done on the 39 phoneme set.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training Procedure",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "As TIMIT is a relatively small dataset, proper regularization is crucial.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We used the adaptive weight noise as a main regularizer [22].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first trained our models with a column norm constraint [23] with the maximum norm 1 until the lowest development negative log-likelihood is achieved. 3",
+              "tag": "Method"
+            },
+            {
+              "sent": "During this time, and \u03c1 are set to 10 \u22128 and 0.95, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At this point, we began using the adaptive weight noise, and scaled down the model complexity cost L C by a factor of 10, while disabling the column norm constraints.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Once the new lowest development log-likelihood was reached, we fine-tuned the model with a smaller = 10 \u221210 , until we did not observe the improvement in the development phoneme error rate (PER) for 100K weight updates.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Batch size 1 was used throughout the training.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Details of Evaluated Models",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Forced Alignment of Long Utterances",
+      "selected_sentences": [
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "The good performance of the baseline model led us to the question of how it distinguishes between repetitions of similar phoneme sequences and how reliably it decodes longer sequences with more repetitions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We created two datasets of long utterances; one by repeating each test utterance, and the other by concatenating randomly chosen utterances.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In both cases, the waveforms were cross-faded with a 0.05s silence inserted as the \"pau\" phone.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We concatenated up to 15 utterances.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, we checked the forced alignment with these longer utterances by forcing the generator to emit the correct phonemes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each alignment was considered correct if 90% of the alignment weight lies inside the ground-truth phoneme window extended by 20 frames on each side.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Under this definition, all phones but the eos shown in Figure 3 are properly aligned.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "The first column of Figure 4 shows the number of correctly aligned frames w.r.t. the utterance length (in frames) for some of the considered models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "One can see that the baseline model was able to decode sequences up to about 120 phones when a single utterance was repeated, and up to about 150 phones when different utterances were concatenated.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Even when it failed, it correctly aligned about 50 phones.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On the other hand, the model with the hybrid attention mechanism with convolutional features was able to align sequences up to 200 phones long.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, once it began to fail, the model was not able to align almost all phones.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The model with the smoothing behaved similarly to the one with convolutional features only.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Baseline Conv Feats",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Decoding Long Utterances",
+      "selected_sentences": [
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "We evaluated the models on long sequences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each model was decoded using the alignment sharpening techniques that helped to obtain proper forced alignments.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The results are presented in Figure 5.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The baseline model fails to decode long utterances, even when a narrow window is used to constrain the alignments it produces.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The two other location-aware networks are able to decode utterances formed by concatenating up to 11 test utterances.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Better results were obtained with a wider window, presumably because it resembles more the training conditions when at each step the attention mechanism was seeing the whole input sequence.",
+              "tag": "Result"
+            },
+            {
+              "sent": "With the wide window, both of the networks scored about 20% PER on the long utterances, indicating that the proposed location-aware attention mechanism can scale to sequences much longer than those in the training set with only minor modifications required at the decoding stage.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "We proposed and evaluated a novel end-to-end trainable speech recognition architecture based on a hybrid attention mechanism which combines both content and location information in order to select the next position in the input sequence for decoding.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One desirable property of the proposed model is that it can recognize utterances much longer than the ones it was trained on.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the future, we expect this model to be used to directly recognize text from speech [10,17], in which case it may become important to incorporate a monolingual language model to the ARSG architecture [26].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This work has contributed two novel ideas for attention mechanisms: a better normalization approach yielding smoother alignments and a generic principle for extracting and using features from the previous alignments.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Both of these can potentially be applied beyond speech recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For instance, the proposed attention can be used without modification in neural Turing machines, or by using 2D convolution instead of 1D, for improving image caption generation [3].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Strangely, the first two repetitions are aligned without any confusion with subsequent ones -the network starts to confound phoneme location only starting from the third repetition (as seen by the parallel strand of alignment which starts when the network starts to emit the phrase for the third time).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A Additional Figures",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Attention-Based Models for Speech Recognition"
+}

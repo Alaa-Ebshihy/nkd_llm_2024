@@ -1,0 +1,408 @@
+{
+  "paper_id": "1802.08352",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We examine two fundamental tasks associated with graph representation learning: link prediction and semisupervised node classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We present a novel autoencoder architecture capable of learning a joint representation of both local graph structure and available node features for the multitask learning of link prediction and node classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our autoencoder architecture is efficiently trained end-to-end in a single learning stage to simultaneously perform link prediction and node classification, whereas previous related methods require multiple training steps that are difficult to optimize.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We provide a comprehensive empirical evaluation of our models on nine benchmark graph-structured datasets and demonstrate significant improvement over related methods for graph representation learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Reference code and data are available at https://github.com/vuptran/graph-representation-learning.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "I. INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "A S the world is becoming increasingly interconnected, graph-structured data are also growing in ubiquity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we examine the task of learning to make predictions on graphs for a broad range of real-world applications.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, we study two canonical subtasks associated with graph-structured datasets: link prediction and semi-supervised node classification (LPNC).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A graph is a partially observed set of edges and nodes (or vertices), and the learning task is to predict the labels for edges and nodes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In real-world applications, the input graph is a network with nodes representing unique entities, and edges representing relationships (or links) between entities.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Further, the labels of nodes and edges in a graph are often correlated, exhibiting complex relational structures that violate the general assumption of independent and identical distribution fundamental in traditional machine learning [10].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, models capable of exploiting topological structures of graphs have been shown to achieve superior predictive performances on many LPNC tasks [23].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "We present a novel densely connected autoencoder architecture capable of learning a shared representation of latent node embeddings from both local graph topology and available explicit node features for LPNC.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The resulting autoencoder models are useful for many applications across multiple domains, including analysis of metabolic networks for drugtarget interaction [5], bibliographic networks [25], social networks such as Facebook (\"People You May Know\"), terrorist networks [38], communication networks [11], cybersecurity [6], recommender systems [16], and knowledge bases such as DBpedia and Wikidata [35].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "There are a number of technical challenges associated with learning to make meaningful predictions on complex graphs:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Our contribution in this work is a simple, yet versatile autoencoder architecture that addresses all of the above technical challenges.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We demonstrate that our autoencoder models: 1) can handle extreme class imbalance common in link prediction problems; 2) can learn expressive latent features for nodes from topological structures of sparse, bipartite graphs that may have directed and/or weighted edges; 3) is flexible to incorporate explicit side features about nodes as an optional component to improve predictive performance; and 4) utilize extensive parameter sharing to reduce memory footprint and computational complexity, while leveraging available GPUbased implementations for increased scalability.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Further, the autoencoder architecture has the novelty of being efficiently trained end-to-end for the joint, multi-task learning (MTL) of both link prediction and node classification tasks.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "To the best of our knowledge, this is the first architecture capable of performing simultaneous link prediction and node classification in a single learning stage, whereas previous related methods require multiple training stages that are difficult to optimize.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Lastly, we conduct a comprehensive evaluation of the proposed autoencoder architecture on nine challenging benchmark graph-structured datasets comprising a wide range of LPNC applications.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Numerical experiments validate the efficacy of our models by showing significant improvement on multiple evaluation measures over related methods designed for link prediction and/or node classification.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "II. AUTOENCODER ARCHITECTURE FOR LINK PREDICTION AND NODE CLASSIFICATION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A. Link Prediction",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Link Prediction with Node Features",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Optionally, if a matrix of explicit node features X \u2208 R N \u00d7F is available, then we concatenate (A, X) to obtain an augmented adjacency matrix \u0100 \u2208 R N \u00d7(N +F ) and perform the above encoderdecoder transformations on \u0101i for link prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We refer to this variant as \u03b1LoNGAE.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Notice the augmented adjacency matrix is no longer square and symmetric.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The intuition behind the concatenation of node features is to enable a shared representation of both graph and node features throughout the autoencoding transformations by way of the tied parameters {W, V}.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This idea draws inspiration from recent work by Vukoti\u0107 et al [32], where they successfully applied symmetrical autoencoders with parameter sharing for multi-modal and cross-modal representation learning of textual and visual features.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Inference and Learning",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B. Semi-Supervised Node Classification",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "The \u03b1LoNGAE model can also be used to perform efficient information propagation on graphs for the task of semisupervised node classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Node classification is the task of predicting the labels or types of entities in a graph, such as the types of molecules in a metabolic network or document categories in a citation network.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "where C is the set of node labels, y ic = 1 if node i belongs to class c, \u0177ic is the softmax probability that node i belongs to class c, L MBCE is the loss defined for the autoencoder, and the boolean function MASK i = 1 if node i has a label, otherwise MASK i = 0. Notice in this configuration, we can perform multi-task learning for both link prediction and semisupervised node classification, simultaneously.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "III. RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "The field of graph representation learning is seeing a resurgence of research interest in recent years, driven in part by the latest advances in deep learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The aim is to learn a mapping that encodes the input graph into low-dimensional feature embeddings while preserving its original global structure.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hamilton et al [9] succinctly articulate the diverse set of previously proposed approaches for graph representation learning, or graph embedding, as belonging within a unified encoder-decoder framework.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section, we summarize three classes of encoder-decoder models most related to our work: matrix factorization (MF), autoencoders, and graph convolutional networks (GCNs).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "Our work is inspired by recent successful applications of autoencoder architectures for collaborative filtering that outperform popular matrix factorization methods [24], [28], [17], and is related to Structural Deep Network Embedding (SDNE) [34] for link prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similar to SDNE, our models rely on the autoencoder to learn non-linear node embeddings from local graph neighborhoods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, our models have several important distinctions: 1) we leverage extensive parameter sharing between the encoder and decoder parts to enhance representation learning; 2) our \u03b1LoNGAE model can optionally concatenate side node features to the adjacency matrix for improved link prediction performance; and 3) the \u03b1LoNGAE model can be trained end-to-end in a single stage for multi-task learning of link prediction and semi-supervised node classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On the other hand, training SDNE requires multiple steps that are difficult to jointly optimize: i) pretraining via a deep belief network; and ii) utilizing a separate downstream classifier on top of node embeddings for LPNC.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "The GCN model provides an end-to-end learning framework that scales linearly in the number of graph edges and has been shown to achieve strong LPNC results on a number of graph-structured datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the GCN model has a drawback of being memory intensive because it is trained on the full dataset using batch gradient descent for every training iteration.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that our models outperform GCN-based models for LPNC while consuming a constant memory budget by way of mini-batch training.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "IV. EXPERIMENTAL DESIGN",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "In this section, we expound our protocol for the empirical evaluation of our models' capability for learning and generalization on the tasks of link prediction and semi-supervised node classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Secondarily, we also present results of the models' representation capacity on the task of network reconstruction.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A. Datasets and Baselines",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "We evaluate our proposed autoencoder models on nine graph-structured datasets, spanning multiple application domains, from which previous graph embedding methods have achieved strong results for LPNC.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The datasets are summarized in Table I and include networks for Protein interactions, Metabolic pathways, military Conflict between countries, the U.S. PowerGrid, collaboration between users on the BlogCatalog social website, and publication citations from the Cora, Citeseer, Pubmed, ArxivGRQC databases.",
+              "tag": "Method"
+            },
+            {
+              "sent": "{Protein, Metabolic, Conflict, PowerGrid} are reported in [20].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "{Cora, Citeseer, Pubmed} are from [25] and reported in [14], [15].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "And {ArxivGRQC, BlogCatalog} are reported in [34].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "B. Implementation Details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Reconstruction",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Multi-task Learning",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "Lastly, we report LPNC results obtained by our \u03b1LoNGAE model in the MTL setting over 10 runs with random weight initializations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the MTL scenario, the \u03b1LoNGAE model takes as input an incomplete graph with 10 percent of the positive edges, and the same number of negative edges, missing at random and all available node features to simultaneously produce predictions for the missing edges and labels for the nodes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiments, we show that a simple autoencoder architecture with parameter sharing consistently outperforms previous related methods on a range of challenging graphstructured benchmarks for three separate tasks: reconstruction, link prediction, and semi-supervised node classification.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For the reconstruction task, our LoNGAE model achieves superior precision@k performance when compared to the related SDNE model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Although both models leverage a deep autoencoder architecture for graph representation learning, the SDNE model lacks several key implementations necessary for enhanced representation capacity, namely parameter sharing between the encoder-decoder parts and end-to-end training of deep architectures.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "Our \u03b1LoNGAE model also performs favorably well on the task of semi-supervised node classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The model is capable of encoding non-linear node embeddings from both local graph structure and explicit node features, which can be decoded by a softmax activation function to yield accurate node labels.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The efficacy of the proposed \u03b1LoNGAE model is evident especially on the Pubmed dataset, where the label rate is only 0.003.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This efficacy is attributed to parameter sharing being used in the autoencoder architecture, which provides regularization to help improve representation learning and generalization.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Our autoencoder architecture naturally supports multi-task learning, where a joint representation for both link prediction and node classification is enabled via parameter sharing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "MTL aims to exploit commonalities and differences across multiple tasks to find a shared representation that can result in improved performance for each task-specific metric.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we show that our multi-task \u03b1LoNGAE model improves node classification accuracy by learning to predict missing edges at the same time.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Our multi-task model has broad practical utility to address real-world applications where the input graphs may have both missing edges and node labels.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "VI. CONCLUSION",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "In this work, we presented a new autoencoder architecture for link prediction and semi-supervised node classification, and showed that the resulting models outperform related methods in accuracy performance on a range of real-world graphstructured datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The success of our models is primarily attributed to extensive parameter sharing between the encoder and decoder parts of the architecture, coupled with the capability to learn expressive non-linear latent node representations from both local graph neighborhoods and explicit node features.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Further, our novel architecture is capable of simultaneous multi-task learning of both link prediction and node classification in one efficient end-to-end training stage.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Learning to Make Predictions on Graphs with Autoencoders"
+}

@@ -1,0 +1,420 @@
+{
+  "paper_id": "1503.04596",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We present a neural network architecture and training method designed to enable very rapid training and low implementation complexity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Due to its training speed and very few tunable parameters, the method has strong potential for applications requiring frequent retraining or online training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The approach is characterized by (a) convolutional filters based on biologically inspired visual processing filters, (b) randomly-valued classifier-stage input weights, (c) use of least squares regression to train the classifier output weights in a single batch, and (d) linear classifier-stage output units.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We demonstrate the efficacy of the method by applying it to image classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our results match existing state-of-the-art results on the MNIST (0.37% error) and NORB-small (2.2% error) image classification databases, but with very fast training times compared to standard deep network approaches.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The network's performance on the Google Street View House Number (SVHN) (4% error) database is also competitive with state-of-the art methods.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "I. INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "State-of-the-art performance on many image classification databases has been achieved recently using multilayered (ie, deep) neural networks [1].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such performance generally relies on a convolutional feature extraction stage to obtain invariance to translations, rotations and scale [2][3][4][5].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Training of deep networks, however, often requires significant resources, in terms of time, memory and computing power (eg in the order of hours on GPU clusters).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Tasks that require online learning, or periodic replacement of all network weights based on fresh data may thus not be able to benefit from deep learning techniques.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is desirable, therefore, to seek very rapid training methods, even if this is potentially at the expense of a small performance decrease.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Recent work has shown that good performance on image classification tasks can be achieved in 'shallow' convolutional networks-neural architectures containing a single training layer-provided sufficiently many features are extracted [3].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Perhaps surprisingly, such performance arises even with the use of entirely random convolutional filters or filters based on randomly selected patches from training images [4].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although application of a relatively large numbers of filters is common (followed by spatial image smoothing and downsampling), good classification performance can also be obtained with a sparse feature representation (ie relatively few filters and minimal downsampling) [5].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Based on these insights and the goal of devising a fast training method, we introduce a method for combining several existing general techniques into what is equivalent to a five layer neural network (see Figure 1) with only a single trained layer (the output layer), and show that the method: 1) produces state-of-the-art results on well known image classification databases; 2) is trainable in times in the order of minutes (up to several hours for large training sets) on standard desktop/laptop computers; 3) is sufficiently versatile that the same hyper-parameter sets can be applied to different datasets and still produce results comparable to dataset-specific optimisation of hyper-parameters.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "The fast training method we use has been developed independently several times [6][7][8][9] and has gained increasing recognition in recent years-see [10][11][12][13] for recent reviews of the different contexts and applications.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network architecture in the classification stage is that of a three layer neural network comprised from an input layer, a hidden layer of nonlinear units, and a linear output layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The input weights are randomly chosen and untrained, and the output weights are trained in a single batch using least squares regression.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Due to the convexity of the objective function, this method ensures the output weights are optimally chosen for a given set of random input weights.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The rapid speed of training is due to the fact that the least squares optimisation problem an be solved using an O(KM 2 ) algorithm, where M is the number of hidden units and K the number of training points [14].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "When applied to pixel-level features, these networks can be trained as discriminative classifiers and produce excellent results on simple image databases [14][15][16][17][18][19] but poor performance on more difficult ones.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To our knowledge, however, the method has not yet been applied to convolutional features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, we have devised a network architecture (see Figure 1) that consists of three key elements that work together to ensure fast learning and good classification performance: namely, the use of (a) convolutional feature extraction, (b) random-valued input weights for classification, (c) least squares training of output weights that feed in to (d) linear output units.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We apply our network to several image classification databases, including MNIST [20], CIFAR-10 [21], Google Street View House Numbers (SVHN) [22] and NORB [23].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network produces state-of-the-art classification results on MNIST and NORB-small databases and near state-of-the-art performance on SVHN.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "These promising results are presented in this paper to demonstrate the potential benefits of the method; clearly further innovations within the method are required if it is to be competitive on harder datasets like CIFAR-10, or Imagenet.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We expect that the most likely avenues for improving our presented results for CIFAR-10, whilst retaining the method's core attributes, are (1) to introduce limited training of the Stage 1 filters by generalizing the method of [17]; (2) introduction of training data augmentation.",
+              "tag": "Other"
+            },
+            {
+              "sent": "We aim to pursuing these directions in our future work.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "The remainder of the paper is organized as follows.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Section II contains a generic description of the network architecture and the algorithms we use for obtaining convolutional features and classifying inputs based on them.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Section III describes how the generic architecture and training algorithms are specifically applied to four well-known benchmark image classification datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Next, Section IV describes the results we obtained for these datasets, and finally the paper concludes with discussion and remarks in Section V.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "ALGORITHMS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A. Stage 1 Architecture: Convolutional filtering and pooling",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Let",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Input",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "In total there are three hidden layers, plus an input layer and a linear output layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There two main stages: a convolutional filtering and pooling stage, and a classification stage.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Only the final layer of weights, Wout is learnt, and this is achieved in a single batch using least squares regression.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Of the remaining weights matrices, W Filter is specified and remains fixed, eg taken from Overfeat [24]; W Pool describes standard average pooling and downsampling; and W in is set randomly or by using the method of [19] that specifies the weights by sampling examples of the training distribution, as described in the text.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Other variables shown are as follows: J 2 is the number of pixels in an image, L is the number of features extracted per image, D is a downsampling factor, M is the number of hidden units in the classifier stage and N is the number of classes.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "B. Stage 2 Architecture: Classifier",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "\u2022 W out , of size N \u00d7 M be the real-valued output weights matrix for the classifier stage;",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "C. Stage 1 Training: Filters and Pooling",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "D. Stage 2 Training: Classifier Weights",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "E. Application to Test Data",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "The final classification decision for each image is obtained by taking the index of the maximum value of each column of Y test .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "III. IMAGE CLASSIFICATION EXPERIMENTS: SPECIFIC DESIGN",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "We examined the method's performance when used as a classifier of images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table I lists the attributes of four well known databases we used.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the two databases comprised from RGB images, we used C = 4 channels, namely the raw RGB channels, and a conversion to greyscale.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This approach was shown to be effective for SVHN in [26].",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A. Preprocessing",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B. Stage 1 Design: Filters and Pooling",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "C. Stage 2 Design: Classifier projection weights",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "D. Stage 2 Design: Ridge Regression parameter",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "E. Stage 1 and 2 Design: Nonlinearities",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A. Summary of best performance attained",
+      "selected_sentences": [
+        {
+          "par_id": 69,
+          "sentences": [
+            {
+              "sent": "The best performance we achieved is summarised in Table III Results for various databases.",
+              "tag": "Other"
+            },
+            {
+              "sent": "The state-of-the-art result listed for MNIST and CIFAR-10 can be improved by augmenting the training set with distortions and other methods [30][31][32]; we have not done so here, and report state-of-the-art only for methods not doing so.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "B. Trend with increasing M",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "C. Indicative training times",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "V. DISCUSSION AND CONCLUSIONS",
+      "selected_sentences": [
+        {
+          "par_id": 75,
+          "sentences": [
+            {
+              "sent": "As stated in the introduction, the purpose of this paper is to highlight the potential benefits of the method presented, namely that it can attain excellent results with a rapid training speed and low implementation complexity, whilst only suffering from reduced performance relative to state-of-the-art on particularly hard problems.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 76,
+          "sentences": [
+            {
+              "sent": "In terms of efficacy on classification tasks, as shown in Table III, our best result (0.37% error rate) surpasses the best ever reported performance for classification of the MNIST test set when no augmentation of the training set is done.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We have also achieved, to our knowledge, the best performance reported in the literature for the NORB-small database, surpassing the previous best [29] by about 0.3%.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 77,
+          "sentences": [
+            {
+              "sent": "For SVHN, our best result is within \u223c 2% of state-of-theart.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "It is highly likely that using filters trained on the SVHN database rather than on Imagenet would reduce this gap, given the structured nature of digits, as opposed to the more complex nature of Imagenet images.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Another avenue for closing the gap on state-of-the-art using the same filters would be to increase M and decrease D, thus resulting in more features and more classifier hidden units.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Although we increased M to 40000, we did not observe saturation in the error rate as we increased M to this point.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 79,
+          "sentences": [
+            {
+              "sent": "Finally, we note that there exist iterative approaches for training the classifier component of Stage 2 using least squares regression, and without training the input weightssee, eg, [14,33,34].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These methods can be easily adapted for use with the convolutional front-end, if, for example, additional batches of training data become available, or if the problem involves online learning.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 80,
+          "sentences": [
+            {
+              "sent": "In closing, following acceptance of this paper, we became aware of a newly published paper that combines convolutional feature extraction with least squares regression training of classifier weights to obtain good results for the NORB dataset [35].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The three main differences between the method of the current paper and the method of [35] are as follows.",
+              "tag": "Other"
+            },
+            {
+              "sent": "First, we used a hidden layer in our classifier stage, whereas [35] solves for output weights using least squares regression applied to the output of the pooling stage.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, we used a variety of methods for the convolutional filter weights, whereas [35] uses orthogonalised random weights only.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Third, we downsample following pooling, whereas [35] does not do so.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Enhanced Image Classification With a Fast-Learning Shallow Convolutional Neural Network"
+}

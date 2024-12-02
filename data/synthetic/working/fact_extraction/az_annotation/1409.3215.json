@@ -1,0 +1,670 @@
+{
+  "paper_id": "1409.3215",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Deep Neural Networks (DNNs) are powerful models that have achieved excellent performance on difficult learning tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although DNNs work well whenever large labeled training sets are available, they cannot be used to map sequences to sequences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we present a general end-to-end approach to sequence learning that makes minimal assumptions on the sequence structure.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our method uses a multilayered Long ShortTerm Memory (LSTM) to map the input sequence to a vector of a fixed dimensionality, and then another deep LSTM to decode the target sequence from the vector.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our main result is that on an English to French translation task from the WMT'14 dataset, the translations produced by the LSTM achieve a BLEU score of 34.8 on the entire test set, where the LSTM's BLEU score was penalized on out-of-vocabulary words.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Additionally, the LSTM did not have difficulty on long sentences.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For comparison, a phrase-based SMT system achieves a BLEU score of 33.3 on the same dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When we used the LSTM to rerank the 1000 hypotheses produced by the aforementioned SMT system, its BLEU score increases to 36.5, which is close to the previous best result on this task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The LSTM also learned sensible phrase and sentence representations that are sensitive to word order and are relatively invariant to the active and the passive voice.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, we found that reversing the order of the words in all source sentences (but not target sentences) improved the LSTM's performance markedly, because doing so introduced many short term dependencies between the source and the target sentence which made the optimization problem easier.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Deep Neural Networks (DNNs) are extremely powerful machine learning models that achieve excellent performance on difficult problems such as speech recognition [13,7] and visual object recognition [19,6,21,20].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DNNs are powerful because they can perform arbitrary parallel computation for a modest number of steps.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A surprising example of the power of DNNs is their ability to sort N N -bit numbers using only 2 hidden layers of quadratic size [27].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "So, while neural networks are related to conventional statistical models, they learn an intricate computation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, large DNNs can be trained with supervised backpropagation whenever the labeled training set has enough information to specify the network's parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, if there exists a parameter setting of a large DNN that achieves good results (for example, because humans can solve the task very rapidly), supervised backpropagation will find these parameters and solve the problem.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Despite their flexibility and power, DNNs can only be applied to problems whose inputs and targets can be sensibly encoded with vectors of fixed dimensionality.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is a significant limitation, since many important problems are best expressed with sequences whose lengths are not known a-priori.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, speech recognition and machine translation are sequential problems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Likewise, question answering can also be seen as mapping a sequence of words representing the question to a sequence of words representing the answer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is therefore clear that a domain-independent method that learns to map sequences to sequences would be useful.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Sequences pose a challenge for DNNs because they require that the dimensionality of the inputs and outputs is known and fixed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we show that a straightforward application of the Long ShortTerm Memory (LSTM) architecture [16] can solve general sequence to sequence problems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The idea is to use one LSTM to read the input sequence, one timestep at a time, to obtain large fixeddimensional vector representation, and then to use another LSTM to extract the output sequence from that vector (figure",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second LSTM is essentially a recurrent neural network language model [28,23,30] except that it is conditioned on the input sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The LSTM's ability to successfully learn on data with long range temporal dependencies makes it a natural choice for this application due to the considerable time lag between the inputs and their corresponding outputs (figure",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "There have been a number of related attempts to address the general sequence to sequence learning problem with neural networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our approach is closely related to Kalchbrenner and Blunsom [18] who were the first to map the entire input sentence to vector, and is related to Cho et al [5] although the latter was used only for rescoring hypotheses produced by a phrase-based system.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Graves [10] introduced a novel differentiable attention mechanism that allows neural networks to focus on different parts of their input, and an elegant variant of this idea was successfully applied to machine translation by Bahdanau et al [2].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The Connectionist Sequence Classification is another popular technique for mapping sequences to sequences with neural networks, but it assumes a monotonic alignment between the inputs and the outputs [11].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Figure 1: Our model reads an input sentence \"ABC\" and produces \"WXYZ\" as the output sentence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The model stops making predictions after outputting the end-of-sentence token.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that the LSTM reads the input sentence in reverse, because doing so introduces many short term dependencies in the data that make the optimization problem much easier.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "The main result of this work is the following.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the WMT'14 English to French translation task, we obtained a BLEU score of 34.81 by directly extracting translations from an ensemble of 5 deep LSTMs (with 384M parameters and 8,000 dimensional state each) using a simple left-to-right beamsearch decoder.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is by far the best result achieved by direct translation with large neural networks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For comparison, the BLEU score of an SMT baseline on this dataset is 33.30",
+              "tag": "Method"
+            },
+            {
+              "sent": "The 34.81 BLEU score was achieved by an LSTM with a vocabulary of 80k words, so the score was penalized whenever the reference translation contained a word not covered by these 80k.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This result shows that a relatively unoptimized small-vocabulary neural network architecture which has much room for improvement outperforms a phrase-based SMT system.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, we used the LSTM to rescore the publicly available 1000-best lists of the SMT baseline on the same task [29].",
+              "tag": "Result"
+            },
+            {
+              "sent": "By doing so, we obtained a BLEU score of 36.5, which improves the baseline by 3.2 BLEU points and is close to the previous best published result on this task (which is 37.0 [9]).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Surprisingly, the LSTM did not suffer on very long sentences, despite the recent experience of other researchers with related architectures [26].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We were able to do well on long sentences because we reversed the order of words in the source sentence but not the target sentences in the training and test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By doing so, we introduced many short term dependencies that made the optimization problem much simpler (see sec. 2 and 3.3).",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a result, SGD could learn LSTMs that had no trouble with long sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The simple trick of reversing the words in the source sentence is one of the key technical contributions of this work.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "A useful property of the LSTM is that it learns to map an input sentence of variable length into a fixed-dimensional vector representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given that translations tend to be paraphrases of the source sentences, the translation objective encourages the LSTM to find sentence representations that capture their meaning, as sentences with similar meanings are close to each other while different sentences meanings will be far.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A qualitative evaluation supports this claim, showing that our model is aware of word order and is fairly invariant to the active and passive voice.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "The model",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "The RNN can easily map sequences to sequences whenever the alignment between the inputs the outputs is known ahead of time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, it is not clear how to apply an RNN to problems whose input and the output sequences have different lengths with complicated and non-monotonic relationships.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "The simplest strategy for general sequence learning is to map the input sequence to a fixed-sized vector using one RNN, and then to map the vector to the target sequence with another RNN (this approach has also been taken by Cho et al [5]).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While it could work in principle since the RNN is provided with all the relevant information, it would be difficult to train the RNNs due to the resulting long term dependencies (figure 1) [14,4,16,15].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the Long ShortTerm Memory (LSTM) [16] is known to learn problems with long range temporal dependencies, so an LSTM may succeed in this setting.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "In this equation, each p(y t |v, y 1 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", y t\u22121 ) distribution is represented with a softmax over all the words in the vocabulary.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the LSTM formulation from Graves [10].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that we require that each sentence ends with a special end-of-sentence symbol \"<EOS>\", which enables the model to define a distribution over sequences of all possible lengths.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The overall scheme is outlined in figure 1, where the shown LSTM computes the representation of \"A\", \"B\", \"C\", \"<EOS>\" and then uses this representation to compute the probability of \"W\", \"X\", \"Y\", \"Z\", \"<EOS>\".",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Our actual models differ from the above description in three important ways.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, we used two different LSTMs: one for the input sequence and another for the output sequence, because doing so increases the number model parameters at negligible computational cost and makes it natural to train the LSTM on multiple language pairs simultaneously [18].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, we found that deep LSTMs significantly outperformed shallow LSTMs, so we chose an LSTM with four layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Third, we found it extremely valuable to reverse the order of the words of the input sentence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "So for example, instead of mapping the sentence a, b, c to the sentence \u03b1, \u03b2, \u03b3, the LSTM is asked to map c, b, a to \u03b1, \u03b2, \u03b3, where \u03b1, \u03b2, \u03b3 is the translation of a, b, c.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This way, a is in close proximity to \u03b1, b is fairly close to \u03b2, and so on, a fact that makes it easy for SGD to \"establish communication\" between the input and the output.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We found this simple data transformation to greatly improve the performance of the LSTM.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Dataset details",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "We used the WMT'14 English to French dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We trained our models on a subset of 12M sentences consisting of 348M French words and 304M English words, which is a clean \"selected\" subset from [29].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We chose this translation task and this specific training set subset because of the public availability of a tokenized training and test set together with 1000-best lists from the baseline SMT [29].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Decoding and Rescoring",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "We also used the LSTM to rescore the 1000-best lists produced by the baseline system [29].",
+              "tag": "Method"
+            },
+            {
+              "sent": "To rescore an n-best list, we computed the log probability of every hypothesis with our LSTM and took an even average with their score and the LSTM's score.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Reversing the Source Sentences",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "While the LSTM is capable of solving problems with long term dependencies, we discovered that the LSTM learns much better when the source sentences are reversed (the target sentences are not reversed).",
+              "tag": "Result"
+            },
+            {
+              "sent": "By doing so, the LSTM's test perplexity dropped from 5.8 to 4.7, and the test BLEU scores of its decoded translations increased from 25.9 to 30.6.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "While we do not have a complete explanation to this phenomenon, we believe that it is caused by the introduction of many short term dependencies to the dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Normally, when we concatenate a source sentence with a target sentence, each word in the source sentence is far from its corresponding word in the target sentence.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a result, the problem has a large \"minimal time lag\" [17].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By reversing the words in the source sentence, the average distance between corresponding words in the source and target language is unchanged.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the first few words in the source language are now very close to the first few words in the target language, so the problem's minimal time lag is greatly reduced.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, backpropagation has an easier time \"establishing communication\" between the source sentence and the target sentence, which in turn results in substantially improved overall performance.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "Initially, we believed that reversing the input sentences would only lead to more confident predictions in the early parts of the target sentence and to less confident predictions in the later parts.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, LSTMs trained on reversed source sentences did much better on long sentences than LSTMs trained on the raw source sentences (see sec.",
+              "tag": "Result"
+            },
+            {
+              "sent": "3.7), which suggests that reversing the input sentences results in LSTMs with better memory utilization.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Parallelization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experimental Results",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "We used the cased BLEU score [24] to evaluate the quality of our translations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We computed our BLEU scores using multi-bleu.pl 1 on the tokenized predictions and ground truth.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This way of evaluating the BELU score is consistent with [5] and [2], and reproduces the 33.3 score of [29].",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, if we evaluate the best WMT'14 system [9] (whose predictions can be downloaded from statmt.org\\matrix) in this manner, we get 37.0, which is greater than the 35.8 reported by statmt.org\\matrix.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "The results are presented in tables 1 and 2. Our best results are obtained with an ensemble of LSTMs that differ in their random initializations and in the random order of minibatches.",
+              "tag": "Result"
+            },
+            {
+              "sent": "While the decoded translations of the LSTM ensemble do not outperform the best WMT'14 system, it is the first time that a pure neural translation system outperforms a phrase-based SMT baseline on a large scale MT",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Method test BLEU score (ntst14)",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "Cho et al [5] 34.54 Best WMT'14 result [9] 37.0 Rescoring the baseline 1000-best with a single forward LSTM 35.61 Rescoring the baseline 1000-best with a single reversed LSTM 35.85 Rescoring the baseline 1000-best with an ensemble of 5 reversed LSTMs 36.5 Oracle Rescoring of the Baseline 1000-best lists \u223c45",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "Table 2: Methods that use neural networks together with an SMT system on the WMT'14 English to French test set (ntst14).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "task by a sizeable margin, despite its inability to handle out-of-vocabulary words.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The LSTM is within 0.5 BLEU points of the best WMT'14 result if it is used to rescore the 1000-best list of the baseline system.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Performance on long sentences",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "We were surprised to discover that the LSTM did well on long sentences, which is shown quantitatively in figure 3. Table 3 presents several examples of long sentences and their translations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "One of the attractive features of our model is its ability to turn a sequence of words into a vector of fixed dimensionality.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 2 visualizes some of the learned representations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The figure clearly shows that the representations are sensitive to the order of words, while being fairly insensitive to the",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Truth",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "Il y a , avec la cr\u00e9mation , \" une violence faite au corps aim\u00e9 \" , qui va \u00eatre \" r\u00e9duit \u00e0 un tas de cendres \" en tr\u00e8s peu de temps , et non apr\u00e8s un processus de d\u00e9composition , qui \" accompagnerait les phases du deuil \" .",
+              "tag": "Result"
+            },
+            {
+              "sent": "Figure 3: The left plot shows the performance of our system as a function of sentence length, where the x-axis corresponds to the test sentences sorted by their length and is marked by the actual sequence lengths.",
+              "tag": "Result"
+            },
+            {
+              "sent": "There is no degradation on sentences with less than 35 words, there is only a minor degradation on the longest sentences.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The right plot shows the LSTM's performance on sentences with progressively more rare words, where the x-axis corresponds to the test sentences sorted by their \"average word frequency rank\". replacement of an active voice with a passive voice.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The two-dimensional projections are obtained using PCA.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related work",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "There is a large body of work on applications of neural networks to machine translation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "So far, the simplest and most effective way of applying an RNNLanguage Model (RNNLM) [23] or a Feedforward Neural Network Language Model (NNLM) [3] to an MT task is by rescoring the nbest lists of a strong MT baseline [22], which reliably improves translation quality.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "Our work is closely related to Kalchbrenner and Blunsom [18], who were the first to map the input sentence into a vector and then back to a sentence, although they map sentences to vectors using convolutional neural networks, which lose the ordering of the words.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similarly to this work, Cho et al [5] used an LSTM-like RNN architecture to map sentences into vectors and back, although their primary focus was on integrating their neural network into an SMT system.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Bahdanau et al [2] also attempted direct translations with a neural network that used an attention mechanism to overcome the poor performance on long sentences experienced by Cho et al [5] and achieved encouraging results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Likewise, PougetAbadie et al [26] attempted to address the memory problem of Cho et al [5] by translating pieces of the source sentence in way that produces smooth translations, which is similar to a phrase-based approach.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We suspect that they could achieve similar improvements by simply training their networks on reversed source sentences.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "In this work, we showed that a large deep LSTM, that has a limited vocabulary and that makes almost no assumption about problem structure can outperform a standard SMT-based system whose vocabulary is unlimited on a large-scale MT task.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The success of our simple LSTM-based approach on MT suggests that it should do well on many other sequence learning problems, provided they have enough training data.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "We were also surprised by the ability of the LSTM to correctly translate very long sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We were initially convinced that the LSTM would fail on long sentences due to its limited memory, and other researchers reported poor performance on long sentences with a model similar to ours [5,2,26].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "And yet, LSTMs trained on the reversed dataset had little difficulty translating long sentences.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Sequence to Sequence Learning with Neural Networks"
+}

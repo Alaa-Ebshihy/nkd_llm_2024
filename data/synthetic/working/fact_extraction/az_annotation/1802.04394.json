@@ -1,0 +1,741 @@
+{
+  "paper_id": "1802.04394",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Learning to walk over a graph towards a target node for a given query and a source node is an important problem in applications such as knowledge base completion (KBC).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It can be formulated as a reinforcement learning (RL) problem with a known state transition model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To overcome the challenge of sparse rewards, we develop a graph-walking agent called MWalk, which consists of a deep recurrent neural network (RNN) and Monte Carlo Tree Search (MCTS).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The RNN encodes the state (ie, history of the walked path) and maps it separately to a policy and Q-values.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In order to effectively train the agent from sparse rewards, we combine MCTS with the neural policy to generate trajectories yielding more positive rewards.",
+              "tag": "Method"
+            },
+            {
+              "sent": "From these trajectories, the network is improved in an off-policy manner using Q-learning, which modifies the RNN policy via parameter sharing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our proposed RL algorithm repeatedly applies this policy-improvement step to learn the model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At test time, MCTS is combined with the neural policy to predict the target node.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Experimental results on several graph-walking benchmarks show that MWalk is able to learn better policies than other RL-based methods, which are mainly based on policy gradients.",
+              "tag": "Result"
+            },
+            {
+              "sent": "MWalk also outperforms traditional KBC baselines.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "The problem can also be understood as constructing a function f (G, n S , q) to predict n T , where the functional form of f (\u2022) is generally unknown and has to be learned from a training dataset consisting of samples like (n S , q, n T ).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we model f (G, n S , q) by means of a graph-walking agent that intelligently navigates through a subset of nodes in the graph from n S towards n T .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since n T is unknown, the problem cannot be solved by conventional search algorithms such as A * -search [11], which seeks to find paths between the given source and target nodes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, the agent needs to learn its search policy from the training dataset so that, after training is complete, the agent knows how to walk over the graph to reach the correct target node n T for an unseen pair of (n S , q).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, each training sample is in the form of \"(source node, query, target node)\", and there is no intermediate supervision for the correct search path.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, the agent receives only delayed evaluative feedback: when the agent correctly (or incorrectly) predicts the target node in the training set, the agent will receive a positive (or zero) reward.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this reason, we formulate the problem as a Markov decision process (MDP) and train the agent by reinforcement learning (RL) [27].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "The problem poses two major challenges.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Firstly, since the state of the MDP is the entire trajectory, reaching a correct decision usually requires not just the query, but also the entire history of traversed nodes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For the KBC example in Figure 1(a), having access to the current node n t = Hawaii alone is not sufficient to know that the best action is moving to n t+1 = USA.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, the agent must track the entire history, including the input query q = Citizenship, to reach this decision.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Secondly, the reward is sparse, being received only at the end of a search path, for instance, after correctly predicting n T =USA.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In this paper, we develop a neural graph-walking agent, named MWalk, that effectively addresses these two challenges.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, MWalk uses a novel recurrent neural network (RNN) architecture to encode the entire history of the trajectory into a vector representation, which is further used to model the policy and the Q-function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, to address the challenge of sparse rewards, MWalk exploits the fact that the MDP transition model is known and deterministic. 2 Specifically, it combines Monte Carlo Tree Search (MCTS) with the RNN to generate trajectories that obtain significantly more positive rewards than using the RNN policy alone.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These trajectories can be viewed as being generated from an improved version of the RNN policy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But while these trajectories can improve the RNN policy, their off-policy nature prevents them from being leveraged by policy gradient RL methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To solve this problem, we design a structure for sharing parameters between the Q-value network and the RNN's policy network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This allows the policy network to be indirectly improved through Q-learning over the off-policy trajectories.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Our method is in sharp contrast to existing RL-based methods for KBC, which use a policy gradients (REINFORCE) method [36] and usually require a large number of rollouts to obtain a trajectory with a positive reward, especially in the early stages of learning [9,37,14].",
+              "tag": "Result"
+            },
+            {
+              "sent": "Experimental results on several benchmarks, including a synthetic task and several real-world KBC tasks, show that our approach learns better policies than previous RL-based methods and traditional KBC methods.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Graph Walking as a Markov Decision Process",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In this section, we formulate the graph-walking problem as a Markov Decision Process (MDP), which is defined by the tuple (S, A, R, P), where S is the set of states, A is the set of actions, R is the reward function, and P is the state transition probability.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We further define S, A, R and P below.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 1(b) illustrates the MDP corresponding to the KBC example of Figure 1(a).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let s t \u2208 S denote the state at time t.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Recalling that the agent needs the entire history of traversed nodes and the query to make a correct decision, we define s t by the following recursion:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "We further define \u03c0 \u03b8 (a t |s t ) and Q \u03b8 (s t , a t ) to be the policy and the Q-function, respectively, where \u03b8 is a set of model parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The policy \u03c0 \u03b8 (a t |s t ) denotes the probability of taking action a t given the current state s t .",
+              "tag": "Method"
+            },
+            {
+              "sent": "In MWalk, it is used as a prior to bias the MCTS search.",
+              "tag": "Method"
+            },
+            {
+              "sent": "And Q \u03b8 (s t , a t ) defines the long-term reward of taking action a t at state s t and then following the optimal policy thereafter.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The objective is to learn a policy that maximizes the terminal rewards, ie, correctly identifies the target node with high probability.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We now proceed to explain how to model and jointly learn \u03c0 \u03b8 and Q \u03b8 to achieve this objective.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "The M-Walk Agent",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "In this section, we develop a neural graph-walking agent named MWalk (ie, MCTS for graph Walking), which consists of (i) a novel neural architecture for jointly modeling \u03c0 \u03b8 and Q \u03b8 , and (ii) Monte Carlo Tree Search (MCTS).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We first introduce the overall neural architecture and then explain how MCTS is used during the training and testing stages.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we describe some further details of the neural architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our discussion focuses on addressing the two challenges described earlier: history-dependent state and sparse rewards.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, the vector h t consists of several sub-vectors of the same dimension M : h S,t , {h n ,t : n \u2208 N nt } and h A,t .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each sub-vector encodes part of the state s t in (1).",
+              "tag": "Method"
+            },
+            {
+              "sent": "For instance, the vector h S,t encodes (s t\u22121 , a t\u22121 , n t ), which characterizes the history in the state.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The vector h n ,t encodes the (neighboring) node n and the edge e nt,n connected to n t , which can be viewed as a vector representation of the n -th candidate action (excluding the STOP action).",
+              "tag": "Method"
+            },
+            {
+              "sent": "And the vector h A,t is a vector summarization of E nt and N nt , which is used to model the STOP action probability.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In summary, we use the sub-vectors to model \u03c0 \u03b8 and Q \u03b8 according to:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "where \u2022, \u2022 denotes inner product, f \u03b8\u03c0 (\u2022) is a fully-connected neural network with model parameter \u03b8 \u03c0 , \u03c3(\u2022) denotes the element-wise sigmoid function, and \u03c6 \u03c4 (\u2022) is the softmax function with temperature parameter \u03c4 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that we use the inner product between the vectors h S,t and h n ,t to compute the (pre-softmax) score u n for choosing the n -th candidate action, where n \u2208 N nt .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The inner product operation has been shown to be useful in modeling Q-functions when the candidate actions are described by vector representations [13,3] and in solving other problems [33,1].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, the value of u 0 is computed by f \u03b8\u03c0 (\u2022) using h S,t and h A,t , where u 0 gives the (pre-softmax) score for choosing the STOP action.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We model the Q-function by applying element-wise sigmoid to u 0 , u n 1 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", u n k , and we model the policy by applying the softmax operation to the same set of u 0 , u n 1 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", u n k . 4 ote that the policy network and the Q-network share the same set of model parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We will explain in Section 3.2 how such parameter sharing enables indirect updates to the policy \u03c0 \u03b8 via Q-learning from off-policy data.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "The training algorithm",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "We now discuss how to train the model parameters \u03b8 (including \u03b8 \u03c0 and \u03b8 e ) from a training dataset {(n S , q, n T )} using reinforcement learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "One approach is the policy gradient method (REINFORCE) [36,28], which uses the current policy \u03c0 \u03b8 (a t |s t ) to roll out multiple trajectories (s 0 , a 0 , r 0 , s 1 , . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ".) to estimate a stochastic gradient, and then updates the policy \u03c0 \u03b8 via stochastic gradient ascent.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Previous RL-based KBC methods [38,5] typically use REINFORCE to learn the policy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, policy gradient methods generally suffer from low sample efficiency, especially when the reward signal is sparse, because large numbers of Monte Carlo rollouts are usually needed to obtain many trajectories with positive terminal reward, particularly in the early stages of learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To address this challenge, we develop a novel RL algorithm that uses MCTS to exploit the deterministic MDP transition defined in (1).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, on each MCTS simulation, a trajectory is rolled out by selecting actions according to a variant of the PUCT algorithm [21,25] from the root state s 0 (defined in (1)):",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "where \u03c0 \u03b8 (a|s) is the policy defined in Section 3.1, c and \u03b2 are two constants that control the level of exploration, and N (s, a) and W (s, a) are the visit count and the total action reward accumulated on the (s, a)-th edge on the MCTS tree.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Overall, PUCT treats \u03c0 \u03b8 as a prior probability to bias the MCTS The key idea of our method is that running multiple MCTS simulations generates a set of trajectories with more positive rewards (see Section 4 for more analysis), which can also be viewed as being generated by an improved policy \u03c0 \u03b8 .",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Therefore, learning from these trajectories can further improve \u03c0 \u03b8 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our RL algorithm repeatedly applies this policy-improvement step to refine the policy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, since these trajectories are generated by a policy that is different from \u03c0 \u03b8 , they are off-policy data, breaking the assumptions inherent in policy gradient methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this reason, we instead update the Q-network from these trajectories in an off-policy manner using Q-learning:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Recall from Section 3.1 that \u03c0 \u03b8 and Q \u03b8 (s, a) share the same set of model parameters; once the Q-network is updated, the policy network \u03c0 \u03b8 will also be automatically improved.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, the new \u03c0 \u03b8 is used to control the MCTS in the next iteration.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The main idea of the training algorithm is summarized in Figure 3(b).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "The prediction algorithm",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "At test time, we want to infer the target node n T for an unseen pair of (n S , q).",
+              "tag": "Method"
+            },
+            {
+              "sent": "One approach is to use the learned policy \u03c0 \u03b8 to walk through the graph G to find n T .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, this would not exploit the known MDP transition model (1).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, we combine the learned \u03c0 \u03b8 and Q \u03b8 with MCTS to generate an MCTS search tree, as in the training stage.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that there could be multiple paths that reach the same terminal node n \u2208 G, meaning that there could be multiple leaf states in MCTS corresponding to that node.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, the prediction results from these MCTS leaf states need to be merged into one score to rank the node n.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "where N is the total number of MCTS simulations, and the summation is over all the leaf states s T that correspond to the same node n \u2208 G. Score(n) is a weighted average of the terminal state values associated with the same candidate node n. 5 Among all the candidates nodes, we select the predicted target node to be the one with the highest score: nT = argmax n Score(n).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "The RNN state encoder",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "We evaluate and analyze the effectiveness of MWalk on a synthetic Three Glass Puzzle task and two real-world KBC tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We briefly describe the tasks here, and give the experiment details and hyperparameters in Appendix B.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Knowledge Base Completion",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "In KBC tasks, early work [2] focused on learning vector representations of entities and relations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent approaches have demonstrated limitations of these prior approaches: they suffer from cascading errors when dealing with compositional (multi-step) relationships [10].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hence, recent works [8,18,10,15,30] have proposed approaches for injecting multi-step paths such as random walks through sequences of triples during training, further improving performance on KBC tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "IRN [23] and Neural LP [40] explore multi-step relations by using an RNN controller with attention over an external memory.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared to RL-based approaches, it is hard to interpret the traversal paths, and these models can be computationally expensive to access the entire graph in memory [23].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Two recent works, DeepPath [38] and MINERVA [5], use RL-based approaches to explore paths in knowledge graphs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DeepPath requires target entity information to be in the state of the RL agent, and cannot be applied to tasks where the target entity is unknown.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "MINERVA [5] uses a policy gradient method to explore paths during training and test.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our proposed model further exploits state transition information by integrating the MCTS algorithm.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Empirically, our proposed algorithm outperforms both DeepPath and MINERVA in the KBC benchmarks. 11",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Performance of M-Walk",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "We first report the overall performance of the MWalk algorithm on the three tasks and compare it with other baseline methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We ran the experiments three times and report the means and standard deviations (except for PRA, TransE, and TransR on NELL995, whose results are directly quoted from [38]).",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the Three Glass Puzzle task, MWalk significantly outperforms the baseline: the best model of MWalk achieves an accuracy of (99.0 \u00b1 1.0)% while the best REINFORCE method achieves (49.0 \u00b1 2.6)% (see Appendix C for more experiments with different settings on this task).",
+              "tag": "Result"
+            },
+            {
+              "sent": "For the two KBC tasks, we report their results in Tables 1-2, where PGWalk and QWalk are two methods we created just for the ablation study in the next section.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The proposed method outperforms previous works in most of the metrics on NELL995 and WN18RR datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Additional experiments on the FB15k-237 dataset can be found in Appendix C.1.1 of the supplementary material.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Analysis of M-Walk",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "We performed extensive experimental analysis to understand the proposed MWalk algorithm, including (i) the contributions of different components, (ii) its ability to overcome sparse rewards, (iii) hyperparameter analysis, (iv) its strengths and weaknesses compared to traditional KBC methods, and (v) its running time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, we used ablation studies to analyze the contributions of different components in MWalk.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To understand the contribution of the proposed neural architecture in MWalk, we created a method, PGWalk, which uses the same neural architecture as MWalk but with the same training (PG) and testing (beam search) algorithms as MINERVA [5].",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observed that the novel neural architecture of MWalk contributes an overall 1% gain relative to MINERVA on NELL995, and it is still 1% worse than MWalk, which uses MCTS for training and testing.",
+              "tag": "Result"
+            },
+            {
+              "sent": "To further understand the contribution of MCTS, we created another method, QWalk, which uses the same model architecture as MWalk except that it is trained by Q-learning only without MCTS.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that this lost about 2% in overall performance on NELL995.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observed similar trends on WN18RR.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "Second, we analyze the ability of MWalk to overcome the sparse-reward problem.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Figure 4, we show the positive reward rate (ie, the percentage of trajectories with positive reward during training) on the Three Glass Puzzle task and the NELL995 tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared to the policy gradient method (PGWalk), and Q-learning method (QWalk) methods under the same model architecture, MWalk with MCTS is able to generate trajectories with more positive rewards, and this continues to improve as training progresses.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This confirms our motivation of using MCTS to generate higher-quality trajectories to alleviate the sparse-reward problem in graph walking.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion and Discussion",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "We developed an RL-agent (MWalk) that learns to walk over a graph towards a desired target node for given input query and source nodes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we proposed a novel neural architecture that encodes the state into a vector representation, and maps it to Q-values and a policy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To learn from sparse rewards, we propose a new reinforcement learning algorithm, which alternates between an MCTS trajectory-generation step and a policy-improvement step, to iteratively refine the policy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At test time, the learned networks are combined with MCTS to search for the target node.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Experimental results on several benchmarks demonstrate that our method learns better policies than other baseline methods, including RL-based and traditional methods on KBC tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, we also performed extensive experimental analysis to understand MWalk.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We found that our method is more accurate when the ground truth is in the candidate set.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also found that the out-of-candidate-set error is the main type of error made by MWalk.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Therefore, in future work, we intend to improve this method by reducing such out-of-candidate-set errors.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A Derivation of the recursion for q t",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B Algorithm Implementation Details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "MCTS implementation",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "where T is the length of the traversal path, \u03b3 is the discount factor of the MDP, and V \u03b8 (s T ) is the terminal state-value function modeled by V \u03b8 (s T ) Q(s T , a = STOP).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Experiment settings and hyperparameters For the proposed MWalk, we set the entity embedding dimension to 4 and relation embedding dimension to 64.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The maximum length of the graph walking path (ie, the search horizon) is 8 in the NELL-995 dataset and 5 in the WN18RR dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After the STOP action has been taken, the system evaluates the action sequence and assigns a reward r = 1 if the agent reaches the target node, otherwise r = 0.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The initial query q is the concatenation of the entity embedding vector and the relation embedding vector.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As mentioned earlier, conventional graph traversal algorithms such as BreadthFirst Search (BFS) and DepthFirst Search (DFS) cannot be applied to the graph walking problem, because the ground truth target node is not known at test time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, to understand how quickly MWalk with MCTS can find the correct target node, we compare it with BFS and DFS in the following cheating setup.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we apply BFS and DFS to the test set of the Three Glass Puzzle task by disclosing the target node to them.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Table 8, we report the average traversal steps and maximum steps to reach the target node.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The MWalk with MCTS algorithm is able to find the target node more efficiently than BFS or DFS.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "C.1.1 Knowledge Graph Link Prediction",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "In addition, we conduct further experiments on the FB15k-237 dataset [29], which is a subset of FB15k [2] with inverse relations being removed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the same data split and preprocessing protocol as in [6] for FB15k-237.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The results are reported in Table 10.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe that MWalk outperforms the other RL-based method (MINERVA).",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, it is still worse than the embedding-based methods.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "C.2 The Reasoning (Traversal) Paths",
+      "selected_sentences": []
+    }
+  ],
+  "title": "M-Walk: Learning to Walk over Graphs using Monte Carlo Tree Search"
+}

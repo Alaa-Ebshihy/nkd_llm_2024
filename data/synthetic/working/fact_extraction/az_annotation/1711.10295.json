@@ -1,0 +1,596 @@
+{
+  "paper_id": "1711.10295",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Being a cross-camera retrieval task, person reidentification suffers from image style variations caused by different cameras.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The art implicitly addresses this problem by learning a camera-invariant descriptor subspace.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we explicitly consider this challenge by introducing camera style (CamStyle) adaptation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "CamStyle can serve as a data augmentation approach that smooths the camera style disparities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, with CycleGAN, labeled training images can be style-transferred to each camera, and, along with the original training samples, form the augmented training set.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This method, while increasing data diversity against over-fitting, also incurs a considerable level of noise.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the effort to alleviate the impact of noise, the label smooth regularization (LSR) is adopted.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The vanilla version of our method (without LSR) performs reasonably well on few-camera systems in which over-fitting often occurs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "With LSR, we demonstrate consistent improvement in all systems regardless of the extent of over-fitting.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also report competitive accuracy compared with the state of the art.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Person re-identification (reID) [43] is a cross-camera retrieval task.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given a query person-of-interest, it aims to retrieve the same person from a database collected from multiple cameras.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this task, a person image often undergoes intensive changes in appearance and background.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Capturing images by different cameras is a primary cause of such variations (Figure 1).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Usually, cameras differ from each other regarding resolution, environment illumination, etc",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Comparing to previous methods, this paper resorts to an explicit strategy from the view of camera style adaptation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We are mostly motivated by the need for large data volume in deep learning based person reID.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To learn rich features which are robust to camera variations, annotating large-scale datasets is useful but prohibitively expensive.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Nevertheless, if we can add more samples to the training set that are aware of the style differences between cameras, we are able to 1) address the data scarcity problem in person reID and 2) learn invariant features across different cameras.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Preferably, this process should not cost any more human labeling, so that the budget is kept low.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Based on the above discussions, we propose a camera style (CamStyle) adaptation method to regularize CNN training for person reID.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In its vanilla version, we learn image-image translation models for each camera pair with CycleGAN [51].",
+              "tag": "Method"
+            },
+            {
+              "sent": "With the learned CycleGAN model, for a training image captured by a certain camera, we can gener-  [43].",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The vanilla method is beneficial in reducing over-fitting and achieving camera-invariant property, but, importantly, we find that it also introduces noise to the system (Figure 2).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This problem deteriorates its benefit under full-camera systems where the relatively abundant data has a lower over-fitting risk.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To mitigate this problem, in the improved version, we further apply label smoothing regularization (LSR) [30] on the style-transferred samples, so that their labels are softly distributed during training.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "The proposed camera style adaptation approach, CamStyle, has three advantages.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "First, it can be regarded as a data augmentation scheme that not only smooths the camera style disparities, but also reduces the impact of CNN overfitting.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, by incorporating camera information, it helps learn pedestrian descriptors with the camera-invariant property.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Finally, it is unsupervised, guaranteed by CycleGAN, indicating fair application potentials.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "To summarize, this paper has the following contributions:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "\u2022 A vanilla camera-aware style transfer model for reID data augmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In few-camera systems, the improvement can be as large as 17.1%.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "\u2022 An improved method applying LSR on the styletransferred samples during reID training.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In fullcamera systems, consistent improvement is observed.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "The Proposed Method",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CycleGAN Review",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Camera-aware Image-Image Translation",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Specifically, for training images, we use CycleGAN to train camera-aware style transfer models for each pair of cameras.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following the training strategy in [51], all images are resized to 256 \u00d7 256.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the same architecture  for our camera-aware style transfer networks as CycleGAN.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "With the learned CycleGAN models, for a training image collected from a certain camera, we generate L \u2212 1 new training samples whose styles are similar to the corresponding cameras (examples are shown in Figure 2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this work, we call the generated image as style-transferred image or fake image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this manner, the training set is augmented to a combination of the original images and the style-transferred images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since each style-transferred image preserves the content of its original image, the new sample is considered to be of the same identity as the original image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This allows us to leverage the style-transferred images as well as their associated labels to train reID CNN in together with the original training samples.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Baseline Deep Re-ID Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Training with CamStyle",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "Given a new training set composed of real and fake (style-transferred) images (with their ID labels), this section discusses the training strategies using the CamStyle.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When we view the real and fake images equally, ie, assigning a \"one-hot\" label distribution to them, we obtain a vanilla version of our method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the other hand, when considering the noise introduced by the fake samples, we introduce the full version which includes the label smooth regularization (LSR) [30].",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Because the similarity in overall data distribution between the real and fake data, the vanilla version is able to improve the baseline IDE accuracy under a system with a few cameras, as to be shown in Section 4.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "The style-transferred images have a positive data augmentation effect, but also introduce noise to the system.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, while the vanilla version has merit in reducing over-fitting under a few-camera system in which, due to the lack of data, over-fitting tends to occur, its effectiveness is compromised under more cameras.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The reason is that when data from more cameras is available, the overfitting problem is less critical, and the problem of transfer noise begins to appear.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "To alleviate this problem, we apply the label smoothing regularization (LSR) [30] on the style-transferred images to softly distribute their labels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "That is, we assign less confidence on the ground-truth label and assign small weights to the other classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The re-assignment of the label distribution of each style-transferred image is written as,",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "For real images, we do not use LSR because their labels correctly match the image content.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, we experimentally show that adding LSR to the real images does not improve the reID performance under full-camera systems (see Section 4.4).",
+              "tag": "Method"
+            },
+            {
+              "sent": "So for real images, we use the one-hot label distribution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For style-transferred images, we set = 0.1, the loss function L F = L LSR ( = 0.1).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, Zheng et al [47] propose the label smoothing regularization for outliers (LSRO) to use the unlabeled samples generated by DCGAN [25].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [47], since the generated images do not have labels, a uniform label distribution is assigned to the generated samples, ie, L LSR ( = 1).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Comparing with LSRO [47], our system has two differences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "1) Fake images are generated according to camera styles.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The usage of CycleGAN ensures that the generated images remain the main characteristics of the person (Figure 5 provides some visual comparisons).",
+              "tag": "Result"
+            },
+            {
+              "sent": "2) Labels in our systems are more reliable.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use LSR to address a small portion of unreliable data, while LSRO [47] is used under the scenario where no labels are available.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiment Settings",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "Following Section 3.2, given a training set captured from L camera views, we train a camera-aware style transfer (CycleGAN) model for each pair of cameras.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we train C 2 6 = 15 and C 2 8 = 28 CycleGAN models for Market-1501 and DukeMTMC-reID, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During training, we resize all input images to 256 \u00d7 256 and use the Adam optimizer [15] to train the models from scratch with \u03bb = 10 for all the experiments.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We set the batch size = 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The learning rate is 0.0002 for the Generator and 0.0001 for the Discriminator at the first 30 epochs and is linearly reduced to zero in the remaining 20 epochs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In camera-aware style transfer step, for each training image, we generated L \u2212 1 (5 for Market-1501 and 7 for DukeMTMC-reID) extra fake training images with their original identity preserved as augmented training data.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Parameter Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Variant Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "Vanilla CamStyle improves the accuracy of fewcamera systems.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first evaluate the effectiveness of the vanilla method (without LSR) in Figure 7 and Table 1.",
+              "tag": "Result"
+            },
+            {
+              "sent": "First, in systems with 2 cameras, vanilla CamStyle yields significant improvement over the baseline CNN.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On Market-1501 with 2 cameras, the improvement reaches +17.1% (from 43.2% to 60.3%).",
+              "tag": "Result"
+            },
+            {
+              "sent": "On DukeMTMC-reID with 2 cameras, the rank-1 accuracy is improved from 45.3% to 54.8%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This indicates that the fewcamera systems, due to the lack of training data, are prone to over-fitting, so that our method exhibits an impressive system enhancement.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "Second, as the number of camera increases in the system, the improvement of vanilla CamStyle becomes smaller.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, in the 6-camera system on Market-1501, the improvement in rank-1 accuracy is only +0.7%.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This indicates that 1) the over-fitting problems becomes less severe in this full system and that 2) the noise brought by CycleGAN begins to negatively affect the system accuracy.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "As previously described, when tested in a system with more than 3 cameras, vanilla CamStyle achieves less improvement than the 2-camera system.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show in Figure 7 and Table 1 that using the LSR loss on the fake images achieves higher performance than cross-entropy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown in Table 1, using cross-entropy on style-transferred data improves the rank-1 accuracy to 86.31% under full-camera system on Market-1501.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Replacing cross-entropy with LSR on the fake data increases the rank-1 accuracy to 88.12%.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "As show in Table 3, rank-1 accuracy is 84.15% when no data augmentation is used.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When only applying RF+RC, RE, or CamStyle, rank-1 accuracy is increased to 85.66%, 86.83% and 85.01%, respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, if we combine CamStyle with either RF+RC or RE, we observe consistent improvement over their separate usage.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The best performance is achieved when the three data augmentation methods are used together.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Therefore, while the three distinct data augmentation techniques focus on different aspects of CNN invariance, our results show that, CamStyle is well complementary to the other two.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Particularly, combining these three methods, we achieve 89.49% rank-1 accuracy.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Comparison with State-of-the-art Methods",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "We compare our method with the state-of-the-art methods on Market-1501 and DukeMTMC-reID in Table 4 and Table 5, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, using our baseline training strategy, we obtain a strong baseline (IDE * ) on both datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Specifically, IDE * achieves 85.66% for Market-1501 and 72.31% for DukeMTMC-reID in rank-1 accuracy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared with published IDE implementations [29,47,43], IDE * has the best rank-1 accuracy on Market-1501.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "Then, when applying CamStyle on IDE * , we obtain competitive results compared with the state of the art.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Specifically, we achieve rank-1 accuracy = 88.12% for Market-1501, and rank-1 accuracy = 75.27%",
+              "tag": "Result"
+            },
+            {
+              "sent": "On Market-1501, our method has higher rank-1 accuracy than PDF [28], TriNet [11] and DJL",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Method",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose CamStyle, a camera style adaptation method for deep person re-identification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The camera-aware style transfer models are learned for each pair of cameras with CycleGAN, which are used to generate new training images from the original ones.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The real images and the style-transferred images form the new training set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, to alleviate the increased level of noise induced by CycleGAN, label smooth regularization (LSR) is applied on the generated samples.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments on the Market-1501 and DukeMTMC-reID datasets show that our method can effectively reduce the impact of over-fitting, and, when combined with LSR, yields consistent improvement over the baselines.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, we also show that our method is complementary to other data augmentation techniques.",
+              "tag": "Other"
+            },
+            {
+              "sent": "In the feature, we will extend CamStyle to one view learning and domain adaptation.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Camera Style Adaptation for Person Re-identification"
+}

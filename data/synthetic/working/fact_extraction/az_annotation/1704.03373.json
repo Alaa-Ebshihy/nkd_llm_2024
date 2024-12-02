@@ -1,0 +1,772 @@
+{
+  "paper_id": "1704.03373",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "This paper targets on the problem of set to set recognition, which learns the metric between two image sets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Images in each set belong to the same identity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since images in a set can be complementary, they hopefully lead to higher accuracy in practical applications.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the quality of each sample cannot be guaranteed, and samples with poor quality will hurt the metric.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, the quality aware network (QAN) is proposed to confront this problem, where the quality of each sample can be automatically learned although such information is not explicitly provided in the training stage.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network has two branches, where the first branch extracts appearance feature embedding for each sample and the other branch predicts quality score for each sample.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Features and quality scores of all samples in a set are then aggregated to generate the final feature embedding.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that the two branches can be trained in an end-to-end manner given only the set-level identity annotation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Analysis on gradient spread of this mechanism indicates that the quality learned by the network is beneficial to set-to-set recognition and simplifies the distribution that the network needs to fit.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Experiments on both face verification and person re-identification show advantages of the proposed QAN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The source code and network structure can be downloaded at GitHub 1",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Face verification [12,26,27,28,30] and person reidentification [5,6,20,42] have been well studied and widely used in computer vision applications such as financial identity authentication and video surveillance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Both the two tasks need to measure the distance between two face or person images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such tasks can be naturally formalized as a metric learning problem, where the distance of images from the same identity should be smaller than that from different 1 https://github.com/sciencefans/QualityAwareNetwork",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Note that we are developing PQAN (a fine-grained version of QAN, see Sec.5) in this repository.",
+              "tag": "Other"
+            },
+            {
+              "sent": "So the performance may be higher than that we report in this paper.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Built on large scale training data, convolutional neural networks and carefully designed optimization criterion, current methods can achieve promising performance on standard benchmarks, but may still fail due to appearance variations caused by large pose or illumination.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "In practical applications, instead of one single image, a set of images for each identity can always be collected.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, the image set of one identity can be sampled from the trajectory of the face or person in videos.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Images in a set can be complementary to each other, so that they provide more information than a single image, such as images from different poses.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The direct way to aggregate identity infor-mation from all images in a set can be simply max/average pooling appearance features of all images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, one problem in this pooling is that some images in the set may be not suitable for recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As shown in Figure 1, both sets from left-top and left-bottom hold noisy images caused by shake or blur.",
+              "tag": "Result"
+            },
+            {
+              "sent": "If the noisy images are treated equally and max/average pooling is used to aggregate all images' features, the noisy images will mislead the final representation.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this paper, in order to be robust to images with poor quality as described above and simultaneously use the rich information provided by the other images, our basic idea is that each image can have a quality score in aggregation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For that, we propose a quality aware network (QAN), which has two branches and then aggregated together.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first branch named feature generation part extracts the feature embedding for each image, and the other branch named quality generation part predicts quality score for each image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Features of images in the whole set are then aggregated by the final set pooling unit according to their quality.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "A good property of our approach is that we do not supervise the model by any explicit annotations of the quality.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network can automatically assign low quality scores to images with poor quality in order to keep the final feature embedding useful in set-to-set recognition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To implement that, an elaborate model is designed in which embedding branch and score generation branch can be jointly trained through optimization of the final embedding.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specially in this paper, we use the joint triplet and softmax loss on top of image sets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The designed gradient of image set pooling unit ensures the correctness of this automatic process.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Experiments indicate that the predicted quality score is correlated with the quality annotated by human, and the predicted quality score performs better than human in recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we show the applications of the proposed method on both person re-identification and face verification.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For person re-identification task, the proposed quality aware network improves top-1 matching rates over the baseline by 14.6% on iLIDSVID and 9.0% on PRID2011.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For face verification, the proposed method reduces 15.6% and 29.32% miss ratio when the false positive rate is 0.001 on YouTube Face and IJBA benchmarks.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "\u2022 The proposed quality aware network automatically generates quality scores for each image in a set and leads to better representation for set-to-set recognition.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "\u2022 We design an end-to-end training strategy and demonstrate that the quality generation part and feature generation part benefit from each other during back propagation.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "\u2022 Quality learnt by QAN is better than quality estimated by human and we achieves new state-of-the-art performance on four benchmarks for person re-identification and face verification.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related work",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Our work is build upon recent advances in deep learning based person re-identification and unconstrained face recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In person re-identification, [20,37,41] use features generated by deep convolutional network and obtain state-of-the-art performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To learn face representations in unconstrained face recognition, Huang et al [11] uses convolutional Restricted Boltzmann Machine while deep convolutional neural network is used in [28,30].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, [26,29] use deeper convolutional network and achieved accuracy that even surpasses human performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The accuracy achieved by deep learning on image-based face verification benchmark LFW [12] has been promoted to 99.78%.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Although deep neural network has achieved such great performance on these two problems, in present world, unconstrained set-to-set recognition is more challenging and useful.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Looking backward, there are two different approaches handling set-to-set recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The first approach takes image set as a convex hull [2], affine hull [10] or subspace [1,13].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Under these settings, samples in a set distribute in a Hilbert space or Grassmann mainfold so that this issue can be formulated as a metric learning problem [23,39].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Some other works degrade set-to-set recognition to point-to-point recognition through aggregating images in a set to a single representation in hyperspace.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The most famous approach in this kind is the Bag of features [17], which uses histogram to represent the whole set for feature aggregation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another classical work is vector of locally aggregated descriptors (VLAD) [14], which aggregates all local descriptors from all samples.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Temporal max/average pooling is used in [36] to integrate all frames' features generated by recurrent convolutional network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This method uses the 1st order statistics to aggregate the set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The 2nd order statistics is used in [32,43] in assuming that samples follow Gaussian distribution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In [8], original faces in a set are classified into 20 bins based on their pose and quality.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then faces in each bin are pooled to generate features and finally feature vectors in all bins are merged to be the final representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "[38] uses attention mechanism to summarize several sample points to a single aggregated point.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "The proposed QAN belongs to the second approach.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It discards the dross and selects the essential information in all images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Different from recent works which learn aggregation based on fixed feature [38] or image [8], the QAN learns feature representation and aggregation simultaneously.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "[7] proposed a similar quality aware module named \"memorability based frame selection\" which takes \"visual entropy\" to be the score of a frame.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But the score of a frame  is defined by human and independent with feature generation unit.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In QAN, score is automatically learned and quality generation unit is joint trained with feature generation unit.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Due to mutual benefit between the two parts during training, performance is improved significantly by jointly optimizing images aggregation parameter and images' feature generator.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Quality aware network (QAN)",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "The R Ii is produced by a feature extraction process, containing traditional hand-craft feature extractors or convolutional neural network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "F(\u2022) is an aggregative function, which maps a variable-length input set to a representation of fixed dimension.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The challenge is to find an optimized F(\u2022), which aggregate features from the whole image set to obtain the most discriminative representation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Based on notion that images with higher quality are easier for recognition while images with lower quality containing occlusion and large pose have less effect on set representation, we denote F(\u2022) as",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "where Q(I i ) predicts a quality score \u00b5 i for image I i .",
+              "tag": "Method"
+            },
+            {
+              "sent": "So the representation of a set is a fusion of each images' features, weighted by their quality scores.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "QAN for image set embedding",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "In this paper, feature generation and aggregation module is implemented through an end-to-end convolutional neural network named QAN as shown in Figure 2. Two branches are splited from the middle of it.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the first branch, quality generation part followed by a set pooling unit composes the aggregation module.",
+              "tag": "Method"
+            },
+            {
+              "sent": "And in the second branch, feature generation part generates images' representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Now we introduce how an image set flows through QAN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At the beginning of the process, all images are sent into a fully convolutional network to generate middle representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After that, QAN is divided into two branches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first one (upper) named quality generation part is a tiny convolution neural network (see Sec. 3.4 for details) which is employed to predict quality score \u00b5.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second one (lower), called feature generation part, generates image representations R I for all images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "\u00b5 and R I are aggregated at set pooling unit F, and then pass through a fully connected layer to get the final representation R a (S).",
+              "tag": "Method"
+            },
+            {
+              "sent": "To sum up, this structure generates quality scores for images, uses these quality scores to weight images' representations and sums them up to produce the final set's representation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training QAN without quality supervision",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "We train the QAN in an end-to-end manner.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The data flow is shown in Figure 2. QAN is supposed to generate discriminative representations for images and sets belonging to different identities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For image level training, a fully connection layer is established after feature generation part, which is supervised by Softmax loss L class .",
+              "tag": "Method"
+            },
+            {
+              "sent": "For set level training, a set's representation R a (S) is supervised by L veri which is formulated as:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "Where D is the dimension of images' representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We discuss how a quality score \u00b5 is automatically learned by this back propagation process.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After back-propagation through set pooling unit, gradient of \u00b5 i with regard to L veri can be calculated according to the Eq. 8, which is the dot product of gradient from R a (S) and R Ii .",
+              "tag": "Result"
+            },
+            {
+              "sent": "So if angle of \u2207R a (S) and R Ii belongs to (\u221290 \u2022 , 90 \u2022 ), \u00b5 i 's gradient will be positive.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, as shown in Figure 3, the angle of \u2207R a (S neg ) and x ni \u2212R a (S neg ) is less than 90 \u2022 , so the x ni s quality score \u00b5 ni will become larger after this back propagation process.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In contrast, the relative direction of x a i is in the opposite side of the gradient of R a (S anchor ), making it obviously a hard sample, so its quality score \u00b5 ai will tend to be smaller.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Obviously, samples in the \"correct\" directions along with set gradient always score higher in quality, while those in the \"wrong\" directions gain lower weight.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example in Figure 3, green samples in the upper area and red samples in the lower area keep improving their quality consistently while in the middle area, sample's quality reduces.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To this end, \u00b5 i represents whether i \u2212 th image is a good sample or a hard sample.",
+              "tag": "Other"
+            },
+            {
+              "sent": "This conclusion will be further demonstrated by experiments.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Mechanism for learning quality score",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "\u00b5 regulates the attention of R Ii .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The gradient of R Ii is shown in Eq. 7 with a factor \u00b5 i , together with the gradient propagated from Softmax loss.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since most of hard samples with lower \u00b5 i are always poor images or even full of background noises, the factor \u00b5 i in gradient of R Ii weaken their harmful effect on the whole model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "That is, their impact on parameters in feature generation part is negligible during back propagation.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This mechanism helps feature generation part to focus on good samples and neglect ones, which benefits set-to-set recognition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In quality aware network (QAN), quality generation part is a convolution neural network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We design different score generation parts start at different feature maps.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use QAN split at Pool4 as an instance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 4, the output spatial of Pool4 layer is 512 \u00d7 14 \u00d7 14.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In order to generate a 1 \u00d7 1 quality score, the convolution part contains a 2-stride pooling layer and a final pooling layer with kernel size 7 \u00d7 7. A fully connected layer is followed by the final pooling layer to generate the original quality score.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After that, the origin scores of all images in a set are sent to sigmoid layer and group L1-normalization layer to generate the final scores \u00b5.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For QAN split at Pool3, we will add a block containing three 1-stride convolution layer and a 2stride pooling layer at the beginning of quality generation unit.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "In this section, we first explore the meaning of the quality score learned by QAN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Then QAN's sensitivity to level of feature is analysed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Based on above knowledge, we evaluate QAN on two human re-identification benchmarks and two unconstrained face verification benchmarks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we analyse the concept learned by QAN and compare it with score labelled by human.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "What is learned in QAN?",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "Qualitative analysis We visualize images with their \u00b5 generated by QAN to explore the meaning of \u00b5.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instances of same person with different qualities are shown in the first two rows in Figure 5.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All images are selected from test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The two images in the same column belong to a same person.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The upper images are random selected from images with quality scores higher than 0.8 and the lower images are selected from images with quality scores lower than the corresponding higher one.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is easy to find that images with de-formity, superposition, blur or extreme light condition tend to obtain lower quality scores than normal images.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Person re-identification",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "For person re-identification, we collect 134,942 frames with 16,133 people and 212,726 bounding boxes as the training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments are conducted on PRID2011 [9] and iLiDSVID [33] datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "PRID2011 contains frames in two views captured at different positions of a street.",
+              "tag": "Method"
+            },
+            {
+              "sent": "CameraA has 385 identities while CameraB has 749 identities, and the two videos have a overlap of 200 people.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each person has 5 to 675 images, and the average number is 100. iLIDSVID dataset has 300 people, and each person has two sets also captured from different positions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each person has 23 to 192 images.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Evaluation on common setting",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Dataset cross evaluation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Unconstrained face verification",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "All faces in training and testing sets are detected and aligned by a multi-task region proposal network as described in [3].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we crop the face regions and resize them to 256 \u00d7 224.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After that, a convolutional neural networks with 256 \u00d7 224 inputs are used for face verification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It begins with a 2-stride convolution layer, followed by 4 basic blocks, while each block has three 1-stride convolution layers and one 2-stride pooling layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After that, a fully connected layer is used to get the final feature.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Quality generation branch is built on top of the third pooling layer, where the spatial size of middle representation response is 256 \u00d7 16 \u00d7 14.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We pre-train the network supervised by classification signal and then train the whole QAN.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Method",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Quality by QAN VS. quality by human",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Diagnosis experiments",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "Results are shown in Figure 8.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It can be found that the performance of QAN improves at the beginning and reaches the top accuracy at Pool3.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The end-to-end training version of feature generation part with quality generation part performs better than that of fixed.",
+              "tag": "Result"
+            },
+            {
+              "sent": "So we can make the conclusion that 1) the middle level feature is better for QAN to learn and 2) significant improvement can be achieved by jointly training feature generation part and quality generation part.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion and future work",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "In this paper we propose a Quality Aware Network (QAN) for set-to-set recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It automatically learns the concept of quality for each sample in a set without supervised signal and aggregates the most discriminative samples to generate set representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We theoretically and experimentally demonstrate that the quality predicted by network is beneficial to set representation and better than human labelled.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "QAN can be seen as an attention model that pay attention to high quality elements in a image set.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, an image with poor quality may still has some discriminative regions.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Considering this, our future work will explore a fine-grained quality aware network that pay attention to high quality regions instead of high quality images in a image set.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Quality Aware Network for Set to Set Recognition"
+}

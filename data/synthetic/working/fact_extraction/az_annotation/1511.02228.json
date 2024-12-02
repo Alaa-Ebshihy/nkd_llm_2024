@@ -1,0 +1,590 @@
+{
+  "paper_id": "1511.02228",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "In this paper we present seven techniques that everybody should know to improve example-based single image super resolution (SR): 1) augmentation of data, 2) use of large dictionaries with efficient search structures, 3) cascading, 4) image self-similarities, 5) back projection refinement, 6) enhanced prediction by consistency check, and 7) context reasoning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We validate our seven techniques on standard SR benchmarks (ie",
+              "tag": "Method"
+            },
+            {
+              "sent": "Set5, Set14, B100) and methods (ie",
+              "tag": "Result"
+            },
+            {
+              "sent": "A+, SRCNN, ANR, Zeyde, Yang) and achieve substantial improvements.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The techniques are widely applicable and require no changes or only minor adjustments of the SR methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, our Improved A+ (IA) method sets new stateof-the-art results outperforming A+ by up to 0.9dB on average PSNR whilst maintaining a low time complexity.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "In this paper we present seven ways to improve examplebased SR.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We apply them to the major recent methods: the Adjusted Anchored Neighborhood Regression (A+) method introduced recently by Timofte et al [26], the prior Anchored Neighborhood Regression (ANR) method by the same authors [25], the efficient KSVD/OMP method of Zeyde et al [33], the sparse coding method of Yang et al [32], and the convolutional neural network method (SR",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "+0.9dB",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "CNN) of Dong et al [6].",
+              "tag": "Result"
+            },
+            {
+              "sent": "We achieve consistently significant improvements on standard benchmarks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Also, we combine the techniques to derive our Improved A+ (IA) method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 1 shows a comparison of the large relative improvements when starting from the A+, ANR, Zeyde, or Yang methods on Set5 test images for magnification factor \u00d73. Zeyde is improved by 0.7dB in Peak Signal to Noise Ratio (PSNR), Yang and ANR by 0.8dB, and A+ by 0.9dB.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Also, in Figure 8 we draw a summary of improvements for A+ in relation to our proposed Improved A+ (IA) method.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "The remainder of the paper is structured as follows.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, in Section 2 we describe the framework that we use in all our experiments and briefly review the anchored regression baseline -the A+ method [26].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Then in Section 3 we present the seven ways to improve SR and introduce our Improved A+ (IA) method.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In Section 4 we discuss the generality of the proposed techniques and the results, to then draw the conclusions in Section 5.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "General framework",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "We adopt the framework of [25,26] for developing our methods and running the experiments.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As in those papers, we use 91 training images proposed by [32], and work in the YCbCr color space on the luminance component while the chroma components are bicubically interpolated.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For a given magnification factor, these HR images are (bicubically) downscaled to the corresponding LR images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The magnification factor is fixed to \u00d73 when comparing the 7 techniques.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The LR and their corresponding HR images are then used for training example-based super-resolution methods such as A+ [26], ANR [25], or Zeyde [33].",
+              "tag": "Method"
+            },
+            {
+              "sent": "For quantitative (PSNR) and qualitative evaluation 3 datasets Set5, Set14, and B100 are used as in [26].",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the next section we first describe the employed datasets, then the methods we use or compare with, to finally briefly review the A+ [26] baseline method.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "We use the same standard benchmarks and datasets as used in [26] for introducing A+, and in [32,33,25,20,6,22,7] among others.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Train91 is a training set of 91 RGB color bitmap images as proposed by Yang et al [32].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Train91 contains mainly small sized flower images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The average image size is only \u223c 6, 500 pixels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 2 shows one of the training images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Set5 is used for reporting results.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It contains five popular images: one medium size image ('baby', 512 \u00d7 512) and four smaller ones ('bird', 'butterfly','head', 'women').",
+              "tag": "Method"
+            },
+            {
+              "sent": "They were used in [2] and adopted under the name 'Set5' in [25].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Set14 is a larger, more diverse set than Set5.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It contains 14 commonly used bitmap images for reporting image processing results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The images in Set14 are larger on average than those in Set5.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This selection of 14 images was proposed by Zeyde et al [33].",
+              "tag": "Method"
+            },
+            {
+              "sent": "B100 is the testing set of 100 images from the Berkeley Segmentation Dataset [17].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The images cover a large variety of real-life scenes and all have the same size of 481\u00d7321 pixels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use them for testing as in [26].",
+              "tag": "Method"
+            },
+            {
+              "sent": "L20 is our newly proposed dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since all the above mentioned datasets have images of medium-low resolution, below 0.5m pixels, we decided to created a new dataset, L20, with 20 large high resolution images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The images, as seen in Figure 10, are diverse in content, and their sizes vary from 3m pixels to up to 29m pixels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We conduct the selfsimilarity (S) experiments on the L20 dataset as discussed in Section 3.6.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Methods",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "We report results for a number of representative SR methods.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Yang is a method of Yang et al [32] that employs sparse coding and sparse dictionaries for learning a compact representation of the LRHR priors/training samples and for sharp HR reconstruction results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Zeyde is a method of Zeyde et al [33] that improves the Yang method by efficiently learning dictionaries using KSVD [1] and employing Orthogonal Matching Pursuit (OMP) for sparse solutions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "ANR or Anchored Neighborhood Regression of Timofte et al [25] relaxes the sparse decomposition optimization of patches from Yang and Zeyde to a ridge regression which can be solved offline and stored per each dictionary atom/anchor.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This results in large speed benefits.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A+ of Timofte et al [26] learns the regressors from all the training patches in the local neighborhood of the anchoring point/dictionary atom, and not solely from the anchoring points/dictionary atoms as ANR does.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A+ and ANR have the same run-time complexity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "SRCNN is a method introduced by Dong et al [6], and is based on Convolutional Neural Networks (CNN) [16].",
+              "tag": "Method"
+            },
+            {
+              "sent": "It directly learns to map patches from low to high resolution images.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Anchored regression baseline (A+)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Augmentation of training data (A)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Large dictionary and hierarchical search (H)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Back projection (B)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Cascade of anchored regressors (C)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Enhanced prediction (E)",
+      "selected_sentences": [
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "In image classification [4] often the prediction for an input image is enhanced by averaging the predictions on a set of transformed images derived from it.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The most common transformations include cropping, flipping, and rotations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In SR image rotations and flips should lead to the same HR results at pixel level.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, we apply rotations and flips on the LR image as shown in see Figure 2 to get a set of 8 LR images, then apply the SR method on each, reverse the transformation on the HR outputs and average for the final HR result.",
+              "tag": "Method"
+            },
+            {
+              "sent": "PSNR (dB) gain combined internal dictionary external dictionary (reference)",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "On Set5 (see Figure 6 and Table 2) the enhanced prediction (E) gives a 0.05dB improvement for a single stage and more than 0.24dB when 4 stages are employed in the cascade.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The running time is linear in the number of transformations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In Table 3 we report the improvements due to (E) for different SR methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It varies from +0.05dB for ANR up to +0.25dB for the Yang method.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Self-similarities (S)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Improved A+ (IA)",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "Any combination of the proposed techniques would likely improve over the baseline example-based superresolution method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "If we start from the A+ method, and (A) add augmentation (50 million training samples), increase the number of regressors (to 65536) and (H) use the hierarchical search structure, we achieve 0.33dB improvement over A+ (Set5, \u00d73) without an increase in running time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Adding reasoning with context (R) slightly increases the running time for a gain of 0.1dB.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The cascade (C) allows for another jump in performance, +0.27dB, while the enhanced prediction (E) brings another 0.25dB.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The gain brought by (C) and (E) comes at the price of increasing the computation time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The full setup, using (A, H, R, C, E) is marked as our proposed Improved A+ (IA) method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The addition of internal dictionaries (S) is possible but undesirable due to the computational cost.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Adding IBP (B) to the IA method can further improve the performance by 0.05dB.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Generality of the seven ways",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "Our study focused and demonstrated the seven ways to improve SR mainly on the A+ method.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As a result, the IA method has been proposed, combining 5 out of 7 ways, namely (A, H, R, C, E).",
+              "tag": "Result"
+            },
+            {
+              "sent": "The effect of applying the different techniques is additive, each contributing to the final performance.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "These techniques are general in the sense that they can be applied to other example-based single image super-resolution methods as well.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We demonstrated the techniques on five methods.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "In Figure 1 we report on a running time versus PSNR performance scale the results (Set5, \u00d73) of the reference methods A+, ANR, Zeyde, and Yang together with the improved results starting from these methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The A+A method combines A+ with A and H, while the A+C method combines A+ with A, H, and C. A+A and A+C are lighter versions of our IA.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the improved ANR result we combined the A, H, R, B, and E techniques, for the improved Zeyde result we combined A, R, B, and E, while for Yang we combined B and E without retraining the original model.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "Note that using combinations of the seven techniques we are able to improve significantly all the methods considered in our study which validates the wide applicability of these techniques.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Thus, A+ is improved by 0.9dB in PSNR, Yang and ANR by 0.8dB and Zeyde by 0.7dB.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Benchmark results",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "All the experiments until now used Set5 and L20 and magnification factor \u00d73.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Table 5 we report the average PSNR performance on Set5, Set14, and B100, and for magnification factors \u00d72, \u00d73, and \u00d74 of our methods in comparison with the baseline A+ [26], ANR [25], Zeyde [33],",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "Also we report the result of the bicubic interpolation and the one for the Neighbor Embedding with Locally Linear Embedding (NE+LLE) method of Chang et al [3] as adapted and implemented in [25].",
+              "tag": "Method"
+            },
+            {
+              "sent": "All the methods used the same Train91 dataset for training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For reporting improved results also for magnification factors \u00d72 and \u00d74, we keep the same parameters/settings as used for the case of magnification \u00d73 for our A+B, A+A, A+C, and IA methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A+B is provided for reference as the degradation operators usually are not known and difficult to estimate in practice.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A+B just slightly improves over A+.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A+A improves 0.13dB up to 0.34dB over A+ while preserving the running time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A+C further improves at the price of running time, using a cascade with 3 stages.",
+              "tag": "Result"
+            },
+            {
+              "sent": "IA improves 0.4dB up to 0.9dB over the A+ results, and significantly more over SRCNN, Zeyde, and ANR.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Qualitative assessment",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "In Figure 11 we show image results for magnification \u00d74 on Set14 for our IA method in comparison with the bicubic, Zeyde, ANR, and A+ methods.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "We proposed seven ways to effectively improve the performance of example-based super-resolution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Combined, we obtain a new highly efficient method, called Improved",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Input",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "Zeyde [33] A+ [26] IA (ours) A+ (IA), based on the anchored regressors idea of A+.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Noninvasive techniques such as augmentation of the training data, enhanced prediction by consistency checks, context reasoning, or iterative back projection lead to a significant boost in PSNR performance without significant increases in running time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our hierarchical organization of the anchors in the IA method allows us to handle orders of magnitude more regressors than the original A+ at the same running time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another technique, often overlooked, is the cascaded application of the core super-resolution method towards HR restoration.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Using the image self-similarities or the context is shown also to improve PSNR.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On standard benchmarks IA improves 0.4dB up to 0.9dB over state-ofthe-art methods such as A+ [26] and SRCNN [6].",
+              "tag": "Result"
+            },
+            {
+              "sent": "While we demonstrated the large improvements mainly on the A+ framework, and several other methods (ANR, Yang, Zeyde, SRCNN), we strongly believe that the proposed techniques provide similar benefits for other example-based superresolution methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The proposed techniques are generic and require no changes to the core baseline method.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Seven ways to improve example-based single image super resolution"
+}

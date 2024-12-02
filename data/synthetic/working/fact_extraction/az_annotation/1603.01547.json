@@ -1,0 +1,481 @@
+{
+  "paper_id": "1603.01547",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Several large cloze-style context-questionanswer datasets have been introduced recently: the CNN and Daily Mail news data and the Children's Book Test.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thanks to the size of these datasets, the associated text comprehension task is well suited for deep-learning techniques that currently seem to outperform all alternative approaches.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We present a new, simple model that uses attention to directly pick the answer from the context as opposed to computing the answer using a blended representation of words in the document as is usual in similar models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This makes the model particularly suitable for questionanswering problems where the answer is a single word from the document.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Ensemble of our models sets new state of the art on all evaluated datasets.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "An important property of cloze-style questions is that a large amount of such questions can be automatically generated from real world documents.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This opens the task to data-hungry techniques such as deep learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is an advantage compared to smaller machine understanding datasets like MCTest (Richardson et al, 2013) that have only hundreds of training examples and therefore the best performing systems usually rely on handcrafted features (Sachan et al, 2015;Narasimhan and Barzilay, 2015).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Task and datasets",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "In this section we introduce the task that we are seeking to solve and relevant large-scale datasets that have recently been introduced for this task.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Formal Task Description",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "The training data consist of tuples (q, d, a, A), where q is a question, d is a document that con-tains the answer to question q, A is a set of possible answers and a \u2208 A is the ground truth answer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Both q and d are sequences of words from vocabulary V .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also assume that all possible answers are words from the vocabulary, that is A \u2286 V , and that the ground truth answer a appears in the document, that is a \u2208 d.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "News Articles -CNN and Daily Mail",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "The first two datasets 1 (Hermann et al, 2015) were constructed from a large number of news articles from the CNN and Daily Mail websites.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The main body of each article forms a context, while the cloze-style question is formed from one of short highlight sentences, appearing at the top of each article page.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, the question is created by replacing a named entity from the summary sentence (eg",
+              "tag": "Method"
+            },
+            {
+              "sent": "\"Producer X will not press charges against Jeremy Clarkson, his lawyer says.\").",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Children's Book Test",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "The third dataset 2 , the Children's Book Test (CBT) (Hill et al, 2015), is built from books that are freely available thanks to Project Gutenberg 3 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each context document is formed by 20 consecutive sentences taken from a children's book story.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Due to the lack of summary, the cloze-style question is then constructed from the subsequent (21 st ) sentence.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Basic statistics about the CNN, Daily Mail and CBT datasets are summarized in Table 1.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Our Model -Attention Sum Reader",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Our model called the Attention Sum Reader (AS Reader) 4 is tailor-made to leverage the fact that the answer is a word from the context document.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While it achieves stateof-the-art results on all of the mentioned datasets (where this assumption holds true), it cannot produce an answer which is not contained in the document.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Intuitively, our model is structured as follows:",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Formal Description",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "where I(w, d) is a set of positions where w appears in the document d.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We call this mechanism pointer sum attention since we use attention as a pointer over discrete tokens in the context document and then we directly sum the word's attention across all the occurrences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This differs from the usual use of attention in sequence-to-sequence models  where attention is used to blend representations of words into a new embedding vector.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our use of attention was inspired by Pointer Networks (PtrNets) (Vinyals et al, 2015).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model instance details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "Several recent deep neural network architectures (Hermann et al, 2015;Hill et al, 2015;Chen et al, 2016;Kobayashi et al, 2016) were applied to the task of text comprehension.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The last two architectures were developed independently at the same time as our work.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All of these architectures use an attention mechanism that allows them to highlight places in the document that might be relevant to answering the question.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We will now briefly describe these architectures and compare them to our approach.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Attentive and Impatient Readers",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "In contrast to the Attentive Reader, we select the answer from the context directly using the computed attention rather than using such attention for a weighted sum of the individual representations (see Eq. 2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The motivation for such simplification is the following.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Chen et al. 2016",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Memory Networks",
+      "selected_sentences": [
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "MemNNs (Weston et al, 2014) were applied to the task of text comprehension in (Hill et al, 2015).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Dynamic Entity Representation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Pointer Networks",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "Our model architecture was inspired by PtrNets (Vinyals et al, 2015) in using an attention mechanism to select the answer in the context rather than to blend words from the context into an answer representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While a PtrNet consists of an encoder as well as a decoder, which uses the attention to select the output at each step, our model outputs the answer in a single step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, the pointer networks assume that no input in the sequence appears more than once, which is not the case in our settings.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Summary",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "From a high level perspective we simplify all the discussed text comprehension models by removing all transformations past the attention step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead we use the attention directly to compute the answer probability.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "In this section we evaluate our model on the CNN, Daily Mail and CBT datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show that despite the model's simplicity its ensembles achieve state-of-the-art performance on each of these datasets.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training Details",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "where a is the correct answer for query q and document d, and \u03b8 represents parameters of the encoder functions f and g and of the word embedding function e.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The optimized probability distribution P (a|q, d) is defined in Eq. 2.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "For each batch of the CNN and Daily Mail datasets we randomly reshuffled the assignment of named entities to the corresponding word embedding vectors to match the procedure proposed in (Hermann et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This guaranteed that word embeddings of named entities were used only as semantically meaningless labels not encoding any intrinsic features of the represented entities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This forced the model to truly deduce the answer from the single context document associated with the question.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also do not use pre-trained word embeddings to make our training procedure comparable to (Hermann et al, 2015).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Evaluation Method",
+      "selected_sentences": [
+        {
+          "par_id": 58,
+          "sentences": [
+            {
+              "sent": "We evaluated the proposed model both as a single model and using ensemble averaging.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Although the model computes attention for every word in the document we restrict the model to select an answer from a list of candidate answers associated with each question-document pair.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "What concerns ensembles, we used simple averaging of the answer probabilities predicted by ensemble members.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For ensembling we used 14, 16, 84 and 53 models for CNN, Daily Mail and CBT CN and NE respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ensemble models were chosen either as the top 70% of all trained models, we call this avg ensemble.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Alternatively we use the following algorithm: We started with  (Hermann et al, 2015), results of models marked with \u2021 are taken from (Hill et al, 2015) and results marked with are taken from (Kobayashi et al, 2016).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Performance of \u2021 and models was evaluated only on CNN dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 3: Results of our AS Reader on the CBT datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Results marked with \u2021 are taken from (Hill et al, 2015). (",
+              "tag": "Method"
+            },
+            {
+              "sent": "* ) Human results were collected on 10% of the test set.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Named entity",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "Performance of our models on the CNN and Daily Mail datasets is summarized in Table 2, Table 3 shows results on the CBT dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The tables also list performance of other published models that were evaluated on these datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Ensembles of our models set new state-of-the-art results on all evaluated datasets.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 71,
+          "sentences": [
+            {
+              "sent": "In this article we presented a new neural network architecture for natural language text comprehension.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While our model is simpler than previously published models, it gives a new state-of-the-art accuracy on all evaluated datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "An analysis by (Chen et al, 2016) suggests that on CNN and Daily Mail datasets a significant proportion of questions is ambiguous or too difficult to answer even for humans (partly due to entity anonymization) so the ensemble of our models may be very near to the maximal accuracy achievable on these datasets.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Appendix B Dependence of accuracy on the frequency of the correct answer",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Text Understanding with the Attention Sum Reader Network"
+}

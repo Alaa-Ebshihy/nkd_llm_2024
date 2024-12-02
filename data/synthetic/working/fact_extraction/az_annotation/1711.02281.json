@@ -1,0 +1,430 @@
+{
+  "paper_id": "1711.02281",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Existing approaches to neural machine translation condition each output word on previously generated outputs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce a model that avoids this autoregressive property and produces its outputs in parallel, allowing an order of magnitude lower latency during inference.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Through knowledge distillation, the use of input token fertilities as a latent variable, and policy gradient fine-tuning, we achieve this at a cost of as little as 2.0 BLEU points relative to the autoregressive Transformer network used as a teacher.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We demonstrate substantial cumulative improvements associated with each of the three aspects of our training strategy, and validate our approach on IWSLT 2016 EnglishGerman and two WMT language pairs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "By sampling fertilities in parallel at inference time, our non-autoregressive model achieves near-state-of-the-art performance of 29.8 BLEU on WMT 2016 EnglishRomanian.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Neural network based models outperform traditional statistical models for machine translation (MT) (Bahdanau et al, 2015;Luong et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, state-of-the-art neural models are much slower than statistical MT approaches at inference time (Wu et al, 2016).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Both model families use autoregressive decoders that operate one step at a time: they generate each token conditioned on the sequence of tokens previously generated.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This process is not parallelizable, and, in the case of neural MT models, it is particularly slow because a computationally intensive neural network is used to generate each token.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "While several recently proposed models avoid recurrence at train time by leveraging convolutions (Kalchbrenner et al, 2016;Gehring et al, 2017; or self-attention (Vaswani et al, 2017) as more-parallelizable alternatives to recurrent neural networks (RNNs), use of autoregressive decoding makes it impossible to take full advantage of parallelism during inference.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "We introduce a non-autoregressive translation model based on the Transformer network (Vaswani et al, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We modify the encoder of the original Transformer network by adding a module that predicts fertilities, sequences of numbers that form an important component of many traditional machine translation models (Brown et al, 1993).",
+              "tag": "Method"
+            },
+            {
+              "sent": "These fertilities are supervised during training and provide the decoder at inference time with a globally consistent plan on which to condition its simultaneously computed outputs.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "AUTOREGRESSIVE NEURAL MACHINE TRANSLATION",
+      "selected_sentences": [
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Given a source sentence X = {x 1 , ..., x T }, a neural machine translation model factors the distribution over possible output sentences Y = {y 1 , ..., y T } into a chain of conditional probabilities with a left-to-right causal structure:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Maximum Likelihood training Choosing to factorize the machine translation output distribution autoregressively enables straightforward maximum likelihood training with a cross-entropy loss applied at each decoding step:",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "NON-AUTOREGRESSIVE DECODING",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "As the individual steps of the decoder must be run sequentially rather than in parallel, autoregressive decoding prevents architectures like the Transformer from fully realizing their train-time performance advantage during inference.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Meanwhile, beam search suffers from diminishing returns with respect to beam size (Koehn & Knowles, 2017) and exhibits limited search parallelism because it introduces computational dependence between beams.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "THE MULTIMODALITY PROBLEM",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "THE NON-AUTOREGRESSIVE TRANSFORMER (NAT)",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "We introduce a novel NMT model-the NonAutoregressive Transformer (NAT)-that can produce an entire output translation in parallel.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 2, the model is composed of the following four modules: an encoder stack, a decoder stack, a newly added fertility predictor (details in 3.3), and a translation predictor for token decoding.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "ENCODER STACK",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "DECODER STACK",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Positional attention",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "MODELING FERTILITY TO TACKLE THE MULTIMODALITY PROBLEM",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "\u2022 It should be simple to infer a value for the latent variable given a particular input-output pair, as this is needed to train the model end-to-end.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "\u2022 Adding z to the conditioning context should account as much as possible for the correlations across time between different outputs, so that the remaining marginal probabilities at each output location are as close as possible to satisfying conditional independence.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "\u2022 It should not account for the variation in output translations so directly that p(y|x, z) becomes trivial to learn, since that is the function our decoder neural network will approximate.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Benefits of fertility",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "Fertilities possess all three of the properties listed earlier as desired of a latent variable for non-autoregressive machine translation:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "TRANSLATION PREDICTOR AND THE DECODING PROCESS",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "Noisy parallel decoding (NPD) A more accurate approximation of the true optimum of the target distribution, inspired by Cho (2016), is to draw samples from the fertility space and compute the best translation for each fertility sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We can then use the autoregressive teacher to identify the best overall translation:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "TRAINING",
+      "selected_sentences": [
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "We choose a proposal distribution q defined by a separate, fixed fertility model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Possible options include the output of an external aligner, which produces a deterministic sequence of integer fertilities for each (source, target) pair in a training corpus, or fertilities computed from the attention weights used in our fixed autoregressive teacher model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This simplifies the inference process considerably, as the expectation over q is deterministic.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "SEQUENCE-LEVEL KNOWLEDGE DISTILLATION",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "Thus we additionally apply sequence-level knowledge distillation (Kim & Rush, 2016) to construct a new corpus by training an autoregressive machine translation model, known as the teacher, on an existing training corpus, then using that model's greedy outputs as the targets for training the nonautoregressive student.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The resulting targets are less noisy and more deterministic, as the trained model will consistently translate a sentence like \"Thank you.\" into the same German translation every time; on the other hand, they are also lower in quality than the original dataset.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "FINE-TUNING",
+      "selected_sentences": [
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "Thus we propose a fine-tuning step after training the NAT to convergence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We introduce an additional loss term consisting of the reverse KL divergence with the teacher output distribution, a form of word-level knowledge distillation:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "EXPERIMENTAL SETTINGS",
+      "selected_sentences": [
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "Dataset We evaluate the proposed NAT on three widely used public machine translation corpora: IWSLT16 EnDe 2 , WMT14 EnDe, 3 and WMT16 EnRo 4 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use IWSLT-which is smaller than the other two datasets-as the development dataset for ablation experiments, and additionally train and test our primary models on both directions of both WMT datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All the data are tokenized and segmented into subword symbols using byte-pair encoding (BPE) (Sennrich et al, 2015) to restrict the size of the vocabulary.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For both WMT datasets, we use shared BPE vocabulary and additionally share encoder and decoder word embeddings; for IWSLT, we use separate English and German vocabulary and embeddings.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 61,
+          "sentences": [
+            {
+              "sent": "Teacher Sequence-level knowledge distillation is applied to alleviate multimodality in the training dataset, using autoregressive models as the teachers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The same teacher model used for distillation is also used as a scoring function for fine-tuning and noisy parallel decoding.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "To enable a fair comparison, and benefit from its high translation quality, we implemented the autoregressive teachers using the state-of-the-art Transformer architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, we use the same sizes and hyperparameters for each student and its respective teacher, with the exception of the newly added positional self-attention and fertility prediction modules.",
+              "tag": "Method"
+            },
+            {
+              "sent": "BLEU scores on IWSLT development set as a function of sample size for noisy parallel decoding.",
+              "tag": "Result"
+            },
+            {
+              "sent": "NPD matches the performance of the other two decoding strategies after two samples, and exceeds the performance of the autoregressive teacher with around 1000.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Preparation for knowledge distillation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Fertility supervision during training",
+      "selected_sentences": [
+        {
+          "par_id": 66,
+          "sentences": [
+            {
+              "sent": "Hyperparameters For experiments on WMT datasets, we use the hyperparameter settings of the base Transformer model described in Vaswani et al (2017), though without label smoothing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As IWSLT is a smaller corpus, and to reduce training time, we use a set of smaller hyperparameters (d model = 287, d hidden = 507, n layer = 5, n head = 2, and t warmup = 746) for all experiments on that dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For fine-tuning we use \u03bb = 0.25.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RESULTS",
+      "selected_sentences": [
+        {
+          "par_id": 69,
+          "sentences": [
+            {
+              "sent": "Across the three datasets we used, the NAT performs between 2-5 BLEU points worse than its autoregressive teacher, with part or all of this gap addressed by the use of noisy parallel decoding.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In the case of WMT16 EnglishRomanian, NPD improves the performance of our non-autoregressive model to within 0.2 BLEU points of the previous overall state of the art (Gehring et al, 2017).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "ABLATION STUDY",
+      "selected_sentences": [
+        {
+          "par_id": 71,
+          "sentences": [
+            {
+              "sent": "We also conduct an extensive ablation study with the proposed NAT on the IWSLT dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, we note that the model fails to train when provided with only positional embeddings as input to the decoder.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Second, we see that training on the distillation corpus rather than the ground truth provides a fairly consistent improvement of around 5 BLEU points.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Third, switching from uniform copying of source inputs to fertility-based copying improves performance by four BLEU points when using ground-truth training or two when using distillation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Fine-tuning does not converge with reinforcement learning alone, or with the L BP term alone, but use of all three fine-tuning terms together leads to an improvement of around 1.5 BLEU points.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Training the student model from a distillation corpus produced using beam search is similar to training from the greedily-distilled corpus.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 72,
+          "sentences": [
+            {
+              "sent": "Source: politicians try to pick words and use words to shape reality and control reality , but in fact , reality changes words far more than words can ever change reality . well as a pair in the second, are not present in the versions with noisy parallel decoding, suggesting that NPD scoring using the teacher model can filter out such mistakes.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The translations produced by the NAT with NPD, while of a similar quality to those produced by the autoregressive model, are also noticeably more literal.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also show an example of the noisy parallel decoding process in Figure 5, demonstrating the diversity of translations that can be found by sampling from the fertility space.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "NON-AUTOREGRESSIVE NEURAL MACHINE TRANSLATION"
+}

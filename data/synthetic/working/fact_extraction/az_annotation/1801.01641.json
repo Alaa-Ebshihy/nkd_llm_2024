@@ -1,0 +1,611 @@
+{
+  "paper_id": "1801.01641",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "As an alternative to question answering methods based on feature engineering, deep learning approaches such as convolutional neural networks (CNNs) and Long ShortTerm Memory Models (LSTMs) have recently been proposed for semantic matching of questions and answers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To achieve good results, however, these models have been combined with additional features such as word overlap or BM25 scores.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Without this combination, these models perform significantly worse than methods based on linguistic feature engineering.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose an attention based neural matching model for ranking short answer text.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We adopt value-shared weighting scheme instead of position-shared weighting scheme for combining different matching signals and incorporate question term importance learning using question attention network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Using the popular benchmark TREC QA data, we show that the relatively simple aNMM model can significantly outperform other neural network models that have been used for the question answering task, and is competitive with models that are combined with additional features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When aNMM is combined with additional features, it outperforms all baselines.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Recently, researchers have been studying deep learning approaches to automatically learn semantic match between questions and answers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such methods are built on the top of neural network models such as convolutional neural networks (CNNs) [34,18,16] and Long ShortTerm Memory Models (LSTMs) [25].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The proposed models have the benefit of not requiring hand-crafted linguistic features and external resources.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Some of them [18] achieve state-ofthe art performance for the answer sentence selection task benchmarked by the TREC QA track.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the weakness of the existing studies is that the proposed deep models, either based on CNNs or LSTMs, need to be combined with additional features such as word overlap features and BM25 to perform well.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Without combining these additional features, their performance is significantly worse than the results obtained by the state-of-the-art methods based on linguistic feature engineering [32].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This led us to propose the following research questions:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "RQ1 Without combining additional features, could we build deep learning models that can achieve comparable or even better performance than methods using feature engineering ?",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "RQ2 By combining additional features, could our model outperform state-of-the-art models for question answering ?",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Lack of modeling question focus:",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "To handle these issues in the existing deep learning architectures for ranking answers, we propose an attention based neural matching model (aNMM).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The novel properties of the proposed model and our contributions can be summarized as follows:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "1. Deep neural network with value-shared weights: We introduce a novel value-shared weighting scheme in deep neural networks as a counterpart of the position-shared weighting scheme in CNNs, based on the idea that semantic matching between a question and answer is mainly about the (semantic similarity) value regularities rather than spatial regularities.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "2. Incorporate attention scheme over question terms: We incorporate the attention scheme over the question terms using a gating function, so that we can explicitly discriminate the question term importance.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Extensive experimental evaluation and promising results.",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "We perform a thorough experimental study based on the TREC QA dataset from TREC QA tracks 8-13, which appears to be one of the most widely used benchmarks for answer reranking.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Unlike previous methods using CNNs [34,18] and LSTMs [25], which showed inferior results without combining additional features, our model can achieve better performance than a state-of-art method using linguistic feature engineering and comparable performance with previous deep learning models with combined additional features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "If we combine our model with a simple additional feature like QL, our method can achieve the state-of-the-art performance among current existing methods for ranking answers under multiple metrics.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Our work is related to several research areas, including deep learning models for text matching, factoid question answering, answer ranking in CQA and answer passage / sentence retrieval.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "There have been many previous studies on factoid question answering, most of which use the benchmark data from TREC QA track [32,25,31,34,18]. al. [32] formulated answer sentence selection as a semantic matching problem with a latent word-alignment structure and conducted a series of experimental studies on leveraging proposed lexical semantic models. al. [8] introduced a recursive neural network (RNN) model that can reason over text that contains very few individual words by modeling textual compositionality.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Yu et al [34] proposed an approach for answer sentence selection via distributed representations, and learned to match questions with answers by considering their semantic encoding.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They combined the learning results of their model with word overlap features by training a logistic regression classifier.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Wang and Nyberg [25] proposed a method which uses a stacked bidirectional LongShort Term Memory (BLSTM) network to sequentially read words from question and answer sentences, and then output their relevance scores.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Their system needs to combine the stacked BLSTM relevance model with a BM25 score to achieve good performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Severyn and Moschitti [18] presented a convolutional neural network architecture for re-ranking pairs of short texts, where they learned the optimal representation of text pairs and a similarity function to relate them in a supervised way from the available training data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They also need to combine additional features into their model to outperform previous methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Unlike the previous research, our method can outperform previous methods using feature engineering without combining any additional features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "With an additional simple feature like QL, our model is significantly better than the previous state-of-the-art methods including deep learning methods.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Word Embedding",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "ATTENTION-BASED NEURAL MATCH-ING MODEL",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "In this section we present the proposed model referred as aNMM (attention-based Neural Matching Model), which is shown in Figure 1.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Before we introduce our model, we firstly define some terminologies.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Terminology",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "Short Answer Text: We use Short Answer Text to refer to a short fact, answer sentences or answer passages that can address users' information needs in the issued questions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is the ranking object in this paper and includes answers in various lengths.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the experiments of this paper, we mainly focus on ranking answer sentences that contain correct answer facts as in TREC QA data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "QA Matching Matrix: We use QA Matching Matrix to refer to a matrix which represents the semantic matching information of term pairs from a question and answer pair.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given a question q with length M and an answer a with length N , a QA matching matrix is an M by N matrix P, where Pj,i denote the semantic similarity between term qj and term ai measured by the cosine similarity of the corresponding word embeddings of terms.",
+              "tag": "Method"
+            },
+            {
+              "sent": "If qj and ai are the same term, we assign Pj,i as 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "QA Matching Vector: We use QA Matching Vector to refer to a row in the QA matching matrix.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As presented before, the j-th row of the QA matching matrix P contains the semantic similarity between qj and all terms in answer a .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model Overview",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "2. We then employ a deep neural network with value-shared weighting scheme in the first layer, and fully connected layers in the rest to learn hierarchical abstraction of the semantic matching between question and answer terms.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Value-shared Weighting",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Value-shared Weights: For this method, the assumption is that matching signals in different ranges play different roles in deciding the final ranking score.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus we introduce the value-shared weighting scheme to learn the importance of different levels of matching signals.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The comparison between the position-shared weight and value-shared weight is shown in Figure 2. We can see that for position-shared weights, the weight associated with a node only depends on its position or relative location as specified by the filters in CNN.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However in our model, the weight associated with a node depends on its value.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The value of a node denotes the strength of the matching signal between term pairs of questions and answers from the QA matching matrix, as explained in Section 3.1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Such a setting enables us to use the learned weights to encode how to combine different levels of matching signals.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After this step, the size of the hidden representation becomes fixed and we can use normal fully connected layers to learn higher level representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the term bin to denote a specific range of matching signals. since Pj,i \u2208 [\u22121, 1], if we set the size of bins as 0.1, then we have 21 bins where there is a separate bin for Pj,i = 1 to denote exact match of terms.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Question Attention Network",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model Training",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Extension to Deep Neural Networks with Multiple Sets of Value-shared Weights",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Forward Propagation Prediction",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "For aNMM-2, we add a hidden layer in the neural network where we learn multiple combined scores from the input layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With this hidden layer, we define multiple weight vectors as w.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus w becomes a two dimensional matrix.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The formula for the forward propagation prediction is as follows:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Back Propagation for Model Training",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Data Set and Experiment Settings",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Evaluation and Metrics",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "|Q|",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model Learning Results",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Value-shared Weight",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Question Term Importance",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Learning without Combining Additional Features",
+      "selected_sentences": [
+        {
+          "par_id": 65,
+          "sentences": [
+            {
+              "sent": "Our first experimental setting is ranking answer sentences directly by the predicted score from aNMM without combining any additional features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This will enable us to answer RQ1 proposed in Section 1. Table 4 shows the results of TREC QA on TRAIN and TRAINALL without combining additional features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this table, we compare the results of aNMM with other previous deep learning methods including CNN [34,18] and LSTM [25].",
+              "tag": "Result"
+            },
+            {
+              "sent": "We summarize our observations as follows: (1) Both aNMM-1 and aNMM-2 show significant improvements for MAP and MRR on TRAIN and TRAINALL data sets comparing with previous deep learning methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, if we compare the results of aNMM-1 with the strongest deep learning baseline method by Severyn et al [18] based on CNN, we can see aNMM-1 outperform CNN for 14.67% in MAP on TRAIN, 9.15% in MAP on TRAINALL.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For MRR, we can also observe similar significant improvements of aNMM-1.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results show that with the value-shared weight scheme instead of the position-shared weight scheme in CNN and term importance learning with question attention network, aNMM can predict ranking scores with much higher accuracy comparing with previous deep learning models for ranking answers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "(2) If we compare the results of aNMM-1 and aNMM-2, we can see their results are very close. aNMM-1 has slightly better performance than aNMM-2.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This result indicates that adding one more hidden layer to incorporate multiple bin nodes does not necessarily increase the performance for answer ranking in TREC QA data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, for larger training data sets than TREC QA data, aNMM-2 could have better performance since it has more model parameters and is suitable for fitting larger training data set.",
+              "tag": "Other"
+            },
+            {
+              "sent": "We leave the study of impact of the number of hidden layers in aNMM to future work.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 5 shows the comparison between aNMM with previous methods using feature engineering on TRAINALL without combining additional features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We find that both aNMM-1 and aNMM-2 achieve better performance comparing with other methods using feature engineering.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Specifically, comparing the results of aNMM-1 with the strongest baseline by Yih et al [32] based on enhanced lexical semantic models, aNMM-1 achieves 4.13% gain for MAP and 3.83% gain for MRR.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results show that it is possible to build a uniform deep learning model such that it can achieve better performance than methods using feature engineering.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "To the best of our knowledge, aNMM is the first deep learning model that can achieve good performance comparing with previous methods either based on deep learning models or feature engineering for ranking answers without any additional features, syntactic parsers and external resources except for pre-trained word embeddings.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Learning with Combining Additional Features",
+      "selected_sentences": [
+        {
+          "par_id": 66,
+          "sentences": [
+            {
+              "sent": "Our second experimental setting is to address RQ2 proposed in Section 1, where we ask whether our model can outperform the state-of-the-art performance achieved by CNN [34,18] and LSTM [25] for answer ranking when combining additional features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We combine the predicted score from aNMM-1 and aNMM-2 with the Query Likelihood (QL) [1] score using LambdaMART [28] following a similar approach to [25].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the implementation of LambdaMART in jforests 3 We compare the results with previous deep learning models with additional features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 6 shows the results on TRAIN and TRAINALL when combining additional features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can see that with combined features, both aNMM-1 and aNMM-2 have better performance. aNMM-1 also outperforms  [18] which is the current state-of-the-art method for ranking answers in terms of both MAP and MRR on TRAIN and TRAINALL.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also tried to combine aNMM score with other additional features such as word overlap features, IDF weighted word overlap features and BM25 as in previous research [34,18,25].",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results were either similar or worse than combining aNMM score with QL.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For aNMM, the gains after combining additional features are not as large as neural network models like CNN in [18] and LSTM in [25].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We think the reasons for this are two-fold: (1) The QA matching matrix in aNMM model can capture exact match information by assigning 1 to matrix elements if the corresponding answer term and question term are the same.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This exact match information includes match between numbers and proper nouns, which are highlighted in previous research work [18] as especially important for factoid questions answering, where most of the questions are of type what, when , who that are looking for answers containing numbers or proper nouns.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Within aNMM architecture, this problem has already been handled with QA matching matrix.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus incorporating word overlap features will not help much for improving the performance of aNMM.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "(2) In addition to exact match information, aNMM could also learn question term importance like IDF information through question attention network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead of empirically designing heuristic functions like IDF, aNMM can get learning based question term importance score.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As analyzed in Section 4.3.2, with the optimization process in the back propagation training process, aNMM can learn similar or even better term weighting score than IDF.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Thus combining aNMM score with features like IDF weighted word overlap features and BM25 may not increase the performance of aNMM by a large margin as the case in related research works [34,18,25].",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results Summary",
+      "selected_sentences": [
+        {
+          "par_id": 67,
+          "sentences": [
+            {
+              "sent": "Finally we summarize the results of previously published systems on the QA answer ranking task in Table 7.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can see aNMM  trained with TRAINALL set beats all the previous state-of-the art systems including both methods using feature engineering and deep learning models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results are very promising since aNMM requires no manual feature engineering, no expensive processing by various NLP parsers and no external results like large scale knowledge base except for pre-trained word embeddings.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, even without combining additional features, aNMM still performs well for answer ranking, showing significant improvements over previous deep learning model with no additional features and linguistic feature engineering methods.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Parameter Sensitivity Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CONCLUSIONS AND FUTURE WORK",
+      "selected_sentences": [
+        {
+          "par_id": 69,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose an attention based neural matching model for ranking short answer text.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adopt value-shared weighting scheme instead of position-shared weighting scheme for combing different matching signals and incorporate question term importance learning using a question attention network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We perform a thorough experimental study with the TREC QA dataset from TREC QA tracks 8-13 and show promising results.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Unlike previous methods including CNN as in [34,18] and LSTM as in [25], which only show inferior results without combining additional features, our model can achieve better performance than the state-of-art method using linguistic feature engineering without additional features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "With a simple additional feature, our method can achieve the new state-of-the-art performance among current existing methods.",
+              "tag": "Other"
+            },
+            {
+              "sent": "For further work, we will study other deep learning architectures for answer ranking and extend our work to include nonfactoid question answering data sets.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "aNMM: Ranking Short Answer Texts with Attention-Based Neural Matching Model"
+}

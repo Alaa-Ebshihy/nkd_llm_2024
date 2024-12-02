@@ -1,0 +1,330 @@
+{
+  "paper_id": "1509.06664",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "While most approaches to automatically recognizing entailment relations have used classifiers employing hand engineered features derived from complex natural language processing pipelines, in practice their performance has been only slightly better than bag-of-word pair classifiers using only lexical similarity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The only attempt so far to build an end-to-end differentiable neural network for entailment failed to outperform such a simple similarity classifier.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose a neural model that reads two sentences to determine entailment using long short-term memory units.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We extend this model with a word-by-word neural attention mechanism that encourages reasoning over entailments of pairs of words and phrases.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, we present a qualitative analysis of attention weights produced by this model, demonstrating such reasoning capabilities.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On a large entailment dataset this model outperforms the previous best neural model and a classifier with engineered features by a substantial margin.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is the first generic end-to-end differentiable system that achieves state-of-the-art accuracy on a textual entailment dataset.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "The ability to determine the semantic relationship between two sentences is an integral part of machines that understand and reason with natural language.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recognizing textual entailment (RTE) is the task of determining whether two natural language sentences are (i) contradicting each other, (ii) not related, or whether (iii) the first sentence (called premise) entails the second sentence (called hypothesis).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This task is important since many natural language processing (NLP) problems, such as information extraction, relation extraction, text summarization or machine translation, rely on it explicitly or implicitly and could benefit from more accurate RTE systems (Dagan et al, 2006).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "State-of-the-art systems for RTE so far relied heavily on engineered NLP pipelines, extensive manual creation of features, as well as various external resources and specialized subcomponents such as negation detection (eg",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Lai and Hockenmaier, 2014;Jimenez et al, 2014;Zhao et al, 2014;Beltagy et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Despite the success of neural networks for paraphrase detection (eg",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Socher et al, 2011;Hu et al, 2014;Yin and Sch\u00fctze, 2015), end-to-end differentiable neural architectures failed to get close to acceptable performance for RTE due to the lack of large high-quality datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "An end-to-end differentiable solution to RTE is desirable, since it avoids specific assumptions about the underlying language.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, there is no need for language features like part-of-speech tags or dependency parses.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, a generic sequence-to-sequence solution allows to extend the concept of capturing entailment across any sequential data, not only natural language.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Recently, Bowman et al (2015) published the Stanford Natural Language Inference (SNLI) corpus accompanied by a neural network with long short-term memory units (LSTM, Hochreiter and Schmidhuber, 1997), which achieves an accuracy of 77.6% for RTE on this dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is the first time a generic neural model without hand-crafted features got close to the accuracy of a simple lexicalized classifier with engineered features for RTE.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This can be explained by the high quality and size of SNLI compared to the two orders of magnitude smaller and partly synthetic datasets so far used to evaluate RTE systems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Bowman et al's LSTM encodes the premise and hypothesis as dense fixed-length vectors whose concatenation is subsequently used in a multi-layer perceptron (MLP) for classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast, we are proposing an attentive neural network that is capable of reasoning over entailments of pairs of words and phrases by processing the hypothesis conditioned on the premise.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Our contributions are threefold: (i) We present a neural model based on LSTMs that reads two sentences in one go to determine entailment, as opposed to mapping each sentence independently into a semantic space ( \u00a72.2), (ii) We extend this model with a neural word-by-word attention mechanism to encourage reasoning over entailments of pairs of words and phrases ( \u00a72.4), and (iii) We provide a detailed qualitative analysis of neural attention for RTE ( \u00a74.1).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our benchmark LSTM achieves an accuracy of 80.9% on SNLI, outperforming a simple lexicalized classifier tailored to RTE by 2.7 percentage points.",
+              "tag": "Result"
+            },
+            {
+              "sent": "An extension with word-by-word neural attention surpasses this strong benchmark LSTM result by 2.6 percentage points, setting a new state-of-the-art accuracy of 83.5% for recognizing entailment on SNLI.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "METHODS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "LSTMS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "RECOGNIZING TEXTUAL ENTAILMENT WITH LSTMS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CONDITIONAL ENCODING",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "In contrast to learning sentence representations, we are interested in neural models that read both sentences to determine entailment, thereby reasoning over entailments of pairs of words and phrases.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "ATTENTION",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "that the first LSTM produced when reading the L words of the premise, where k is a hyperparameter denoting the size of embeddings and hidden layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, let e L \u2208 R L be a vector of 1s and h N be the last output vector after the premise and hypothesis were processed by the two LSTMs respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The attention mechanism will produce a vector \u03b1 of attention weights and a weighted representation r of the premise via",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "WORD-BY-WORD ATTENTION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "TWO-WAY ATTENTION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "EXPERIMENTS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "RESULTS AND DISCUSSION",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "Our LSTM outperforms a simple lexicalized classifier by 2.7 percentage points.",
+              "tag": "Result"
+            },
+            {
+              "sent": "To the best of our knowledge, this is the first instance of a neural end-to-end differentiable model to achieve state-ofthe-art performance on a textual entailment dataset.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "Word-by-word Attention Enabling the model to attend over output vectors of the premise for every word in the hypothesis yields another 1.2 percentage point improvement compared to attending based only on the last output vector of the premise.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We argue that this is due to the model being able to check for entailment or contradiction of individual words and phrases in the hypothesis, and demonstrate this effect in the qualitative analysis below.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "QUALITATIVE ANALYSIS",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "It is instructive to analyze which output representations the model is attending over when deciding the class of an RTE example.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that interpretations based on attention weights have to be taken with care since the model is not forced to solely rely on representations obtained from attention (see h N in Eq. 10 and 14).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the following we visualize and discuss the attention patterns of the presented attentive models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For each attentive model we hand-picked examples from ten randomly drawn samples of the validation set.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "Word-by-word Attention Visualizations of word-by-word attention are depicted in Figure 3.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We found that word-by-word attention can easily detect if the hypothesis is simply a reordering of words in the premise (3a).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, it is able to resolve synonyms (\"airplane\" and \"aircraft\", 3c) and capable of matching multi-word expressions to single words (\"garbage can\" to \"trashcan\", 3b).",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is also noteworthy that irrelevant parts of the premise, such as words capturing little meaning or whole uninformative relative clauses, are correctly neglected for determining entailment (\"which also has a rope leading out of it\", 3b).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CONCLUSION",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "In this paper, we show how the state-of-the-art in recognizing textual entailment on a large, humancurated and annotated corpus, can be improved with general end-to-end differentiable models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our results demonstrate that LSTM recurrent neural networks that read pairs of sequences to produce a final representation from which a simple classifier predicts entailment, outperform both a neural baseline as well as a classifier with hand-engineered features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Extending these models with attention over the premise provides further improvements to the predictive abilities of the system, resulting in a new state-of-the-art accuracy for recognizing entailment on the Stanford Natural Language Inference corpus.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "The models presented here are general sequence models, requiring no appeal to Natural Languagespecific processing beyond tokenization, and are therefore a suitable target for transfer learning through pre-training the recurrent systems on other corpora, and conversely, applying the models trained on this corpus to other entailment tasks.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Future work will focus on such transfer learning tasks, as well as scaling the methods presented here to larger units of text (eg paragraphs and entire documents) using hierarchical attention mechanisms.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Additionally, it would be worthwhile exploring how other, more structured forms of attention (eg",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Sukhbaatar et al, 2015), or other forms of differentiable memory (eg",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Grefenstette et al, 2015;Joulin and Mikolov, 2015) could help improve performance on RTE over the neural models presented in this paper.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, we aim to investigate the application of these generic models to non-natural language sequential entailment problems.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": ""
+}

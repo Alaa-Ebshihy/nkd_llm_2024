@@ -1,0 +1,741 @@
+{
+  "paper_id": "1804.03786",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "As a classic statistical model of 3D facial shape and texture, 3D Morphable Model (3DMM) is widely used in facial analysis, eg, model fitting, image synthesis.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Conventional 3DMM is learned from a set of well-controlled 2D face images with associated 3D face scans, and represented by two sets of PCA basis functions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Due to the type and amount of training data, as well as the linear bases, the representation power of 3DMM can be limited.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To address these problems, this paper proposes an innovative framework to learn a nonlinear 3DMM model from a large set of unconstrained face images, without collecting 3D face scans.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, given a face image as input, a network encoder estimates the projection, shape and texture parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Two decoders serve as the nonlinear 3DMM to map from the shape and texture parameters to the 3D shape and texture, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With the projection parameter, 3D shape, and texture, a novel analytically-differentiable rendering layer is designed to reconstruct the original input face.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The entire network is end-to-end trainable with only weak supervision.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We demonstrate the superior representation power of our nonlinear 3DMM over its linear counterpart, and its contribution to face alignment and 3D reconstruction. 1",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "3D Morphable Model (3DMM) is a statistical model of 3D facial shape and texture in a space where there are explicit correspondences [4].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The morphable model framework provides two key benefits: first, a point-to-point correspondence between the reconstruction and all other models, enabling morphing, and second, modeling underlying transformations between types of faces (male to female, neutral to smile, etc).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "3DMM has been widely applied in numerous areas, such as computer vision [4,44], graphics [1], human behavioral analysis [2] and craniofacial surgery [34].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "3DMM is learnt through supervision by performing dimension reduction, normally Principal Component Anal- 1 Project page: http://cvlab.cse.msu.edu/project-nonlinear-3dmm.html ysis (PCA), on a training set of face images/scans.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To model highly variable 3D face shapes, a large amount of high-quality 3D face scans is required.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, this requirement is expensive to fulfill.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The first 3DMM [4] was built from scans of 200 subjects with a similar ethnicity/age group.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They were also captured in well-controlled conditions, with only neutral expressions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, it is fragile to large variances in the face identity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The widely used Basel Face Model (BFM) [26] is also built with only 200 subjects in neutral expressions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Lack of expression can be compensated using expression bases from FaceWarehouse [9] or BD-3FE [43].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "After more than a decade, almost all models use less than 300 training scans.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such a small training set is far from adequate to describe the full variability of human faces [8].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Only recently, Booth et al [8] spent a significant effort to build 3DMM from scans of \u223c10, 000 subjects.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Second, the texture model of 3DMM is normally built with a small number of 2D face images co-captured with 3D scans, under well-controlled conditions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, such a model is only learnt to represent the facial texture in similar conditions, rather than in-the-wild environments.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This substantially limits the application scenarios of 3DMM.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Finally, the representation power of 3DMM is limited by not only the size of training set but also its formulation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The facial variations are nonlinear in nature.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Eg, the variations in different facial expressions or poses are nonlinear, which violates the linear assumption of PCA-based models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, a PCA model is unable to interpret facial variations well.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given the barrier of 3DMM in its data, supervision and linear bases, this paper aims to revolutionize the paradigm of learning 3DMM by answering a fundamental question:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Whether and how can we learn a nonlinear 3D Morphable Model of face shape and texture from a set of unconstrained 2D face images, without collecting 3D face scans?",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "As shown in Figure 1, starting with an observation that the linear 3DMM formulation is equivalent to a single layer network, using a deep network architecture naturally increases the model capacity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, we utilize two network decoders, instead of two PCA spaces, as the shape and texture model components, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With careful consideration of each component, we design different networks for shape and texture: the multi-layer perceptron (MLP) for shape and convolutional neural network (CNN) for texture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each decoder will take a shape or texture representation as input and output the dense 3D face or a face texture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These two decoders are essentially the nonlinear 3DMM.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Further, we learn the fitting algorithm to our nonlinear 3DMM, which is formulated as a CNN encoder.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The encoder takes a 2D face image as input and generates the shape and texture parameters, from which two decoders estimate the 3D face and texture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The 3D face and texture would perfectly reconstruct the input face, if the fitting algorithm and 3DMM are well learnt.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, we design a differentiable rendering layer to generate a reconstructed face by fusing the 3D face, texture, and the camera projection parameters estimated by the encoder.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, the endto-end learning scheme is constructed where the encoder and two decoders are learnt jointly to minimize the difference between the reconstructed face and the input face.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Jointly learning the 3DMM and the model fitting encoder allows us to leverage the large collection of unconstrained 2D images without relying on 3D scans.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show significantly improved shape and texture representation power over the linear 3DMM.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Consequently, this also benefits other tasks such as 2D face alignment and 3D reconstruction.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "1) We learn a nonlinear 3DMM model that has greater representation power than its traditional linear counterpart.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "2) We jointly learn the model and the model fitting algorithm via weak supervision, by leveraging a large collection of 2D images without 3D scans.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The novel rendering layer enables the end-to-end training.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Prior Work",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Since the original work by Blanz and Vetter [4], there has been a large amount of effort trying to improve 3DMM modeling mechanism.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Paysan et al [26] use a Nonrigid Iterative Closest Point [3] to directly align 3D scans as an alternative to the UV space alignment method in [4].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Vlasic et al [40] use a multilinear model to model the combined effect of identity and expression variation on the facial shape.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Later, Bolkart and Wuhrer [6] show how such a multilinear model can be estimated directly from the 3D scans using a joint optimization over the model parameters and groupwise registration of 3D scans.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With PCA bases, the statistical distribution underlying 3DMM is Gaussian.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Koppen et al [20] argue that single-mode Gaussian can't represent real-world distribution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They introduce the Gaussian Mixture 3DMM that models the global population as a mixture of Gaussian subpopulations, each with its own mean, but shared covariance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Booth el al. [7] aim to improve texture of 3DMM to go beyond controlled settings by learning inthe-wild feature-based texture model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, both works are still based on statistical PCA bases.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Duong et al [25] address the problem of linearity in face modeling by using Deep Boltzmann Machines.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, they only work with 2D face and sparse landmarks; and hence cannot handle faces with large-pose variations or occlusion well.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "2D Face Alignment can be cast as a regression problem where 2D landmark locations are regressed directly [12].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For large-pose or occluded faces, strong priors of 3DMM face shape have been shown to be beneficial.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hence, there is increasing attention in conducting face alignment by fitting a 3D face model to a single 2D image [16-19, 21, 24, 46].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among the prior works, iterative approaches with cascades of regressors tend to be preferred.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "At each cascade, it can be a single [16,39] or even two regressors [41].",
+              "tag": "Method"
+            },
+            {
+              "sent": "In contrast to aforementioned works that use a fixed 3DMM model, our model and model fitting are learned jointly.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This results in a more powerful model: a single-pass encoder, which is learnt jointly with the model, achieves state-of-the-art face alignment performance on AFLW2000 [46] benchmark dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "3DMM also demonstrates its strength in face reconstruction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since with a single image, present information about the surface is limited; 3D face re- construction must rely on prior knowledge like 3DMM [31].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Besides 3DMM fitting methods [5,15,35,45], recently, Richardson et al [30] design a refinement network that adds facial details on top of the 3DMM-based geometry.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, this approach can only learn 2.5D depth map, which loses the correspondence property of 3DMM.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The recent work of Tewari et al reconstruct a 3D face by an elegant encoder-decoder network [35].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While their ability to decompose lighting with reflectance is satisfactory, our work has a different objective of learning a nonlinear 3DMM.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conventional Linear 3DMM",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "The 3D Morphable Model (3DMM) [4] and its 2D counterpart, Active Appearance Model [11,22], provide parametric models for synthesizing faces, where faces are modeled using two components: shape and texture.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In [4], Blanz et al propose to describe the 3D face space with PCA:",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Nonlinear 3DMM",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "As mentioned in Sec. 1, the linear 3DMM has the problems such as requiring 3D face scans for supervised learning, unable to leverage massive unconstrained face images for learning, and the limited representation power due to the linear bases.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We propose to learn a nonlinear 3DMM model using only large-scale in-the-wild 2D face images.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Problem Formulation",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "In linear 3DMM, the factorization of each components (texture, shape) can be seen as a matrix multiplication between coefficients and bases.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "From a neural network's perspective, this can be viewed as a shallow network with only one fully connected layer and no activation function.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Naturally, to increase the model's representative power, the shallow network can be extended to a deep architecture.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we design a novel learning scheme to learn a deep 3DMM and its inference (or fitting) algorithm.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "Specifically, as shown in Figure 2, we use two deep networks to decode the shape, texture parameters into the 3D facial shape and texture respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To make the framework end-to-end trainable, these parameters are estimated by an encoder network, which is essentially the fitting algorithm of our 3DMM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Three deep networks join forces for the ultimate goal of reconstructing the input face image, with the assistance of a geometry-based rendering layer.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "Formally, given a set of 2D face images {I i } N i=1 , we aim to learn an encoder E: I\u2192m, f S , f T that estimates the projection parameter m, and shape and texture parameters f S \u2208 R l S , f T \u2208 R l T , a 3D shape decoder D S : f S \u2192S that decodes the shape parameter to a 3D shape S, and a texture decoder D T : f T \u2192T that decodes the texture parameter to a realistic texture T \u2208 R U \u00d7V , with the objective that the rendered image with m, S, and T can approximate the original image well.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Shape & Texture Representation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "In-Network Face Rendering",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "To reconstruct a face image from the texture T, shape S, and projection parameter m, we define a rendering layer R(m, S, T).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is accomplished in three steps.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Firstly, the texture value of each vertex in S is determined by its predefined location in the 2D texture T. Usually, it involves sub-pixel sampling via a bilinear sampling kernel:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Network Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "We design our E, D T network architecture as in Tab. 1. Also, D S includes two fully connected layers with 1, 000-dim intermediate representation with eLU activation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The entire network is end-to-end trained to reconstruct the input images, with the loss function:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "With face profiling technique, Zhu et al [46] expands the 300W dataset [32] into 122, 450 images with the fitted 3DMM shape S and projection parameters m.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given S and m, we create the pseudo groundtruth texture T by referring every pixel in the UV space back to the input image, ie, backward of our rendering layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With m, S, T, we define our pre-training loss by:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "where U \u2208 R 2\u00d768 is the manually labeled 2D landmark locations, d is a constant 68-dim vector storing the indexes of 68 3D vertices corresponding to the labeled 2D landmarks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Unlike the three losses above, these landmark annotations are \"golden\" groundtruth, and hence L L can be used during the entire training process.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Different from traditional face alignment work where the shape bases are fixed, our work jointly learns the bases functions (ie, the shape decoder D S ) as well.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Minimizing the landmark loss when updating D S only moves a tiny subset of vertices, since our D S is a MLP consisting of fully connected layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This could lead to unrealistic shapes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, when optimizing the landmark loss, we fix the decoder D S and only update the encoder.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that the estimated groundtruth in L 0 and the landmarks are the only supervision used in our training, due to this our learning is considered as weakly supervised.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experimental Results",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Expressiveness",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Representation Power",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Given a face image, assuming we know the groundtruth shape and projection parameters, we can unwarp the texture into the UV space, as we generate \"pseudo groundtruth\" texture in the weakly supervised step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With the groundtruth texture, by using gradient descent, we can estimate a texture parameter f T whose decoded texture matches with the groundtruth.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Alternatively, we can minimize the reconstruction error in the image space, through the rendering layer with the groundtruth S and m.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Empirically, the two methods give similar performances but we choose the first option as it involves only one warping step, instead of rendering in every optimization iteration.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the linear model, we use the fitting results of Basel texture and Phong illumination model [27] given by [46].",
+              "tag": "Method"
+            },
+            {
+              "sent": "As in Figure 8, our nonlinear texture is closer to the groundtruth than the linear model, especially for in-the-wild images (the first two rows).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is expected since the linear model is trained with controlled images.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Quantitatively, our nonlinear model has significantly lower L 1 reconstruction error than the lin-   We also compare the power of nonlinear and linear 3DMM in representing real-world 3D scans.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We compare with BFM [26], the most commonly used 3DMM at present.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use ten 3D face scans provided by [26], which are not included in the training set of BFM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As these face meshes are already registered using the same triangle definition with BFM, no registration is necessary.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given the groundtruth shape, by using gradient descent, we can estimate a shape parameter whose decoded shape matches the groundtruth.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We define matching criteria on both vertex distances and surface normal direction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This empirically improves fidelity of final results compared to only optimizing vertex distances.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Also, to emphasize the compactness of nonlinear models, we train different models with different latent space sizes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 9 shows the visual quality of two models' reconstructions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As we can see, our reconstructions closely match the face shapes.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Meanwhile the linear model struggles with face shapes outside its PCA span.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Applications",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "Having shown the capability of our nonlinear 3DMM (ie, two decoders), now we demonstrate the applications of our entire network, which has the additional encoder.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Many  of 3DMM are centered on its ability to fit to 2D face images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 10 visualizes our 3DMM fitting results on CelebA dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our encoder estimates the shape S, texture T as well as projection parameter m.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We can recover personal facial characteristic in both shape and texture.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our texture can have variety skin color or facial hair, which is normally hard to be recovered by linear 3DMM.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Face alignment is a critical step for any facial analysis task such as face recognition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With enhancement in the modeling, we hope to improve this task (Figure 11).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare face alignment performance with state-of-the-art methods, SDM [42] and 3DDFA [46], on the AFLW2000 dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The alignment accuracy is evaluated by the Normalized Mean Error (NME), the average of visible landmark error normalized by the bounding box size.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Here, current state-of-the-art 3DDFA [46]   of CNNs that iteratively refines its estimation in multiple steps, meanwhile ours is a single-pass of E and D S .",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, by jointly learning model fitting with 3DMM, our network can surpass [46]'s performance, as in Tab. 4. Another perspective is that in conventional 3DMM fitting [46], the texture is used as the input to regress the shape parameter, while ours adopts an analysis-by-synthesis scheme and texture is the output of the synthesis.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Further, for a more fair comparison of nonlinear vs. linear models, we train an encoder with the same architecture as our E, whose output parameter will multiple with the linear shape bases A, and train with the landmark loss function (Eqn.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Again we observe the higher error from the linear model-based fitting.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Ablation on Texture Learning",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "Since its debut in 1999, 3DMM has became a cornerstone of facial analysis research with applications to many problems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Despite its impact, it has drawbacks in requiring training data of 3D scans, learning from controlled 2D images, and limited representation power due to linear bases.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These drawbacks could be formidable when fitting 3DMM to unconstrained faces, or learning 3DMM for generic objects such as shoes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper demonstrates that there exists an alternative approach to 3DMM learning, where a nonlinear 3DMM can be learned from a large set of uncon-strained face images without collecting 3D face scans.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Further, the model fitting algorithm can be learnt jointly with 3DMM, in an end-to-end fashion.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Nonlinear 3D Face Morphable Model"
+}

@@ -1,0 +1,736 @@
+{
+  "paper_id": "1902.01275",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We propose a real-time RGB-based pipeline for object detection and 6D pose estimation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our novel 3D orientation estimation is based on a variant of the Denoising Autoencoder that is trained on simulated views of a 3D model using Domain Randomization.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This so-called Augmented Autoencoder has several advantages over existing methods: It does not require real, pose-annotated training data, generalizes to various test sensors and inherently handles object and view symmetries.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead of learning an explicit mapping from input images to object poses, it provides an implicit representation of object orientations defined by samples in a latent space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our pipeline achieves stateof-the-art performance on the TLESS dataset both in the RGB and RGBD domain.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also evaluate on the LineMOD dataset where we can compete with other synthetically trained approaches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We further increase performance by correcting 3D orientation estimates to account for perspective errors when the object deviates from the image center and show extended results.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our code is available here 1",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Therefore, we propose a novel approach that directly addresses these issues.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Concretely, our method operates on single RGB images, which significantly increases the usability as no depth information is required.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We note though that depth maps may be incorporated optionally to refine the estimation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a first step, we build upon state-of-the-art 2D Object Detectors of (Liu et al (2016); Lin et al (2018)) which provide object bounding boxes and identifiers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the resulting scene crops, we employ our novel 3D orientation estimation algorithm, which is based on a previously trained deep network architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While deep networks are also used in existing approaches, our approach differs in that we do not explicitly learn from 3D pose annotations during training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, we implicitly learn representations from rendered 3D model views.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is accomplished by training a generalized version of the Denoising Autoencoder from Vincent et al (2010), that we call 'Augmented Autoencoder (AAE)', using a novel Do- Figure 1: Our full 6D Object Detection pipeline: after detecting an object (2D Object Detector), the object is quadratically cropped and forwarded into the proposed Augmented Autoencoder.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the next step, the bounding box scale ratio at the estimated 3D orientation R obj2cam is used to compute the 3D translation tobj2cam .",
+              "tag": "Other"
+            },
+            {
+              "sent": "The resulting euclidean transformation \u0124 obj2cam \u2208 R 4x4 already shows promising results as presented in Sundermeyer et al (2018), however it still lacks of accuracy given a translation in the image plane towards the borders.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, the pipeline is extended by the Perspective Correction block which addresses this problem and results in more accurate 6D pose estimates \u0124obj2cam for objects which are not located in the image center.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Additionally, given depth data, the result can be further refined ( \u0124(refined) obj2cam ) by applying an Iterative Closest Point post-processing (bottom).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Our approach has several advantages: First, since the training is independent from concrete representations of object orientations within SO(3) (eg quaternions), we can handle ambiguous poses caused by symmetric views because we avoid one-to-many mappings from images to orientations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, we learn representations that specifically encode 3D orientations while achieving robustness against occlusion, cluttered backgrounds and generalizing to different environments and test sensors.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, they usually rely on the computationally expensive evaluation of many pose hypotheses and do not take into account any high level features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, existing depth sensors are often more sensitive to sunlight or specular object surfaces than RGB cameras.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Convolutional Neural Networks (CNNs) have revolutionized 2D object detection from RGB images (Ren et al, 2015;Liu et al, 2016;Lin et al, 2018).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But, in comparison to 2D bounding box annotation, the effort of labeling real images with full 6D object poses is magnitudes higher, requires expert knowledge and a complex setup (Hoda\u0148 et al, 2017).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Simulation to Reality Transfer",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Photo-Realistic Rendering",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Domain Adaptation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Domain Randomization",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Domain Randomization (DR) builds upon the hypothesis that by training a model on rendered views in a variety of semi-realistic settings (augmented with random lighting conditions, backgrounds, saturation, etc), it will also generalize to real images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Tobin et al (2017) demonstrated the potential of the DR paradigm for 3D shape detection using CNNs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hinterstoisser et al (2017) showed that by training only the head network of FasterRCNN of Ren et al (2015) with randomized synthetic views of a textured 3D model, it also generalizes well to real images.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It must be noted, that their rendering is almost photo-realistic as the textured 3D models have very high quality.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Kehl et al (2017) pioneered an end-to-end CNN, called 'SSD6D', for 6D object detection that uses a moderate DR strategy to utilize synthetic training data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The authors render views of textured 3D object reconstructions at random poses on top of MS COCO background images (Lin et al, 2014) while varying brightness and contrast.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This lets the network generalize to real images and enables 6D detection at 10Hz.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Like us, for accurate distance estimation they rely on Iterative Closest Point (ICP) post-processing using depth data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast, we do not treat 3D orientation estimation as a classification task.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training Pose Estimation with SO(3) targets",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Regression",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Classification",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Symmetries",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Learning Representations of 3D orientations",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "We can also learn indirect pose representations that relate object views in a low-dimensional space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The descriptor learning can either be self-supervised by the object views themselves or still rely on fixed SO(3) representations.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Descriptor Learning",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Wohlhart and Lepetit (2015) introduced a CNN-based descriptor learning approach using a triplet loss that minimizes/maximizes the Euclidean distance between similar/dissimilar object orientations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition, the distance between different objects is maximized.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Although mixing in synthetic data, the training also relies on pose-annotated sensor data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The approach is not immune against symmetries since the descriptor is built using explicit 3D orientations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus, the loss can be dominated by symmetric object views that appear the same but have opposite orientations which can produce incorrect average pose predictions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Balntas et al (2017) extended this work by enforcing proportionality between descriptor and pose distances.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They acknowledge the problem of object symmetries by weighting the pose distance loss with the depth difference of the object at the considered poses.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This heuristic increases the accuracy on symmetric objects with respect to Wohlhart and Lepetit (2015).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "Our work is also based on learning descriptors, but in contrast we train our Augmented Autoencoders (AAEs) such that the learning process itself is independent of any fixed SO(3) representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The loss is solely based on the appearance of the reconstructed object views and thus symmetrical ambiguities are inherently regarded.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus, unlike Balntas et al (2017); Wohlhart and Lepetit (2015) we abstain from the use of real labeled data during training and instead train completely self-supervised.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This means that assigning 3D orientations to the descriptors only happens after the training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Kehl et al (2016) train an Autoencoder architecture on random RGBD scene patches from the LineMOD dataset Hinterstoisser et al (2011).",
+              "tag": "Method"
+            },
+            {
+              "sent": "At test time, descriptors from scene and object patches are compared to find the 6D pose.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since the approach requires the evaluation of a lot of patches, it takes about 670ms per prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, using local patches means to ignore holistic relations between object features which is crucial if few texture exists.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead we train on holistic object views and explicitly learn domain invariance.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Method",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "In the following, we mainly focus on the novel 3D orientation estimation technique based on the AAE.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Autoencoders",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Augmented Autoencoder",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "To make evident that Hypothesis 1 holds for geometric transformations, we learn latent representations of binary images depicting a 2D square at different scales, in-plane translations and rotations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our goal is to encode only the in-plane rotations r \u2208 [0, 2\u03c0] in a two dimensional latent space z \u2208 R 2 independent of scale or translation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 3 depicts the results after training a CNN-based AE architecture similar to the model in Figure 5.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It can be observed that the AEs trained on reconstructing squares at fixed scale and translation (1) or random scale and translation (2) do not clearly encode rotation alone, but are also sensitive to other latent factors.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Instead, the encoding of the AAE (3) becomes invariant to translation and scale such that all squares with coinciding orientation are mapped to the same code.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, the latent representation is much smoother and the latent dimensions imitate a shifted sine and cosine function with frequency f = 4 2\u03c0 respectively.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The reason is that the square has two perpendicular axes of symmetry, ie after rotating \u03c0 2 the square appears the same.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This property of representing the orientation based on the appearance of an object rather than on a fixed parametrization is valuable to avoid ambiguities due to symmetries when teaching 3D object orientations.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Learning 3D Orientation from Synthetic Object Views",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "Our toy problem showed that we can explicitly learn representations of object in-plane rotations using a geometric augmentation technique.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Applying the same geometric input augmentations we can encode the whole SO(3) space of views from a 3D object model (CAD or 3D reconstruction) while being robust against inaccurate object detections.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, the encoder would still be unable to relate image crops from real RGB sensors because (1) the 3D model and the real object differ, (2) simulated and real lighting conditions differ, (3) the network can't distinguish the object from background clutter and foreground occlusions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead of trying to imitate every detail of specific real sensor recordings in simulation we propose a Domain Randomization (DR) technique within the AAE framework to make the encodings invariant to insignificant environment and sensor variations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The goal is that the trained encoder treats the differences to real camera images as just another irrelevant variation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, while keeping reconstruction targets clean, we randomly apply additional augmentations to the input training views: (1)",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Codebook Creation and Test Procedure",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "After training, the AAE is able to extract a 3D object from real scene crops of many different camera sensors (Figure 6).",
+              "tag": "Result"
+            },
+            {
+              "sent": "The clarity and orientation of the decoder reconstruction is an indicator of the encoding quality.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To determine 3D object orientations from test scene crops we create a codebook (Figure 7 (top)): At test time, the considered object(s) are first detected in an RGB scene.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The image is quadratically cropped using the longer side of the bounding box multiplied with a padding factor of 1.2 and resized to match the encoder input size.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The padding accounts for imprecise bounding boxes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After encoding we compute the cosine similarity between the test code z test \u2208 R 128 and all codes z i \u2208 R 128 from the codebook:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "The highest similarities are determined in a kNearestNeighbor (kNN) search and the corresponding rotation matrices {R kN N } from the codebook are returned as estimates of the 3D object orientation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the quantitative evaluation we use k = 1, however the next neighbors can yield valuable information on ambiguous views and could for example be used in particle filter based tracking.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use cosine similarity because (1) it can be very efficiently computed on a single GPU even for large codebooks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiments we have 2562 equidistant viewpoints \u00d7 36 in-plane rotation = 92232 total entries.",
+              "tag": "Method"
+            },
+            {
+              "sent": "(2) We observed that, presumably due to the circular nature of rotations, scaling a latent test code does not change the object orientation of the decoder reconstruction (Figure 8).",
+              "tag": "Result"
+            },
+            {
+              "sent": "On Occluded LineMOD, the detectors trained on the simplistic renderings failed to achieve good detection performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, recent work of Hodan et al (2019) quantitatively investigated the training of 2D detectors on synthetic data and they reached decent detection performance on Occluded LineMOD by fine-tuning FasterRCNN on photo-realistic synthetic images showing the feasibility of a purely synthetic pipeline.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Projective Distance Estimation",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "We estimate the full 3D translation t real from camera to object center, similar to Kehl et al (2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, we save the 2D bounding box for each synthetic object view in the codebook and compute its diagonal length bb syn,i .",
+              "tag": "Method"
+            },
+            {
+              "sent": "At test time, we compute the ratio between the detected bounding box diagonal bb real and the corresponding codebook diagonal bb syn,argmax(cosi) , ie at similar orientation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The pinhole camera model yields the distance treal,z treal,z = t syn,z \u00d7 bb syn,argmax(cosi) bb real \u00d7 f real f syn (5)",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Perspective Correction",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "While the codebook is created by encoding centered object views, the test image crops typically do not originate from the image center.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Naturally, the appearance of the object view changes when translating the object in the image plane at constant object orientation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This causes a noticeable error in the rotation estimate from the codebook towards the image borders.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, this error can be corrected by determining the object rotation that approximately preserves the appearance of the object when translating it to our estimate treal .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "ICP Refinement",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "The refinement is first applied in direction of the vector pointing from camera to the object where most of the RGB-based pose estimation errors stem from and then on the full 6D pose.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Inference Time",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "We evaluate the AAE and the whole 6D detection pipeline on the TLESS (Hoda\u0148 et al, 2017) and LineMOD (Hinterstoisser et al, 2011) datasets.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Test Conditions",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "It is common practice to ignore in-plane rotations or to only consider object poses that appear in the dataset (Rad and Lepetit, 2017;Wohlhart and Lepetit, 2015) which also limits applicability.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Symmetric object views are often individually treated (Rad and Lepetit, 2017;Balntas et al, 2017) or ignored (Wohlhart and Lepetit, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The SIXD challenge (Hodan, 2017) is an attempt to make fair comparisons between 6D localization algorithms by prohibiting the use of test scene pixels.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We follow these strict evaluation guidelines, but treat the harder problem of 6D detection where it is unknown which of the considered objects are present in the scene.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is especially difficult in the TLESS dataset since objects are very similar.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We train the AAEs on the reconstructed 3D models, except for object 19-23 where we train on the CAD models because the pins are missing in the reconstructed plugs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We noticed, that the geometry of some 3D reconstruction in TLESS is slightly inaccurate which badly influences the RGB-based distance estimation (Sec.",
+              "tag": "Result"
+            },
+            {
+              "sent": "3.6.2) since the synthetic bounding box diagonals are wrong.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, in a second training run we only train on the 30 CAD models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hoda\u0148 et al (2016) introduced the Visible Surface Discrepancy (err vsd ), an ambiguity-invariant pose error function that is determined by the distance between the estimated and ground truth visible object depth surfaces.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As in the SIXD challenge, we report the recall of correct 6D object poses at err vsd < 0.3 with tolerance \u03c4 = 20mm and > 10% object visibility.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Although the Average Distance of Model Points (ADD) metric introduced by Hinterstoisser et al (2012b) cannot handle pose ambiguities, we also present it for the LineMOD dataset following the official protocol in Hinterstoisser et al (2012b).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For objects with symmetric views (eggbox, glue), Hinterstoisser et al (2012b) adapts the metric by calculating the average distance to the closest model point.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Manhardt et al (2018) has noticed inaccurate intrinsics and sensor registration errors between RGB and D in the LineMOD dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, purely synthetic RGB-based approaches, although visually correct, suffer from false pose rejections.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The focus of our experiments lies on the TLESS dataset.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Metrics",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Ablation Studies",
+      "selected_sentences": [
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "To assess the AAE alone, in this subsection we only predict the 3D orientation of Object 5 from the TLESS dataset on Primesense and Kinect RGB scene crops.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 5 shows the influence of different input augmentations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It can be seen that the effect of different color augmentations is cumulative.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For textureless objects, even the inversion of color channels seems to be beneficial since it prevents overfitting to synthetic color information.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results in Table 6 show that our domain randomization strategy allows to generalize from 3D reconstructions as well as untextured CAD models as long as the considered objects are not significantly textured.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Instead of a performance drop we report an increased err vsd < 0.3 recall due to the more accurate geometry of the model which results in correct bounding box diagonals and thus a better projective distance estimation in the RGB-domain.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "In Table 8 we also compare our pipeline against state-of-the-art methods on the LineMOD dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Here, our synthetically trained pipeline does not reach the performance of approaches that use real pose annotated training data.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "There are multiple issues: (1) As described in Sec 4.1 the real training and test set are strongly correlated and approaches using the real training set can over-fit to it; (2) the models provided in LineMOD are quite bad which affects both, the detection and pose estimation performance of synthetically trained approaches;",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "(3) the advantage of not suffering from pose-ambiguities does not matter much in LineMOD where most object views are pose-ambiguity free; (4) We train and test poses from the whole SO(3) as opposed to only a limited range in which the test poses lie.",
+              "tag": "Result"
+            },
+            {
+              "sent": "SSD6D also trains only on synthetic views of the 3D models and we outperform their approach by a big margin in the RGB-only domain before ICP refinement.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Failure Cases",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Rotation and Translation Histograms",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Demonstration on Embedded Hardware",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "We have proposed a new self-supervised training strategy for Autoencoder architectures that enables robust 3D object orientation estimation on various RGB sensors while training only on synthetic views of a 3D model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By demanding the Autoencoder to revert geometric and color input augmentations, we learn representations that (1) specifically encode 3D object orientations, (2) are invariant to a significant domain gap between synthetic and real RGB images, (3) inherently regard pose ambiguities from symmetric object views.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Around this approach, we created a real-time (42 fps), RGB-based pipeline for 6D object detection which is especially suitable when pose-annotated RGB sensor data is not available.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Augmented Autoencoders: Implicit 3D Orientation Learning for 6D Object Detection"
+}

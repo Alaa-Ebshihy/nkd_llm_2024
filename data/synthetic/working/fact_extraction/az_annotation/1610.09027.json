@@ -1,0 +1,611 @@
+{
+  "paper_id": "1610.09027",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Neural networks augmented with external memory have the ability to learn algorithmic solutions to complex tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These models appear promising for applications such as language modeling and machine translation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, they scale poorly in both space and time as the amount of memory grows -limiting their applicability to real-world domains.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Here, we present an end-to-end differentiable memory access scheme, which we call Sparse Access Memory (SAM), that retains the representational power of the original approaches whilst training efficiently with very large memories.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We show that SAM achieves asymptotic lower bounds in space and time complexity, and find that an implementation runs 1,000\u00d7 faster and with 3,000\u00d7 less physical memory than non-sparse models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "SAM learns with comparable data efficiency to existing models on a range of synthetic tasks and one-shot Omniglot character recognition, and can scale to tasks requiring 100,000s of time steps and memories.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As well, we show how our approach can be adapted for models that maintain temporal associations between memories, as with the recently introduced Differentiable Neural Computer.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recurrent neural networks, such as the Long ShortTerm Memory (LSTM) [11], have proven to be powerful sequence learning models [6,18].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, one limitation of the LSTM architecture is that the number of parameters grows proportionally to the square of the size of the memory, making them unsuitable for problems requiring large amounts of long-term memory.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent approaches, such as Neural Turing Machines (NTMs) [7] and Memory Networks [21], have addressed this issue by decoupling the memory capacity from the number of model parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We refer to this class of models as memory augmented neural networks (MANNs).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "External memory allows MANNs to learn algorithmic solutions to problems that have eluded the capabilities of traditional LSTMs, and to generalize to longer sequence lengths.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Nonetheless, MANNs have had limited success in real world application.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this paper, we present a MANN named SAM (sparse access memory).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By thresholding memory modifications to a sparse subset, and using efficient data structures for content-based read operations, our model is optimal in space and time with respect to memory size, while retaining end-to-end gradient based optimization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To test whether the model is able to learn with this sparse approximation, we examined its performance on a selection of synthetic and natural tasks: algorithmic tasks from the NTM work [7], Babi reasoning tasks used with Memory Networks [17] and Omniglot one-shot classification [16,12].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also tested several of these tasks scaled to longer sequences via curriculum learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For large external memories we observed improvements in empirical run-time and memory overhead by up to three orders magnitude over vanilla NTMs, while maintaining near-identical data efficiency and performance.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Further, in Supplementary D we demonstrate the generality of our approach by describing how to construct a sparse version of the recently published Differentiable Neural Computer [8].",
+              "tag": "Method"
+            },
+            {
+              "sent": "This Sparse Differentiable Neural Computer (SDNC) is over 400\u00d7 faster than the canonical dense variant for a memory size of 2,000 slots, and achieves the best reported result in the Babi tasks without supervising the memory access.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Attention and content-based addressing",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Memory Networks",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Neural Turing Machine",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "The Neural Turing Machine is a recurrent neural network equipped with a content-addressable memory, similar to Memory Networks, but with the additional capability to write to memory over time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The memory is accessed by a controller network, typically an LSTM, and the full model is differentiable -allowing it to be trained via BPTT.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "This paper introduces Sparse Access Memory (SAM), a new neural memory architecture with two innovations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most importantly, all writes to and reads from external memory are constrained to a sparse subset of the memory words, providing similar functionality as the NTM, while allowing computational and memory efficient operation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Secondly, we introduce a sparse memory management scheme that tracks memory usage and finds unused blocks of memory for recording new information.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "For a memory containing N words, SAM executes a forward, backward step in \u0398(log N ) time, initializes in \u0398(N ) space, and consumes \u0398(1) space per time step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Under some reasonable assumptions, SAM is asymptotically optimal in time and space complexity (Supplementary A).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Read",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Write",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Controller",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Efficient backpropagation through time",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "We have already demonstrated how the forward operations in SAM can be efficiently computed in O(T log N ) time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, when considering space complexity of MANNs, there remains a dependence on M t for the computation of the derivatives at the corresponding time step.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A naive implementation requires the state of the memory to be cached at each time step, incurring a space overhead of O(N T ), which severely limits memory size and sequence length.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Approximate nearest neighbors",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Learning with sparse memory access",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "Figure 2 shows that sparse models are able to learn with comparable efficiency to the dense models and, surprisingly, learn more effectively for some tasks -notably priority sort and associative recall.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This shows that sparse reads and writes can actually benefit early-stage learning in some cases.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Scaling with a curriculum",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "The computational efficiency of SAM opens up the possibility of training on tasks that require storing a large amount of information over long sequences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Here we show this is possible in practice, by scaling tasks to a large scale via an exponentially increasing curriculum.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "To investigate whether SAM was able to learn algorithmic solutions to tasks, we investigated its ability to generalize to sequences that far exceeded those observed during training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Namely we trained SAM on the associative recall task up to sequences of length 10, 000, and found it was then able to generalize to sequences of length 200,000 (Supplementary Figure 8).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Question answering on the Babi tasks",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "[20] introduced toy tasks they considered a prerequisite to agents which can reason and understand natural language.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They are synthetically generated language tasks with a vocab of about 150 words that test various aspects of simple reasoning such as deduction, induction and coreferencing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We tested the models (including the Sparse Differentiable Neural Computer described in Supplementary D) on this task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The full results and training details are described in Supplementary G.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Both the sparse and dense perform comparably at this task, again indicating the sparse approximations do not impair learning.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We believe the NTM may perform poorly since it lacks a mechanism which allows it to allocate memory effectively.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Learning on real world data",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "Finally, we demonstrate that the model is capable of learning in a non-synthetic dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Omniglot [12] is a dataset of 1623 characters taken from 50 different alphabets, with 20 examples of each character.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset is used to test rapid, or one-shot learning, since there are few examples of each character but many different character classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following [16], we generate episodes where a subset of characters are randomly selected from the dataset, rotated and stretched, and assigned a randomly chosen label.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At each time step an example of one of the characters is presented, along with the correct label of the proceeding character.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each character is presented 10 times in an episode (but each presentation may be any one of the 20 examples of the character).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In order to succeed at the task the model must learn to rapidly associate a novel character with the correct label, such that it can correctly classify subsequent examples of the same character class.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "Again, we used an exponential curriculum, doubling the number of additional characters provided to the model whenever the cost was reduced under a threshold.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After training all MANNs for the same length of time, a validation task with 500 characters was used to select the best run, and this was then tested on a test set, containing all novel characters for different sequence lengths (Figure 4).",
+              "tag": "Result"
+            },
+            {
+              "sent": "All of the MANNs were able to perform much better than chance, even on sequences \u2248 4\u00d7 longer than seen during training.",
+              "tag": "Result"
+            },
+            {
+              "sent": "SAM outperformed other models, presumably due to its much larger memory capacity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Previous results on the Omniglot curriculum [16] task are not identical, since we used 1-hot labels throughout and the training curriculum scaled to longer sequences, but our results with the dense models are comparable (\u2248 0.4 errors with 100 characters), while the SAM is significantly better (0.2 < errors with 100 characters).",
+              "tag": "Result"
+            },
+            {
+              "sent": "All of the MANNs were able to perform much better than chance with \u2248 500 characters (sequence lengths of \u2248 5000), even though they were trained, at most, on sequences of \u2248 130 (chance is 0.002 for 500 characters).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This indicates they are learning generalizable solutions to the task.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "SAM is able to outperform other approaches, presumably because it can utilize a much larger memory.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "Scaling memory systems is a pressing research direction due to potential for compelling applications with large amounts of memory.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We have demonstrated that you can train neural networks with large memories via a sparse read and write scheme that makes use of efficient data structures within the network, and obtain significant speedups during training.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Although we have focused on a specific MANN (SAM), which is closely related to the NTM, the approach taken here is general and can be applied to many differentiable memory architectures, such as Memory Networks [21].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "It should be noted that there are multiple possible routes toward scalable memory architectures.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, prior work aimed at scaling Neural Turing Machines [22] used reinforcement learning to train a discrete addressing policy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This approach also touches only a sparse set of memories at each time step, but relies on higher variance estimates of the gradient during optimization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Though we can only guess at what class of memory models will become staple in machine learning systems of the future, we argue in Supplementary A that they will be no more efficient than SAM in space and time complexity if they address memories based on content.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "We have experimented with randomized k-d trees and LSH within the network to reduce the forward pass of training to sublinear time, but there may be room for improvement here.",
+              "tag": "Method"
+            },
+            {
+              "sent": "K-d trees were not designed specifically for fully online scenarios, and can become imbalanced during training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent work in tree ensemble models, such as Mondrian forests [13], show promising results in maintaining balanced hierarchical set coverage in the online setting.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "An alternative approach which may be well-suited is LSH forests [3], which adaptively modifies the number of hashes used.",
+              "tag": "Other"
+            },
+            {
+              "sent": "It would be an interesting empirical investigation to more fully assess different ANN approaches in the challenging context of training a neural network.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "Existing lower bounds [14,1] assert that for any data structure a \u2208 A, a requires \u2126(log N ) time and \u2126(N ) space to perform a read operation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The SAM memory architecture proposed in this paper is contained within A as it computes the approximate nearest neighbors problem in fixed dimensions [15].",
+              "tag": "Method"
+            },
+            {
+              "sent": "As we will show, SAM requires O(log N ) time to query and maintain the ANN, O(1) to perform all subsequent sparse read, write, and error gradient calculations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It requires O(N ) space to initialize the memory and O(1) to store intermediate sparse tensors.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We thus conclude it is optimal in asymptotic time and space complexity.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A.1 Initialization",
+      "selected_sentences": [
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "Upon initialization, SAM consumes O(N ) space and time to instantiate the memory and the memory Jacobian.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, it requires O(N ) time and space to initialize auxiliary data structures which index the memory, such as the approximate nearest neighbor which provides a content-structured view of the memory, and the least accessed ring, which maintains the temporal ordering in which memory words are accessed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These initializations represent an unavoidable one-off cost that does not recur per step of training, and ultimately has little effect on training speed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the remainder of the analysis we will concentrate on the space and time cost per training step.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A.2 Read",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.3 Write",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.4 Content-based addressing",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B Control flow",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "C Training details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "D Sparse Differentiable Neural Computer",
+      "selected_sentences": [
+        {
+          "par_id": 67,
+          "sentences": [
+            {
+              "sent": "Recently [8] proposed a novel MANN the Differentiable Neural Computer (DNC).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The two innovations proposed by this model are a new approach to tracking memory freeness (dynamic memory allocation) and a mechanism for associating memories together (temporal memory linkage).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We demonstrate here that the approaches enumerated in the paper can be adapted to new models by outlining a sparse version of this model, the Sparse Differentiable Neural Computer (SDNC), which learns with similar data efficiency while retaining the computational advantages of sparsity.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "D.1 Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 68,
+          "sentences": [
+            {
+              "sent": "For brevity, we will only explain the sparse implementations of these two items, for the full model details refer to the original paper.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The mechanism for sparse memory reads and writes was implemented identically to SAM.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "D.2 Results",
+      "selected_sentences": [
+        {
+          "par_id": 78,
+          "sentences": [
+            {
+              "sent": "We benchmarked the speed and memory performance of the SDNC versus a naive DNC implementation (details of setup in Supplementary E).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The results are displayed in Figure 7. Here, the computational benefits of sparsity are more pronounced due to the expensive (quadratic time and space) temporal transition table operations in the DNC.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We were only able to run comparative benchmarks up to N = 2048, as the DNC quickly exceeded the machine's physical memory for larger values; however even at this modest memory size we see a speed increase of \u2248 440\u00d7 and physical memory reduction of \u2248 240\u00d7.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note, unlike the SAM memory benchmark in Section 4 we plot the total memory consumption, ie the memory overhead of the initial start state plus the memory overhead of unrolling the core over a sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is because the SDNC and DNC do not have identical start states.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The sparse temporal transition matrices N0, P0 \u2208 [0, 1] N \u00d7N{K} consume much less memory than the corresponding L0 \u2208 [0, 1] N \u00d7N in the DNC.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In order to compare the models on an interesting task we ran the DNC and SDNC on the Babi task (this task is described more fully in the main text).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The results are described in Supplementary G and demonstrate the SDNC is capable of learning competitively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In particular, it achieves the best report result on the Babi task.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "E Benchmarking details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "G Babi results",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Scaling Memory-Augmented Neural Networks with Sparse Reads and Writes"
+}

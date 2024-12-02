@@ -1,0 +1,287 @@
+{
+  "paper_id": "1607.01759",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "This paper explores a simple and efficient baseline for text classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our experiments show that our fast text classifier fastText is often on par with deep learning classifiers in terms of accuracy, and many orders of magnitude faster for training and evaluation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We can train fastText on more than one billion words in less than ten minutes using a standard multicore CPU, and classify half a million sentences among 312K classes in less than a minute.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Meanwhile, linear classifiers are often considered as strong baselines for text classification problems (Joachims, 1998;McCallum and Nigam, 1998;Fan et al, 2008).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Despite their simplicity, they often obtain stateof-the-art performances if the right features are used (Wang and Manning, 2012).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In this work, we explore ways to scale these baselines to very large corpus with a large output space, in the context of text classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Inspired by the recent work in efficient word representation learning (Mikolov et al, 2013;Levy et al, 2015), we show that linear models with a rank constraint and a fast loss approximation can train on a billion words within ten minutes, while achieving performance on par with the state-of-the-art.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate the quality of our approach fastText 1 on two different tasks, namely tag prediction and sentiment analysis.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model architecture",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "A simple and efficient baseline for sentence classification is to represent sentences as bag of words (BoW) and train a linear classifier, eg, a logistic regression or an SVM (Joachims, 1998;Fan et al, 2008).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, linear classifiers do not share parameters among features and classes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This possibly limits their generalization in the context of large output space where some classes have very few examples.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Hierarchical softmax",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "N-gram features",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "We evaluate fastText on two different tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, we compare it to existing text classifers on the problem of sentiment analysis.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then, we evaluate its capacity to scale to large output space on a tag prediction dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that our model could be implemented with the Vowpal Wabbit library, 2 but we observe in practice, that our tailored implementation is at least 2-5\u00d7 faster.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Sentiment analysis",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "We present the results in Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use 10 hidden units and run fastText for 5 epochs with a learning rate selected on a validation set from {0.05, 0.1, 0.25, 0.5}.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On this task, adding bigram information improves the performance by 1-4%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Overall our accuracy is slightly better than charCNN and charCRNN and, a bit worse than VDCNN.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that we can increase the accuracy slightly by using more n-grams, for example with trigrams, the performance on Sogou goes up to 97.1%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, Figure 3 shows that our method is competitive with the methods presented in Tang et al (2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We tune the hyperparameters on the validation set and observe that using n-grams up to 5 leads to the best performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Unlike Tang et al (2015), fastText does not use pre-trained word embeddings, which can be explained the 1% difference in accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Both charCNN and VDCNN are trained on a NVIDIA Tesla K40 GPU, while our models are trained on a CPU using 20 threads.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 2 shows that methods using convolutions are several orders of magnitude slower than fastText.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "While it is possible to have a 10\u00d7 speed up for charCNN by using more recent CUDA implementations of convolutions, fastText takes less than a minute to train on these datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The GRNNs method of Tang et al (2015)   We show a few correct and incorrect tag predictions.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Tag prediction",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "To test scalability of our approach, further evaluation is carried on the YFCC100M dataset (Thomee et al, 2016) which consists of almost 100M images with captions, titles and tags.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We focus on predicting the tags according to the title and caption (we do not use the images).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We remove the words and tags occurring less than 100 times and split the data into a train, validation and test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The train set contains 91,188,648 examples (1.5B tokens).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The validation has 930,497 examples and the test set 543,424.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The vocabulary size is 297,141 and there are 312,116 unique tags.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We will release a script that recreates this dataset so that our numbers could be reproduced.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We consider a frequency-based baseline which predicts the most frequent tag.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also compare with Tagspace (Weston et al, 2014), which is a tag prediction model similar to ours, but based on the Wsabie model of Weston et al (2011).",
+              "tag": "Method"
+            },
+            {
+              "sent": "While the Tagspace model is described using convolutions, we consider the linear version, which achieves comparable performance but is much faster.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Both models achieve a similar performance with a small hidden layer, but adding bigrams gives us a significant boost in accuracy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "At test time, Tagspace needs to compute the scores for all the classes which makes it relatively slow, while our fast inference gives a significant speed-up when the number of classes is large (more than 300K here).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Overall, we are more than an order of magnitude faster to obtain model with a better quality.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The speedup of the test phase is even more significant (a 600\u00d7 speedup).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 4 shows some qualitative examples.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion and conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "In this work, we propose a simple baseline method for text classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unlike unsupervisedly trained word vectors from word2vec, our word features can be averaged together to form good sentence representations.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "In several tasks, fastText obtains performance on par with recently proposed methods inspired by deep learning, while being much faster.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "Although deep neural networks have in theory much higher representational power than shallow models, it is not clear if simple text classification problems such as sentiment analysis are the right ones to evaluate them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We will publish our code so that the research community can easily build on top of our work.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Bag of Tricks for Efficient Text Classification"
+}

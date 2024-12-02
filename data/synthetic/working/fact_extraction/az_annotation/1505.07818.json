@@ -1,0 +1,680 @@
+{
+  "paper_id": "1505.07818",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We introduce a new representation learning approach for domain adaptation, in which data at training and test time come from similar but different distributions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our approach is directly inspired by the theory on domain adaptation suggesting that, for effective domain transfer to be achieved, predictions must be made based on features that cannot discriminate between the training (source) and test (target) domains.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The approach implements this idea in the context of neural network architectures that are trained on labeled data from the source domain and unlabeled data from the target domain (no labeled target-domain data is necessary).",
+              "tag": "Method"
+            },
+            {
+              "sent": "As the training progresses, the approach promotes the emergence of features that are (i) discriminative for the main learning task on the source domain and (ii) indiscriminate with respect to the shift between the domains.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that this adaptation behaviour can be achieved in almost any feed-forward model by augmenting it with few standard layers and a new gradient reversal layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The resulting augmented architecture can be trained using standard backpropagation and stochastic gradient descent, and can thus be implemented with little effort using any of the deep learning packages.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We demonstrate the success of our approach for two distinct classification problems (document sentiment analysis and image classification), where state-of-the-art domain adaptation performance on standard benchmarks is achieved.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also validate the approach for descriptor learning task in the context of person re-identification application.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Learning a discriminative classifier or other predictor in the presence of a shift between training and test distributions is known as domain adaptation (DA).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The proposed approaches build mappings between the source (training-time) and the target (test-time) domains, so that the classifier learned for the source domain can also be applied to the target domain, when composed with the learned mapping between domains.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The appeal of the domain adaptation approaches is the ability to learn a mapping between domains in the situation when the target domain data are either fully unlabeled (unsupervised domain annotation) or have few labeled samples (semi-supervised domain adaptation).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Below, we focus on the harder unsupervised case, although the proposed approach (domain-adversarial learning) can be generalized to the semi-supervised case rather straightforwardly.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Unlike many previous papers on domain adaptation that worked with fixed feature representations, we focus on combining domain adaptation and deep feature learning within one training process.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our goal is to embed domain adaptation into the process of learning representation, so that the final classification decisions are made based on features that are both discriminative and invariant to the change of domains, ie, have the same or very similar distributions in the source and the target domains.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this way, the obtained feed-forward network can be applicable to the target domain without being hindered by the shift between the two domains.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our approach is motivated by the theory on domain adaptation (BenDavid et al, 2006, that suggests that a good representation for cross-domain transfer is one for which an algorithm cannot learn to identify the domain of origin of the input observation.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "We thus focus on learning features that combine (i) discriminativeness and (ii) domaininvariance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is achieved by jointly optimizing the underlying features as well as two discriminative classifiers operating on these features: (i) the label predictor that predicts class labels and is used both during training and at test time and (ii) the domain classifier that discriminates between the source and the target domains during training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While the parameters of the classifiers are optimized in order to minimize their error on the training set, the parameters of the underlying deep feature mapping are optimized in order to minimize the loss of the label classifier and to maximize the loss of the domain classifier.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The latter update thus works adversarially to the domain classifier, and it encourages domain-invariant features to emerge in the course of the optimization.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Crucially, we show that all three training processes can be embedded into an appropriately composed deep feed-forward network, called domain-adversarial neural network (DANN) (illustrated by Figure 1, page 12) that uses standard layers and loss functions, and can be trained using standard backpropagation algorithms based on stochastic gradient descent or its modifications (eg, SGD with momentum).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The approach is generic as a DANN version can be created for almost any existing feed-forward architecture that is trainable by backpropagation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In practice, the only non-standard component of the proposed architecture is a rather trivial gradient reversal layer that leaves the input unchanged during forward propagation and reverses the gradient by multiplying it by a negative scalar during the backpropagation.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "We provide an experimental evaluation of the proposed domain-adversarial learning idea over a range of deep architectures and applications.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first consider the simplest DANN architecture where the three parts (label predictor, domain classifier and feature extractor) are linear, and demonstrate the success of domain-adversarial learning for such architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The evaluation is performed for synthetic data as well as for the sentiment analysis problem in natural language processing, where DANN improves the state-of-the-art marginalized Stacked Autoencoders (mSDA) of Chen et al (2012) on the common Amazon reviews benchmark.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "We further evaluate the approach extensively for an image classification task, and present results on traditional deep learning image data sets-such as MNIST (LeCun et al, 1998) and SVHN (Netzer et al, 2011)-as well as on Office benchmarks (Saenko et al, 2010), where domain-adversarial learning allows obtaining a deep architecture that considerably improves over previous state-of-the-art accuracy.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Finally, we evaluate domain-adversarial descriptor learning in the context of person re-identification application (Gong et al, 2014), where the task is to obtain good pedestrian image descriptors that are suitable for retrieval and verification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We apply domainadversarial learning, as we consider a descriptor predictor trained with a Siamese-like loss instead of the label predictor trained with a classification loss.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In a series of experiments, we demonstrate that domain-adversarial learning can improve cross-data-set re-identification considerably.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related work",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Our approach also attempts to match feature space distributions, however this is accomplished by modifying the feature representation itself rather than by reweighing or geometric transformation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Also, our method uses a rather different way to measure the disparity between distributions based on their separability by a deep discriminatively-trained classifier.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note also that several approaches perform transition from the source to the target domain (Gopalan et al, 2011;Gong et al, 2012) by changing gradually the training distribution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Among these methods, Chopra et al (2013) does this in a \"deep\" way by the layerwise training of a sequence of deep autoencoders, while gradually replacing source-domain samples with target-domain samples.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This improves over a similar approach of Glorot et al (2011) that simply trains a single deep autoencoder for both domains.",
+              "tag": "Other"
+            },
+            {
+              "sent": "In both approaches, the actual classifier/predictor is learned in a separate step using the feature representation learned by autoencoder(s).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In contrast to Glorot et al (2011); Chopra et al (2013), our approach performs feature learning, domain adaptation and classifier learning jointly, in a unified architecture, and using a single learning algorithm (backpropagation).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We therefore argue that our approach is simpler (both conceptually and in terms of its implementation).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our method also achieves considerably better results on the popular Office benchmark.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "While the above approaches perform unsupervised domain adaptation, there are approaches that perform supervised domain adaptation by exploiting labeled data from the target domain.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the context of deep feed-forward architectures, such data can be used to \"fine-tune\" the network trained on the source domain (Zeiler and Fergus, 2013;Oquab et al, 2014;Babenko et al, 2014).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our approach does not require labeled target-domain data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At the same time, it can easily incorporate such data when they are available.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "A part of this paper has been published as a conference paper (Ganin and Lempitsky, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This version extends Ganin and Lempitsky (2015) very considerably by incorporating the report Ajakan et al (2014) (presented as part of the Second Workshop on Transfer and MultiTask Learning), which brings in new terminology, in-depth theoretical analysis and justification of the approach, extensive experiments with the shallow DANN case on synthetic data as well as on a natural language processing task (sentiment analysis).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, in this version we go beyond classification and evaluate domain-adversarial learning for descriptor learning setting within the person re-identification application.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Domain Adaptation",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "We consider classification tasks where X is the input space and Y = {0, 1, . . .",
+              "tag": "Claim"
+            },
+            {
+              "sent": ", L\u22121} is the set of L possible labels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, we have two different distributions over X\u00d7Y , called the source domain D S and the target domain D T .",
+              "tag": "Method"
+            },
+            {
+              "sent": "An unsupervised domain adaptation learning algorithm is then provided with a labeled source sample S drawn i.i.d. from D S , and an unlabeled target sample T drawn i.i.d. from D X T , where",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Domain Divergence",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Proxy Distance",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Generalization Bound on the Target Risk",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Domain-Adversarial Neural Networks (DANN)",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "An original aspect of our approach is to explicitly implement the idea exhibited by Theorem 2 into a neural network classifier.",
+              "tag": "Method"
+            },
+            {
+              "sent": "That is, to learn a model that can generalize well from one domain to another, we ensure that the internal representation of the neural network contains no discriminative information about the origin of the input (source or target), while preserving a low risk on the source (labeled) examples.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Example Case with a Shallow Neural Network",
+      "selected_sentences": [
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "). Recall that for the examples from the source distribution (d i =0), the corresponding labels y i \u2208 Y are known at training time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the examples from the target domains, we do not know the labels at training time, and we want to predict such labels at test time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This enables us to add a domain adaptation term to the objective of Equation ( 5), giving the following regularizer:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Algorithm 1 Shallow DANN -Stochastic training update",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Generalization to Arbitrary Architectures",
+      "selected_sentences": [
+        {
+          "par_id": 73,
+          "sentences": [
+            {
+              "sent": "where \u00b5 is the learning rate.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use stochastic estimates of these gradients, by sampling examples from the data set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The updates of Equations (13-15) are very similar to stochastic gradient descent (SGD) updates for a feed-forward deep model that comprises feature extractor fed into the label predictor and into the domain classifier (with loss weighted by \u03bb).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The only difference is that in (13), the gradients from the class and domain predictors are subtracted, instead of being summed (the difference is important, as otherwise SGD would try to make features dissimilar across domains in order to minimize the domain classification loss).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Since SGDand its many variants, such as ADAGRAD (Duchi et al, 2010) or ADADELTA (Zeiler, 2012)-is the main learning algorithm implemented in most libraries for deep learning, it would be convenient to frame an implementation of our stochastic saddle point procedure as SGD.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 74,
+          "sentences": [
+            {
+              "sent": "Fortunately, such a reduction can be accomplished by introducing a special gradient reversal layer (GRL), defined as follows.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The gradient reversal layer has no parameters associated with it.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During the forward propagation, the GRL acts as an identity transformation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During the backpropagation however, the GRL takes the gradient from the subsequent level and changes its sign, ie, multiplies it by \u22121, before passing it to the preceding layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Implementing such a layer using existing object-oriented packages for deep learning is simple, requiring only to define procedures for the forward propagation (identity transformation), and backpropagation (multiplying by \u22121).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The layer requires no parameter update.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 76,
+          "sentences": [
+            {
+              "sent": "Mathematically, we can formally treat the gradient reversal layer as a \"pseudo-function\" R(x) defined by two (incompatible) equations describing its forward and backpropagation behaviour:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 77,
+          "sentences": [
+            {
+              "sent": "where I is an identity matrix.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We can then define the objective \"pseudo-function\" of (\u03b8 f , \u03b8 y , \u03b8 d ) that is being optimized by the stochastic gradient descent within our method:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 78,
+          "sentences": [
+            {
+              "sent": "Running updates (13-15) can then be implemented as doing SGD for (18) and leads to the emergence of features that are domain-invariant and discriminative at the same time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After the learning, the label predictor G y (G f (x; \u03b8 f ); \u03b8 y ) can be used to predict labels for samples from the target domain (as well as from the source domain).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that we release the source code for the Gradient Reversal layer along with the usage examples as an extension to Caffe ). 4",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments with Shallow Neural Networks",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments on a Toy Problem",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Unsupervised Hyper-Parameter Selection",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments on Sentiment Analysis Data Sets",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Combining DANN with Denoising Autoencoders",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments with Deep Networks on Image Classification",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Baselines",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CNN architectures and Training Procedure",
+      "selected_sentences": [
+        {
+          "par_id": 111,
+          "sentences": [
+            {
+              "sent": "The other hyper-parameters are not selected through a grid search as in the small scale experiments of Section 5.1, which would be computationally costly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, the learning rate is adjusted during the stochastic gradient descent using the following formula:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Visualizations",
+      "selected_sentences": [
+        {
+          "par_id": 116,
+          "sentences": [
+            {
+              "sent": "between the success of the adaptation in terms of the classification accuracy for the target domain, and the overlap between the domain distributions in such visualizations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results On Image Data Sets",
+      "selected_sentences": [
+        {
+          "par_id": 125,
+          "sentences": [
+            {
+              "sent": "Following previous works, we assess the performance of our method across three transfer tasks most commonly used for evaluation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our training protocol is adopted from ; Chopra et al (2013); Long and Wang (2015) as during adaptation we use all available labeled source examples and unlabeled target examples (the premise of our method is the abundance of unlabeled data in the target domain).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Also, all source domain data are used for training.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Under this \"fully-transductive\" setting, our method is able to improve previously-reported state-of-the-art accuracy for unsupervised adaptation very considerably (Table 3), especially in the most challenging Amazon \u2192 Webcam scenario (the two domains with the largest domain shift).",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 126,
+          "sentences": [
+            {
+              "sent": "Interestingly, in all three experiments we observe a slight over-fitting (performance on the target domain degrades while accuracy on the source continues to improve) as training progresses, however, it doesn't ruin the validation accuracy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, switching off the domain classifier branch makes this effect far more apparent, from which we conclude that our technique serves as a regularizer.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments with Deep Image Descriptors for Re-Identification",
+      "selected_sentences": [
+        {
+          "par_id": 127,
+          "sentences": [
+            {
+              "sent": "In this section we discuss the application of the described adaptation method to person re-identification (re-id ) problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The task of person re-identification is to associate people seen from different camera views.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More formally, it can be defined as follows: given two sets of images from different cameras (probe and gallery) such that each person depicted in the probe set has an image in the gallery set, for each image of a person from the probe set find an image of the same person in the gallery set.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Disjoint camera views, different illumination conditions, various poses and low quality of data make this problem difficult even for humans (eg, Liu et al, 2013, reports human performance at Rank1=71.08%).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 128,
+          "sentences": [
+            {
+              "sent": "Unlike classification problems that are discussed above, re-identification problem implies that each image is mapped to a vector descriptor.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The distance between descriptors is then used to match images from the probe set and the gallery set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To evaluate results of re-id methods the Cumulative Match Characteristic (CMC) curve is commonly used.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is a plot of the identification rate (recall) at rank-k, that is the probability of the matching gallery image to be within the closest k images (in terms of descriptor distance) to the probe image.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Data Sets and Protocols",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results on Re-identification data sets",
+      "selected_sentences": [
+        {
+          "par_id": 139,
+          "sentences": [
+            {
+              "sent": "After the sufficient number of iterations, domain-adversarial training consistently improves the performance of re-identification.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For the pairs that involve PRID data set, which is more dissimilar to the other two data sets, the improvement is considerable.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Overall, this demonstrates the applicability of the domain-adversarial learning beyond classification problems.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Figure 10 further demonstrates the effect of adaptation on the distributions of the learned descriptors in the source and in target sets in VIPeR \u2192 CUHK/p1 experiments, where domain adversarial learning once again achieves better intermixing of the two domains.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 140,
+          "sentences": [
+            {
+              "sent": "The paper proposes a new approach to domain adaptation of feed-forward neural networks, which allows large-scale training based on large amount of annotated data in the source domain and large amount of unannotated data in the target domain.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similarly to many previous shallow and deep DA techniques, the adaptation is achieved through aligning the distributions of features across the two domains.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, unlike previous approaches, the alignment is accomplished through standard backpropagation training.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 141,
+          "sentences": [
+            {
+              "sent": "The approach is motivated and supported by the domain adaptation theory of BenDavid et al (2006.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The main idea behind DANN is to enjoin the network hidden layer to learn a representation which is predictive of the source example labels, but uninformative about the domain of the input (source or target).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We implement this new approach within both shallow and deep feed-forward architectures.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The latter allows simple implementation within virtually any deep learning package through the introduction of a simple gradient reversal layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We have shown that our approach is flexible and achieves state-of-the-art results on a variety of benchmark in domain adaptation, namely for sentiment analysis and image classification tasks.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 142,
+          "sentences": [
+            {
+              "sent": "A convenient aspect of our approach is that the domain adaptation component can be added to almost any neural network architecture that is trainable with backpropagation.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Towards this end, We have demonstrated experimentally that the approach is not confined to classification tasks but can be used in other feed-forward architectures, eg, for descriptor learning for person re-identification.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Domain-Adversarial Training of Neural Networks"
+}

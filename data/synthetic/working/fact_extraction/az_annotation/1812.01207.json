@@ -1,0 +1,407 @@
+{
+  "paper_id": "1812.01207",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Multi-emotion sentiment classification is a natural language processing (NLP) problem with valuable use cases on realworld data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We demonstrate that large-scale unsupervised language modeling combined with finetuning offers a practical solution to this task on difficult datasets, including those with label class imbalance and domain-specific context.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By training an attention-based Transformer network (Vaswani et al 2017) on 40GB of text (Amazon reviews) (McAuley et al 2015) and fine-tuning on the training set, our model achieves a 0.69 F1 score on the SemEval Task 1:E-c multidimensional emotion classification problem (Mohammad et al 2018), based on the Plutchik wheel of emotions (Plutchik 1979).",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results are competitive with state of the art models, including strong F1 scores on difficult (emotion) categories such as Fear (0.73), Disgust (0.77) and Anger (0.78), as well as competitive results on rare categories such as Anticipation (0.42) and Surprise (0.37).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, we demonstrate our application on a real world text classification task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We create a narrowly collected text dataset of real tweets on several topics, and show that our finetuned model outperforms general purpose commercially available APIs for sentiment and multidimensional emotion classification on this dataset by a significant margin.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also perform a variety of additional studies, investigating properties of deep learning architectures, datasets and algorithms for achieving practical multidimensional sentiment classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Overall, we find that unsupervised language modeling and finetuning is a simple framework for achieving high quality results on realworld sentiment classification.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recent work has shown that language models -both RNN variants like the multiplicative LSTM (mLSTM) (Krause et al 2016), as well as the attention-based Transformer network (Vaswani et al 2017) -can be trained efficiently over very large datasets, and that the resulting models can be transferred to downstream language understanding problems, often matching or exceeding the previous state of the art approaches on academic datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, how well do these models perform on practical text classification problems, with real world data?",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this work, we train both mLSTM and Transformer language models on a large 40GB text dataset (McAuley et al 2015), then transfer those models to two text classification problems: binary sentiment (including Neutral labels), and multidimensional emotion classification based on the Plutchik wheel of emotions (Plutchik 1979).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We examine our performance on these tasks, both against large academic datasets, and on an original text dataset that we compiled from social media messages about several specific topics, such as video games.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "We demonstrate that our approach matches the state of the art on the academic datasets without domain-specific training and without excessive hyper-parameter tuning.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Meanwhile on the social media dataset, our approach outperforms commercially available APIs by significant margins, even when those models are re-calibrated to the test set.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Furthermore, we notice that 1) the Transformer model generally out-performs the mLSTM model, especially when fine-tuning on multidimensional emotion classification, and 2) fine-tuning the model significantly improves performance on the emotion tasks, both for the mLSTM and the Transformer model.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We suggest that our approach creates models with good generalization to increasingly difficult text classification problems, and we offer ablation studies to demonstrate that effect.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Our work shows that unsupervised language modeling combined with finetuning offers a practical solution to specialized text classification problems, including those with large category class imbalance, and significant human label disagreement.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Background",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Supervised learning is difficult to apply to NLP problems because labels are expensive.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Following (Radford, J\u00f3zefowicz,   and Sutskever 2017), (Radford et al 2018) and (Dai and Le 2015), we train unsupervised text models on large amounts of unlabelled text data, and transfer the model features to small supervised text problems.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The supervised text classification problem used for transfer is binary sentiment on the Stanford Sentiment Treebank (SST) (Socher et al 2013).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Plutchik's Wheel of Emotions We focus our multidimension emotion classification on Plutchik's wheel of emotions (Plutchik 1979).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This taxonomy, in use since 1979, aims to classify human emotions as a combination of four dualities: Joy Sadness, Anger Fear, Trust Disgust, and Surprise Anticipation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "According to the basic emotion model (Ekman 2013), while humans experience hundreds of emotions, some emotions are more fundamental than others.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "The commercial general purpose emotion classification API that we compare against, IBM's Watson 1 , offers classification scores for the Joy, Sadness, Fear, Disgust and Anger emotions -all present in Plutchik's wheel (Figure 1).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "SemEval Multidimension Emotion Dataset",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "The Se-mEval Task 1:E-c problem (Mohammad et al 2018) offers a training set of 6,857 tweets, with binary labels for the eight Plutchik categories, plus Optimism, Pessimism, and Love.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset was created through a process of text selection and human labeling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show our results on this dataset and compare it to the current state of the art performance.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "While it is not possible to report rater agreement on these categories for the compilation of the dataset, the authors note that 2 out of 7 raters had to agree for a positive label to be applied, as requiring larger agreement caused a scarcity of  (Plutchik 1979).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This indicates that some of the categories had significant rater disagreement between the human raters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The dataset also included a substantial degree of label class imbalance, with some categories like Anger (37%), Disgust (38%), Joy (36%) and Sadness (29%) represented often in the dataset, while others like Trust (5%) and Surprise (5%) present much less frequently (Figure 2).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This class imbalance and human rater disagreement is not uncommon for real world text classification problems 2 .",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Company Tweet Dataset In addition to the SemEval tweet dataset, we wanted to see how our model would perform on a similar but domain-specific task: Plutchik emotion classification on tweets relevant to a particular company.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We collected tweets on a variety of topics, including:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Henceforth, we refer to the combined company tweets dataset consisting of: \u2022 4,021 random tweets \u2022 5,024 tweets selected for higher emotion content \u2022 4,281 tweets selected for source category balance Finetuning Recent work has shown promising results using unsupervised language modeling, followed by transfer learning to natural language tasks (Radford, J\u00f3zefowicz, and Sutskever 2017), (Radford et al 2018).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, these models benefit when the entire model is fine-tuned on the transfer task, as demonstrated in (Howard and Ruder 2018).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, these methods have beaten the state of the art on binary sentiment classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These models have also attained the best overall score on the GLUE Benchmark 4 (Wang et al 2018), comprised of a variety of text understanding tasks, including entailment and question answering.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Methodology",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "We chose to compare these particular models because they work in fundamentally different ways and because they collectively hold state of the art results on many significant academic NLP benchmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We wanted to test these models on difficult classification problems with real-world data.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "ELMo Baseline",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Binary Sentiment Tweets",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Multi-Label Emotion Tweets",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "The IBM Watson API offers multi-label emotion predictions for five categories: Anger, Disgust, Fear, Joy and Sadness.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare our models to Watson on these categories for both the SemEval dataset and the company tweets in Table 7.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We find that our models outperform Watson on every emotion category.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "SemEval Tweets We submitted our finetuned Transformer model to the SemEval Task1:EC challenge, as seen in Table 6.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These results were computed by the organizers on a golden test set, for which we do not have access to the truth labels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model achieved the top macro-averaged F1 score among all submission, with competitive but lower scores for the micro-average F1 an the Jaccard Index accuracy 8 .",
+              "tag": "Result"
+            },
+            {
+              "sent": "This suggests that our model out-performs the other top submission on rare and difficult categories, since macroaverage weighs performance on all classes equally, and the most common categories of Joy, Anger, Disgust and Optimism get relatively higher F1 scores across all models. 8",
+              "tag": "Claim"
+            },
+            {
+              "sent": "SemEval 2018 results can be seen at http://alt.qcri.org/semeval2018/.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our entry is #1 in the postevaluation period for Task1:EC, as of October 2018.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also compare the deep learning architectures of the Transformer and mLSTM on this dataset in Table 7 and find that the Transformer outperforms the mLSTM across Plutchik categories.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "In comparison, we demonstrate that finetuning can be as effective on this task, despite training only on 7,000 tweets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, out language modeling took place on the Amazon Reviews dataset, which does not contain emoji, hashtags or usernames.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We would expect to see improvements if our unsupervised dataset contained emoji, for example.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Analysis",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "There is not sufficient space for a thorough analysis, but we wanted to suggest why general purpose APIs may not work well on our company tweets dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 1 samples the largest binary sentiment disagreements between human raters and the Wat-son API.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For simplicity, we restrict examples to video game tweets, which comprise 19.1% of our test set.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As we can see, all of these examples appear to ascribe negative emotion to generally negative terms which, in a video game context, do not indicate negative sentiment.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "In this work we demonstrate that unsupervised pretraining and finetuning provides a flexible framework that is effective for difficult text classification tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We noticed that the finetuning was especially effective with the Transformer network, when transferring to downstream tasks with noisy labels and specialized context.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "We think that this framework makes it easy to customize a text classification model on niche tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unsupervised language modeling can be done on general text datasets, and requires no labels.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Meanwhile downstream task transfer works well enough, even on small amounts of domain-specific labelled data, to be accessible to most academics and small organization.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 61,
+          "sentences": [
+            {
+              "sent": "It would be great to see this approach applied to a variety of practical text classification problems, much as (Radford et al 2018) and (Devlin et al 2018) have applied language modeling and transfer to a variety of academic text understanding problems on the GLUE Benchmark.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Practical Text Classification With Large Pre-Trained Language Models"
+}

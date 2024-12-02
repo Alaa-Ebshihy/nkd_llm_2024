@@ -1,0 +1,722 @@
+{
+  "paper_id": "1710.06555",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Person Re-identification (ReID) is to identify the same person across different cameras.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is a challenging task due to the large variations in person pose, occlusion, background clutter, etc",
+              "tag": "Claim"
+            },
+            {
+              "sent": "How to extract powerful features is a fundamental problem in ReID and is still an open problem today.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we design a MultiScale ContextAware Network (MSCAN) to learn powerful features over full body and body parts, which can well capture the local context knowledge by stacking multi-scale convolutions in each layer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, instead of using predefined rigid parts, we propose to learn and localize deformable pedestrian parts using Spatial Transformer Networks (STN) with novel spatial constraints.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The learned body parts can release some difficulties, eg pose variations and background clutters, in part-based representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we integrate the representation learning processes of full body and body parts into a unified framework for person ReID through multi-class person identification tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Extensive evaluations on current challenging large-scale person ReID datasets, including the image-based Market1501, CUHK03 and sequence-based MARS datasets, show that the proposed method achieves the state-of-the-art results.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Person re-identification aims to search for the same person across different cameras with a given probe image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It has attracted much attention in recent years due to its importance in many practical applications, such as video surveillance and content-based image retrieval.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Despite of years of efforts, it still has many challenges, such as large variations in person pose, illumination, and background clutter.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition, similar appearance of clothes among different people and imperfect pedestrian detection results further increase its difficulty in real applications.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Most existing methods for ReID focus on developing a powerful representation to handle the variations of view-(Full body in Figure 1), or learn a part-based representation for predefined rigid parts (Rigid body parts in Figure 1) or learn a feature embedding for both of them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although these DCNN models have obtained impressive results on existing ReID datasets, there are still two problems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, for feature learning, current popular DCNN models typically stack single-scale convolution and max pooling layers to generate deep networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With the increase of the number of layers, these DCNN models could easily miss some small scale visual cues, such as sunglasses and shoes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, these fine-grained attributes are very useful to distinguish the pedestrian pairs with small inter-class variations.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Thus these DCNN models are not the best choice for pedestrian feature learning.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Second, due to the pose variations and imperfect pedestrian detectors, the pedestrian image samples may be misaligned.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Sometimes they may have some backgrounds or lack some parts, eg",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In these cases, for part-based representation, the predefined rigid grids may fail to capture correct correspondence between two pedestrian images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus the rigid predefined grids are far from robust for effective part-based feature learning.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose to learn the features of full body and body parts jointly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To solve the first problem, we propose a MultiScale ContextAware Network (MSCAN).",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 1, for each convolutional layer of the MSCAN, we adopt multiple convolution kernels with different receptive fields to obtain multiple feature maps.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Feature maps from different convolution kernels are concatenated as current layer's output.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To decrease the correlations among different convolution kernels, the dilated convolution [45] is used rather than general convolution kernels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Through this way, multi-scale context knowledge is obtained at the same layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus the local visual cues for finegrained discrimination is enhanced.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, through embedding contextual features layer-by-layer (convolution operation across layers), MSCAN can obtain more contextaware representation for input image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To solve the second problem, instead of using rigid body parts, we propose to localize latent pedestrian parts through Spatial Transform Networks (STN) [13], which is originally proposed to learn image transformation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To adapt it to the pedestrian part localization task, we propose three new constraints on the learned transformation parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With these constraints, more flexible parts can be localized at the informative regions, so as to reduce the distraction of background contents.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "The contributions of this paper are summarized as follows: (a) We propose a multi-scale context-aware network to enhance the visual context information for better feature representation of fine-grained visual cues.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "(b) Instead of using rigid parts, we propose to learn and localize pedestrian parts using spatial transformer networks with novel prior spatial constraints.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Experimental results show that fusing the global full-body and local body-part representations greatly improves the performance of person ReID.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Typical person ReID methods focus on two key points: developing a powerful feature for image representation and learning an effective metric to make the same person be close and different persons far away.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, deep learning approaches have achieved the state-of-the-art results for person ReID [34,39,48,52,54].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Here we mainly review the related deep learning methods.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "With the increasing sample size of ReID dataset, the IDE feature which is learned through multi-class person identification tasks, has shown great potentials on current largescale person ReID datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Xiao et al [39] propose the domain guided dropout to learn features over multiple datasets simultaneously with identity classification loss.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Zheng et al [52] learn the IDE feature for the video-based person reidentification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Xiao et al [40] and Zheng et al [55] learn the IDE feature to jointly solve the pedestrian detection and person ReID tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Schumann et al [30] learn the IDE feature for domain adaptive person ReID.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The similar phenomenon has also been validated on face recognition [33].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "As we know, previous DCNN models usually adopt the layer-by-layer single-scale convolution kernels to learn the context information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Some DCNN models [5,31,44] adopt rigid body parts to learn local pedestrian features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Different from them, we improve the classical models in two ways.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Firstly, we propose to enhance the context knowledge through multi-scale convolutions at the same layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The relationship among different context knowledge are learned by embedding feature maps layer-by-layer (convolution or FC operation).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Secondly, instead of using rigid parts, we utilize the spatial transformer networks with proposed prior constraints to learn and localize latent human parts.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Proposed Method",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "The focus of this approach is to learn powerful feature representations to describe pedestrians.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The overall framework of the proposed method is shown in Figure 2. In this section, we introduce our model from four aspects: a multiscale context-aware network for efficient feature learning (Section 3.1), the latent parts learning and localization for better local part-based feature representation (Section 3.2), the fusion of global full-body and local body-part features for person ReID (Section 3.3), and our final objective function in Section 3.4.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Multi-scale Context-aware Network",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Visual context is an important component to assist visual-related tasks, such as object recognition [24] and object detection [46,56].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Typical convolutional neural networks model context information through hierarchical convolution and pooling [11,17].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For person ReID task, the most important visual cues are visual attribute knowledge, such as clothes color and types.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, they have large variations in scale, shape and position, such as the hat/glasses at small local scale and the cloth color at the larger scale.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Directly using bottom-to-up single-scale convolution and pooling may not be effective to handle these complex variations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Especially, with the increase number of layers, the small visual regions, such as hat, will be easily missed in top layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To better learn these diverse visual cues, we propose the Multi-scale ContextAware Network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The architecture of the proposed MSCAN is shown in Tabel 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It has an initial convolution layer with kernel size 5 \u00d7 5 to capture the low-level visual features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we use four multi-scale convolution layers to obtain the complex image context information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In each multi-scale convolution layer, we use a convolution kernel with size 3 \u00d7 3. To obtain multi-scale receptive fields, we adopt dilated convolution [45] for the convolution filters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use three different dilation ratios, ie 1,2 and 3, to capture different scale context information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The feature maps from different dilation ratios are concatenated along the channel axis to form the final output of the current convolution layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus, the visual context information are enhanced explicitly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To integrate different context information together, the feature maps of current convolution layer are embedded through layer-bylayer convolution or FC operation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a result, the visual cues at different scales are fused in a latent way.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Besides, we adopt Batch Normalization [12] and ReLU neural activation units after each convolution layer.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "In summary, as shown in Figure 2, we use MSCAN to learn the multi-scale context representation for full body and body parts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, it is also used for feature learning in spatial transformer networks mentioned below.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Latent Part Localization",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Pedestrian parts are important in person ReID.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Some existing work [5,10,22,44] has explored rigid body parts to develop robust features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, due to the unsatisfying pedestrian detection algorithms and large pose variations, the method of using rigid body parts for local feature learning is not the optimal solution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As shown in Figure 1, when using rigid body parts, the top part consists of large amount of background.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This motivates us to learn and localize the pedestrian parts automatically.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "In this paper, we expect STN to learn three parts corresponding to the head-shoulder, upper body and lower body.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each part is learned by an independent STN from the original pedestrian image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the spatial localization network, firstly we use MSCAN to extract the global image feature maps.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we learn the high-level abstract representation by a 128-dimension FC layer (FC loc in Figure 2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "At last, we learn the transformation parameters \u03b8 with a 4-dimension FC layer based on the FC loc.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The MSCAN and FC loc are shared among three spatial localization networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The grid generator can crop the learned pedestrian parts based on the learned transformation parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this paper, the resolution of the cropped part image is 96 \u00d7 64.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Feature Extraction and Fusion",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "The features of full body and body parts are learned by separate networks and then are fused in a unified framework for multi-class person identification tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the body-based representation, we use MSCAN to extract the global feature maps and then learn a 128-dimension feature embedding (denoted as FC body in Figure 2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the part-based representation, first, for each body part, we use the MSCAN to extract its feature maps and learn a 64-dimension feature embedding (denoted as FC part1, FC part2, FC part3).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then, we learn a 128-dimension feature embedding (denoted as FC part) based on features of each body part.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The Dropout [32] is adopted after each FC layer to prevent overfitting.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At last, the features of global full body and local body parts are concatenated to be a 256dimension feature as the final person representation.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Objective Function",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Datasets and Protocols",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "In this paper, we evaluate our proposed method on current largest person ReID datasets, including Market1501 [53], CUHK03 [20] and MARS [52].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We do not directly train our model on small datasets, such as VIPeR [9].",
+              "tag": "Method"
+            },
+            {
+              "sent": "It would be easily overfitting and insufficient to learn such a large capacity network on small datasets from scratch.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, we give some results through finetuneing the model from Market1501 to VIPeR and make cross-dataset ReID on VIPeR for generalization validation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Related experimental results are discussed in Section 4.6.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "MARS: It is the largest sequence-based person ReID dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It contains 1,261 identities with each identity captured by at least two cameras.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It consists of 20,478 tracklets and 1,191,003 bounding boxes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following [52], we use 625 identities for training and the rest 631 identities for testing.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "Following original evaluation protocols in each dataset, we adopt three evaluation protocols for fair comparison with existing methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first one is Cumulated Matching Characteristics (CMC) which is adopted on the CUHK03 and MARS datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second one is Rank-1 identification rate on the Market1501 dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The third one is mean Average Precision (mAP) on the Market1501 and MARS datasets. mAP considers both precision and recall rate, which could be complementary to CMC.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Implementation Details",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "Model: We try to learn the pedestrian representation through multi-class person identification tasks using full body and body parts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To evaluate the effectiveness of full body and body parts independently, we extract two submodels from the whole network of Figure 2. The first one only uses the full body to learn the person representation with identity classification loss.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second one only uses the parts to learn the person representation with identity classification and body parts localization loss.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For person re-identification, we use the L2 normalized person representation and Euclidean metric to measure the distance between two pedestrian samples.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Comparison with State-of-the-art Methods",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "Compared with existing full body-based convolutional neural networks, such as CAN and GateSCNN, the proposed network structure can better capture pedestrian features with multi-class person identification tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our fullbody representation improves Rank-1 identification rate by 9.57% on the state-of-the-art results produced by the GateCNN in single query.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared with the full body, our body-part representation increase 0.80%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The main reason is that the pedestrians detected by DPM consists much more background information and the part-based representation can better reduce the influences of background clutter.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "MARS: This dataset is the largest sequence-based person ReID dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On this dataset, we compare the proposed method with several classical methods, including Keep It as Simple and straightforward Metric (KISSME) [16], XQDA [22], and CaffeNet [17].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similar to previous work [52], both single query and multiple query are evaluated on MARS.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The overall experimental results on the MARS are shown in Table 5   trates the effectiveness of our model.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Effectiveness of MSCAN",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "For better understanding the learned pedestrian parts, we visualize the localized latent parts in Figure 4 using our fusion model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For these detected person with large background (the first row in Figure 4), the proposed model can learn foreground information with complementary latent pedestrian parts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As we can see, the learned parts consist of three main components, including upper body, middle body (combination of upper body and lower body), and lower body.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Similar results can be achieved when original detection pedestrians contain less background or occlusion (the second row in Figure 4).",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is easy to see that, the automatically learned pedestrian parts are not strictly head-shoulder, upper body and lower-body.",
+              "tag": "Result"
+            },
+            {
+              "sent": "But it indeed consists of these three parts with large overlap.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared with rigid parts, the proposed model can automatically localize the appropriate latent parts for feature learning.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Effectiveness of localization loss",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Cross-dataset Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "Similar with typical image classification task with CNN, our approach requires large scale of data, not only more identities, but also more instances for each identity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "So we do not train the proposed model on each single small person ReID dataset, such as VIPeR.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, we conduct cross-dataset evaluation from the pretrained model on the Market1501, CUHK03 and MARS datasets to the VIPeR dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The experimental results are shown in Table 10.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared with other methods, such as Domain Transfer Rank Support Vector Machines [26] and DML [44], the models trained on large-scale datasets have better generalization ability and have better Rank-1 identification rate.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "In this work, we have studied the problem of person ReID in three levels: 1) a multi-scale context-aware network to capture the context knowledge for pedestrian feature learning, 2) three novel constraints on STN for effective latent parts localization and body-part feature representation, 3) the fusion of full-body and body-part identity discriminative features for powerful pedestrian representation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We have validated the effectiveness of the proposed method on current large-scale person ReID datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experimental results have demonstrated that the proposed method achieves the state-of-the-art results.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Learning Deep Context-aware Features over Body and Latent Parts for Person Re-identification"
+}

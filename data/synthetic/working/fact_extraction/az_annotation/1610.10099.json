@@ -1,0 +1,696 @@
+{
+  "paper_id": "1610.10099",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We present a novel neural network for processing sequences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ByteNet is a one-dimensional convolutional neural network that is composed of two parts, one to encode the source sequence and the other to decode the target sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The two network parts are connected by stacking the decoder on top of the encoder and preserving the temporal resolution of the sequences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To address the differing lengths of the source and the target, we introduce an efficient mechanism by which the decoder is dynamically unfolded over the representation of the encoder.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ByteNet uses dilation in the convolutional layers to increase its receptive field.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The resulting network has two core properties: it runs in time that is linear in the length of the sequences and it sidesteps the need for excessive memorization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ByteNet decoder attains state-of-the-art performance on character-level language modelling and outperforms the previous best results obtained with recurrent networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ByteNet also achieves state-of-the-art performance on character-to-character machine translation on the English-toGerman WMT translation task, surpassing comparable neural translation models that are based on recurrent networks with attentional pooling and run in quadratic time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We find that the latent alignment structure contained in the representations reflects the expected alignment between the tokens.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "In neural language modelling, a neural network estimates a distribution over sequences of words or characters that belong to a given language (Bengio et al, 2003).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In neural machine translation, the network estimates a distribution over sequences in the target language conditioned on a given sequence in the source language.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network can be thought of as composed of two parts: a source network (the encoder) that encodes the source sequence into a representation and a target network (the decoder) that uses the  representation of the source encoder to generate the target sequence (Kalchbrenner & Blunsom, 2013).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Recurrent neural networks (RNN) are powerful sequence models (Hochreiter & Schmidhuber, 1997) and are widely used in language modelling (Mikolov et al, 2010), yet they have a potential drawback.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "RNNs have an inherently serial structure that prevents them from being run in parallel along the sequence length during training and evaluation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Forward and backward signals in a RNN also need to traverse the full distance of the serial path to reach from one token in the sequence to another.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The larger the distance, the harder it is to learn the dependencies between the tokens (Hochreiter et al, 2001).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "A number of neural architectures have been proposed for modelling translation, such as encoder-decoder networks (Kalchbrenner & Blunsom, 2013;Sutskever et al, 2014;Cho et al, 2014;Kaiser & Bengio, 2016), networks with attentional pooling (Bahdanau et al, 2014) and twodimensional networks (Kalchbrenner et al, 2016a).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Despite the generally good performance, the proposed models either have running time that is super-linear in the length of the source and target sequences, or they process the source sequence into a constant size representation, burdening the model with a memorization step.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Both of these drawbacks grow more severe as the length of the sequences increases.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "We present a family of encoder-decoder neural networks that are characterized by two architectural mechanisms aimed to address the drawbacks of the conventional approaches mentioned above.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first mechanism involves the stacking of the decoder on top of the representation of the encoder in a manner that preserves the temporal resolution of the sequences; this is in contrast with architectures that encode the source into a fixed-size representation (Kalchbrenner & Blunsom, 2013;Sutskever et al, 2014).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second mechanism is the dynamic unfolding mechanism that allows the network to process in a simple and efficient way source and target sequences of different lengths (Sect.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "The ByteNet is the instance within this family of models that uses one-dimensional convolutional neural networks (CNN) of fixed depth for both the encoder and the decoder (Figure 1).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The two CNNs use increasing factors of dilation to rapidly grow the receptive fields; a similar technique is also used in (van den Oord et al, 2016a).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The convolutions in the decoder CNN are masked to prevent the network from seeing future tokens in the target sequence (van den Oord et al, 2016b).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "The network has beneficial computational and learning properties.",
+              "tag": "Method"
+            },
+            {
+              "sent": "From a computational perspective, the network has a running time that is linear in the length of the source and target sequences (up to a constant c \u2248 log d where d is the size of the desired dependency field).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The computation in the encoder during training and decoding and in the decoder during training can also be run efficiently in parallel along the sequences (Sect.",
+              "tag": "Method"
+            },
+            {
+              "sent": "From a learning perspective, the representation of the source sequence in the ByteNet is resolution preserving; the representation sidesteps the need for memorization and allows for maximal bandwidth between encoder and decoder.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, the distance traversed by forward and backward signals between any input and output tokens corresponds to the fixed depth of the networks and is largely independent of the dis-tance between the tokens.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Dependencies over large distances are connected by short paths and can be learnt more easily.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "We apply the ByteNet model to strings of characters for character-level language modelling and character-tocharacter machine translation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate the decoder network on the Hutter Prize Wikipedia task (Hutter, 2012) where it achieves the state-of-the-art performance of 1.31 bits/character.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We further evaluate the encoderdecoder network on character-to-character machine translation on the English-toGerman WMT benchmark where it achieves a state-of-the-art BLEU score of 22.85 (0.380 bits/character) and 25.53 (0.389 bits/character) on the 2014 and 2015 test sets, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the character-level machine translation task, ByteNet betters a comparable version of GNMT (Wu et al, 2016a) that is a state-of-the-art system.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results show that deep CNNs are simple, scalable and effective architectures for challenging linguistic processing tasks.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Neural Translation Model",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Each conditional factor expresses complex and long-range dependencies among the source and target tokens.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The strings are usually sentences of the respective languages; the tokens are words or, as in the our case, characters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network that models p(t|s) is composed of two parts: a source network (the encoder) that processes the source string into a representation and a target network (the decoder) that uses the source representation to generate the target string (Kalchbrenner & Blunsom, 2013).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The decoder functions as a language model for the target language.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Desiderata",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "The use of operations that run in parallel along the sequence length can also be beneficial for reducing computation time.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Second, the size of the source representation should be linear in the length of the source string, ie it should be resolution preserving, and not have constant size.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is to avoid burdening the model with an additional memorization step before translation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In more general terms, the size of a representation should be proportional to the amount of information it represents or predicts.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "ByteNet",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "We aim at building neural language and translation models that capture the desiderata set out in Sect.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The proposed ByteNet architecture is composed of a decoder that is stacked on an encoder (Sect.",
+              "tag": "Method"
+            },
+            {
+              "sent": "3.1) and generates variable-length outputs via dynamic unfolding (Sect.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The decoder is a language model that is formed of one-dimensional convolutional layers that are masked (Sect.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The encoder processes the source string into a representation and is formed of one-dimensional convolutional layers that use dilation but are not masked.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 1 depicts the two networks and their combination.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Encoder-Decoder Stacking",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "A notable feature of the proposed family of architectures is the way the encoder and the decoder are connected.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To maximize the representational bandwidth between the encoder and the decoder, we place the decoder on top of the representation computed by the encoder.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is in contrast to models that compress the source representation into a fixed-size vector (Kalchbrenner & Blunsom, 2013;Sutskever et al, 2014) or that pool over the source representation with a mechanism such as attentional pooling (Bahdanau et al, 2014).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Dynamic Unfolding",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "An encoder and a decoder network that process sequences of different lengths cannot be directly connected due to the different sizes of the computed representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We circumvent this issue via a mechanism which we call dynamic unfolding, which works as follows.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "In this manner the representation produced by the encoder can be efficiently computed, while maintaining high bandwidth and being resolution-preserving.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Once the encoder representation is computed, we let the decoder unfold stepby-step over the encoder representation until the decoder itself outputs an end-of-sequence symbol; the unfolding process may freely proceed beyond the estimated length | t| of the encoder representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 2 gives an example of dynamic unfolding.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Input Embedding Tensor",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Masked One-dimensional Convolutions",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Dilation",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "The masked convolutions use dilation to increase the receptive field of the target network (Chen et al, 2014;Yu & Koltun, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Dilation makes the receptive field grow exponentially in terms of the depth of the networks, as opposed to linearly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use a dilation scheme whereby the dilation rates are doubled every layer up to a maximum rate r (for our experiments r = 16).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The scheme is repeated multiple times in the network always starting from a dilation rate of 1 (van den Oord et al, 2016a;Kalchbrenner et al, 2016b).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Residual Blocks",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model Comparison",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Recurrent ByteNets",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "The ByteNet is composed of two stacked encoder and decoder networks where the decoder network dynamically adapts to the output length.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This way of combining the networks is not tied to the networks being strictly convolutional.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We may consider two variants of the ByteNet that use recurrent networks for one or both of the networks (see Figure 4).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first variant replaces the convolutional decoder with a recurrent one that is similarly stacked and dynamically unfolded.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second variant also replaces the convolutional encoder with a recurrent encoder, eg a bidirectional RNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The target RNN is then placed on top of the source RNN.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Considering the latter Recurrent ByteNet, we can see that the RNN EncDec network (Sutskever et al, 2014;Cho et al, 2014) is a Recurrent ByteNet where all connections between source and target -except for the first one that connects s 0 and t 0 -have been severed.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The Recurrent ByteNet is a generalization of the RNN EncDec and, modulo the type of weight-sharing scheme, so is the convolutional ByteNet.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Comparison of Properties",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "Our comparison criteria reflect the desiderata set out in Sect.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We separate the first (computation time) desider-atum into three columns.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first column indicates the time complexity of the network as a function of the length of the sequences and is denoted by Time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The other two columns Net S and Net T indicate, respectively, whether the source and the target network use a convolutional structure (CNN) or a recurrent one (RNN); a CNN structure has the advantage that it can be run in parallel along the length of the sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second (resolution preservation) desideratum corresponds to the RP column, which indicates whether the source representation in the network is resolution preserving.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, the third desideratum (short forward and backward flow paths) is reflected by two columns.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The Path S column corresponds to the length in layer steps of the shortest path between a source token and any output target token.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similarly, the Path T column corresponds to the length of the shortest path between an input target token and any output target token.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Shorter paths lead to better forward and backward signal propagation.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "Table 1 summarizes the properties of the models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ByteNet, the Recurrent ByteNets and the RNN EncDec are the only networks that have linear running time (up to the constant c).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The RNN EncDec, however, does not preserve the source sequence resolution, a feature that aggravates learning for long sequences such as those that appear in character-to-character machine translation (Luong & Manning, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The RCTM 2, the RNN EncDec Att, the Grid LSTM and the Extended Neural GPU do preserve the resolution, but at a cost of a quadratic running time.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The ByteNet stands out also for its Path properties.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dilated structure of the convolutions connects any two source or target tokens in the sequences by way of a small number of network layers corresponding to the depth of the source or target networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For character sequences where learning long-range dependencies is important, paths that are sublinear in the distance are advantageous.",
+              "tag": "Method"
+            },
+            {
+              "sent": "(Luong et al, 2015) words words 14.0 RNN EncDec Att (Zhou et al, 2016) words words 20.6 RNN EncDec Att (Luong et al, 2015) words words 20.9 GNMT (RNN EncDec Att) (Wu et al, 2016a) word-pieces word-pieces 24.61",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model Test",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Character Prediction",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "We first evaluate the ByteNet Decoder separately on a character-level language modelling benchmark.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the Hutter Prize version of the Wikipedia dataset and follow the standard split where the first 90 million bytes are used for training, the next 5 million bytes are used for validation and the last 5 million bytes are used for testing (Chung et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The total number of characters in the vocabulary is 205.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "The ByteNet Decoder that we use for the result has 30 residual blocks split into six sets of five blocks each; for the five blocks in each set the dilation rates are, respectively, 1, 2, 4, 8 and 16.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The masked kernel has size 3.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This gives a receptive field of 315 characters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The number of hidden units d is 512.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this task we use residual multiplicative blocks (Figure 3 Right).",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the optimization we use Adam (Kingma & Ba, 2014) with a learning rate of 0.0003 and a weight decay term of 0.0001.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We apply dropout to the last ReLU layer before the softmax dropping units with a probability of 0.1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We do not reduce the learning rate during training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At each step we sample a batch of sequences of 500 characters each, use the first 100 characters as the minimum context and predict the latter 400 characters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 3 lists recent results of various neural sequence models on the Wikipedia dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All the results except for the ByteNet result are obtained using some variant of the LSTM recurrent neural network (Hochreiter & Schmidhuber, 1997).",
+              "tag": "Result"
+            },
+            {
+              "sent": "The ByteNet decoder achieves 1.31 bits/character on the test set.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Character-Level Machine Translation",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "We evaluate the full ByteNet on the WMT English to German translation task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use NewsTest 2013 for validation and NewsTest 2014 and 2015 for testing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The English and German strings are encoded as sequences of characters; no explicit segmentation into words or morphemes is applied to the strings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The outputs of the network are strings of characters in the target language.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We keep 323 characters in the German vocabulary and 296 in the English vocabulary.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "The ByteNet used in the experiments has 30 residual blocks in the encoder and 30 residual blocks in the decoder.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As in the ByteNet Decoder, the residual blocks are arranged in sets of five with corresponding dilation rates of 1, 2, 4, 8 and 16.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this task we use the residual blocks with ReLUs (Figure 3 Left).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The number of hidden units d is 800.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The size of the kernel in the source network is 3, whereas the size of the masked kernel in the target network is 3.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the optimization we use Adam with a learning rate of 0.0003.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "Table 2 and Table 4 contain the results of the experiments.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On NewsTest 2014 the ByteNet achieves the highest performance in character-level and subword-level neural machine translation, and compared to the word-level systems it is second only to the version of GNMT that uses word-pieces.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On NewsTest 2015, to our knowledge, ByteNet achieves the best published results to date.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "We have introduced the ByteNet, a neural translation model that has linear running time, decouples translation from memorization and has short signal propagation paths for tokens in sequences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We have shown that the ByteNet decoder is a state-of-the-art character-level language model based on a convolutional neural network that outperforms recurrent neural language models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We have also shown that the ByteNet generalizes the RNN EncDec architecture and achieves state-of-the-art results for character-to-character machine translation and excellent results in general, while maintaining linear running time complexity.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We have revealed the latent structure learnt by the ByteNet and found it to mirror the expected alignment between the tokens in the sentences.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Neural Machine Translation in Linear Time"
+}

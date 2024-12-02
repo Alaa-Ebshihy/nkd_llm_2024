@@ -1,0 +1,306 @@
+{
+  "paper_id": "1512.08422",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose the TBCNNpair model to recognize entailment and contradiction between two sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In our model, a tree-based convolutional neural network (TBCNN) captures sentencelevel semantics; then heuristic matching layers like concatenation, element-wise product/difference combine the information in individual sentences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experimental results show that our model outperforms existing sentence encoding-based approaches by a large margin.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recognizing entailment and contradiction between two sentences (called a premise and a hypothesis) is known as natural language inference (NLI) in MacCartney (2009).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Provided with a premise sentence, the task is to judge whether the hypothesis can be inferred (entailment), or the hypothesis cannot be true (contradiction).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Several examples are illustrated in Table 1.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Traditional approaches to NLI mainly fall into two groups: feature-rich models and formal reasoning methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Feature-based approaches typically leverage machine learning models, but require intensive human engineering to represent lexical and syntactic information in two sentences * Equal contribution.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Premise",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Table 1: Examples of relations between a premise and a hypothesis: Entailment, Contradiction, and Neutral (irrelevant).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "The renewed prosperity of neural networks has made significant achievements in various NLP applications, including individual sentence modeling (Kalchbrenner et al, 2014; as well as sentence matching (Hu et al, 2014;Yin and Sch\u00fctze, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A typical neural architecture to model sentence pairs is the \"Siamese\" structure (Bromley et al, 1993), which involves an underlying sentence model and a matching layer to determine the relationship between two sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Prevailing sentence models include convolutional networks (Kalchbrenner et al, 2014) and recurrent/recursive networks (Socher et al, 2011b).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although they have achieved high performance, they may either fail to fully make use of the syntactical information in sentences or be difficult to train due to the long propagation path.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, we propose a novel tree-based convolutional neural network (TBCNN) to alleviate the aforementioned problems and have achieved higher performance in two sentence classification tasks .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, it is less clear whether TBCNN can be harnessed to model sentence pairs for implicit logical inference, as is in the NLI task.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose the TBCNN-pair neural model to recognize entailment and contradiction between two sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We lever-age our newly proposed TBCNN model to capture structural information in sentences, which is important to NLI.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For example, the phrase \"riding bicycles on the streets\" in Table 1 can be well recognized by TBCNN via the dependency relations dobj(riding,bicycles) and prep on(riding,street).",
+              "tag": "Result"
+            },
+            {
+              "sent": "As we can see, TBCNN is more robust than sequential convolution in terms of word order distortion, which may be introduced by determinators, modifiers, etc",
+              "tag": "Result"
+            },
+            {
+              "sent": "A pooling layer then aggregates information along the tree, serving as a way of semantic compositonality.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, two sentences' information is combined by several heuristic matching layers, including concatenation, element-wise product and difference; they are effective in capturing relationships between two sentences, but remain low complexity.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "To sum up, the main contributions of this paper are two-fold: (1) We are the first to introduce tree-based convolution to sentence pair modeling tasks like NLI; (2) Leveraging additional heuristics further improves the accuracy while remaining low complexity, outperforming existing sentence encoding-based approaches to a large extent, including feature-rich methods and long short term memory (LSTM)-based recurrent networks. 1",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Entailment recognition can be viewed as a task of sentence pair modeling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most neural networks in this field involve a sentence-level model, followed by one or a few matching layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They are sometimes called \"Siamese\" architectures (Bromley et al, 1993).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hu et al (2014) and Yin and Sch\u00fctze (2015) apply convolutional neural networks (CNNs) as the individual sentence model, where a set of feature detectors over successive words are designed to extract local features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Wan et al (2015) build sentence pair models upon recurrent neural networks (RNNs) to iteratively integrate information along a sentence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Socher et al (2011a) dynamically construct tree structures (analogous to parse trees) by recursive autoencoders to detect paraphrase between two sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As shown, inherent structural information in sentences is oftentimes important to natural language understanding.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Our Approach",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Tree-Based Convolution",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Matching Heuristics",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Evaluation 4.1 Dataset",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "To evaluate our TBCNN-pair model, we used the newly published Stanford Natural Language Inference (SNLI) dataset (Bowman et al, 2015). 4 he dataset is constructed by crowdsourced efforts, each sentence written by humans.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, the SNLI dataset is magnitudes of larger than previous resources, and hence is particularly suitable for comparing neural models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The target labels comprise three classes: Entailment, Contradiction, and Neutral (two irrelevant sentences).",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Hyperparameter Settings",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Performance",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "As seen, the TBCNN sentence pair model, followed by simple concatenation alone, outperforms existing sentence encoding-based approaches (without pretraining), including a feature-rich method using 6 groups of humanengineered features, long short term memory (LSTM)-based RNNs, and traditional CNNs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This verifies the rationale for using tree-based convolution as the sentence-level neural model for NLI.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 4 compares different heuristics of matching.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first analyze each heuristic separately: using element-wise product alone is significantly worse than concatenation or element-wise difference; the latter two are comparable to each other.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "Combining different matching heuristics improves the result: the TBCNN-pair model with concatenation, element-wise product and difference yields the highest performance of 82.1%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As analyzed in Section 3.2, the element-wise difference matching layer does not add to model complexity and can be absorbed as a special case into simple concatenation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, explicitly using such heuristic yields an accuracy boost of 1-2%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Further applying element-wise product improves the accuracy by another 0.5%.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "The full TBCNN-pair model outperforms all existing sentence encoding-based approaches, in-cluding a 1024d gated recurrent unit (GRU)-based RNN with \"skip-thought\" pretraining (Vendrov et al, 2015).",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results obtained by our model are also comparable to several attention-based LSTMs, which are more computationally intensive than ours in terms of complexity order.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Complexity Concerns",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "In this paper, we proposed the TBCNN-pair model for natural language inference.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model relies on the tree-based convolutional neural network (TBCNN) to capture sentence-level semantics; then two sentences' information is combined by several heuristics including concatenation, element-wise product and difference.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experimental results on a large dataset show a high performance of our TBCNN-pair model while remaining a low complexity order.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Natural Language Inference by Tree-Based Convolution and Heuristic Matching"
+}

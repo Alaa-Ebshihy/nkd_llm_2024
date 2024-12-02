@@ -1,0 +1,718 @@
+{
+  "paper_id": "1603.05474",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "This paper presents a Neural Aggregation Network (NAN) for video face recognition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The network takes a face video or face image set of a person with a variable number of face images as its input, and produces a compact, fixed-dimension feature representation for recognition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The whole network is composed of two modules.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The feature embedding module is a deep Convolutional Neural Network (CNN) which maps each face image to a feature vector.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The aggregation module consists of two attention blocks which adaptively aggregate the feature vectors to form a single feature inside the convex hull spanned by them.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Due to the attention mechanism, the aggregation is invariant to the image order.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our NAN is trained with a standard classification or verification loss without any extra supervision signal, and we found that it automatically learns to advocate high-quality face images while repelling low-quality ones such as blurred, occluded and improperly exposed faces.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The experiments on IJBA, YouTube Face, Celebrity-1000 video face recognition benchmarks show that it consistently outperforms naive aggregation methods and achieves the state-of-the-art accuracy.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Video face recognition has caught more and more attention from the community in recent years [42,21,43,11,26,22,23,27,15,35,31,10].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared to image-based face recognition, more information of the subjects can be exploited from the input videos, which naturally incorporate faces of the same subject in varying poses and illumination conditions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The key issue in video face recognition is to build an appropriate representation of the video face, such that it can effectively integrate the information across different frames together, maintaining beneficial while discarding noisy information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These features are passed to the aggregation module, producing a single 128-dimensional vector r 1 to represent the input faces images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This compact representation is used for recognition.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "To this end, we look for an adaptive weighting scheme to linearly combine all frame-level features from a video together to form a compact and discriminative face representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Different from the previous methods, we neither fix the weights nor rely on any particular heuristics to set them.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, we designed a neural network to adaptively calculate the weights.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We named our network the Neural Aggregation Network (NAN), whose coefficients can be trained through supervised learning in a normal face recognition training task without the need for extra supervision signals.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "The proposed NAN is composed of two major modules that could be trained end-to-end or one by one separately.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first one is a feature embedding module which serves as a frame-level feature extractor using a deep CNN model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The other is the aggregation module that adaptively fuses the feature vectors of all the video frames together.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Our neural aggregation network is designed to inherit the main advantages of pooling techniques, including the ability to handle arbitrary input size and producing orderinvariant representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The key component of this network is inspired by the Neural Turing Machine [12] and the work of [38], both of which applied an attention mechanism to organize the input through accessing an external memory.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This mechanism can take an input of arbitrary size and work as a tailor emphasizing or suppressing each input element just via a weighted averaging, and very importantly it is order independent and has trainable parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we design a simple network structure of two cascaded attention blocks associated with this attention mechanism for face feature aggregation.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Apart from building a video-level representation, the neural aggregation network can also serve as a subject level feature extractor to fuse multiple data sources.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For example, one can feed it with all available images and videos, or the aggregated video-level features of multiple videos from the same subject, to obtain a single feature representation with fixed size.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this way, the face recognition system not only enjoys the time and memory efficiency due to the compact representation, but also exhibits superior performance, as we will show in our experiments.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "We evaluated the proposed NAN for both the tasks of video face verification and identification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We observed consistent margins in three challenging datasets, including the YouTube Face dataset [42], the IJBA dataset [19], and the Celebrity-1000 dataset [23], compared to the baseline strategies and other competing methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Last but not least, we shall point out that our proposed NAN can serve as a general framework for learning contentadaptive pooling.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Therefore, it may also serve as a feature aggregation scheme for other computer vision tasks.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Works",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Recently, state-of-the-art face recognition methods has been dominated by deep convolution neural networks [35,31,28,7,9].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For video face recognition, most of these methods either use pairwise frame feature similarity computation [35,31] or naive (average/max) frame feature pooling [28,7,9].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This motivated us to seek for an adaptive aggregation approach.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Neural Aggregation Network",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "As shown in Figure 1, the NAN network takes a set of face images of a person as input and outputs a single feature vector as its representation for the recognition task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is built upon a modern deep CNN model for frame feature embedding, and becomes more powerful for video face recognition by adaptively aggregating all frames in the video into a compact vector representation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Image ID Score",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Feature embedding module",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "The image embedding module of our NAN is a deep Convolution Neural Network (CNN), which embeds each frame of a video to a face feature representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To leverage modern deep CNN networks with high-end performances, in this paper we adopt the GoogLeNet [34] with the Batch Normalization (BN) technique [17].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Certainly, other network architectures are equally applicable here as well.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The GoogLeNet produces 128-dimension image features, which are first normalized to be unit vectors then fed into the aggregation module.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the rest of this paper, we will simply refer to the employed GoogLeNetBN network as CNN.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Aggregation module",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Consider the video face recognition task on n pairs of video face data (X i , y i ) n i=1 , where X i is a face video sequence or a image set with varying image number K i , ie",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "We instead try to design a better weighting scheme.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Three main principles have been considered in designing our aggregation module.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, the module should be able to process different numbers of images (ie different K i 's), as the video data source varies from person to person.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, the aggregation should be invariant to the image order -we prefer the result unchanged when the image sequence are reversed or reshuffled.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This way, the aggregation module can handle an arbitrary set of image or video faces without temporal information (eg that collected from different Internet locations).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Third, the module should be adaptive to the input faces and has parameters trainable through supervised learning in a standard face recognition training task.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "Our solution is inspired by the memory attention mechanism described in [12,32,38].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The idea therein is to use a neural model to read external memories through a differentiable addressing/attention scheme.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such models are often coupled with Recurrent Neural Networks (RNN) to handle sequential inputs/outputs [12,32,38].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although an RNN structure is not needed for our purpose, its memory attention mechanism is applicable to our aggregation task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this work, we treat the face features as the memory and cast feature weighting as a memory addressing procedure.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We employ in the aggregation module the \"attention blocks\", to be described as follows.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Attention blocks",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "An attention block reads all feature vectors from the feature embedding module, and generate linear weights for them.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, let {f k } be the face feature vectors, then an attention block filters them with a kernel q via dot product, yielding a set of corresponding significances {e k }.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They are then passed to a softmax operator to generate positive weights {a k } with k a k = 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These two operations can be described by the following equations, respectively:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "It can be seen that our algorithm essentially selects one point inside of the convex hull spanned by all the feature vectors.",
+              "tag": "Method"
+            },
+            {
+              "sent": "One related work is [3] where each face image set is approximated with a convex hull and set similarities are defined as the shortest path between two convex hulls.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "In this way, the number of inputs {f k } does not affect the size of aggregation r, which is of the same dimension as a single feature f k .",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Besides, the aggregation result is invariant to the input order of f k : according to Eq. 1, 2, and 3, permuting f k and f k has no effects on the aggregated representation r.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, an attention block is modulated by the filter kernel q, which is trainable through standard backpropagation and gradient descent.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "Single attention block Universal face feature quality measurement.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first try using one attention block for aggregation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this case, vector q is the parameter to learn.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It has the same size as a single feature f and serves as a universal prior measuring the face feature quality.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "We train the network to perform video face verification (see Section 2.3 and Section 3 for details) in the IJBA dataset [19] on the extracted face features, and Figure 2 shows the sorted scores of all the faces images in the dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It can be seen that after training, the network favors highquality face images, such as those of high resolutions and with relatively simple backgrounds.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It down-weights face images with blur, occlusion, improper exposure and extreme poses.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 1 shows that the network achieves higher accuracy than the average pooling baseline in the verification and identification tasks.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "High weight Low weight",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "Samples from a video/image set All weights graphic locations in the feature space (ie for different persons), and content-aware aggregation can learn to select features that are more discriminative for the identity of the input image set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To this end, we employ two attention blocks in a cascaded and end-to-end fashion described as follows.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let q 0 be the kernel of the first attention block, and r 0 be the aggregated feature with q 0 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adaptively compute q 1 , the kernel of the second attention block, through a transfer layer taking r 0 as the input:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Network training",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "The NAN network can be trained either for face verification and identification tasks with standard configurations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training loss",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Module training",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "The two modules can be trained either simultaneously in an end-to-end fashion, or separately one by one.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The latter option is chosen in this work.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we first train the CNN on single images with the identification task, then we train the aggregation module on top of the features extracted by CNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More details can be found in Section 3.1.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "We chose this separate training strategy mainly for two reasons.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, in this work we would like to focus on analyzing the effectiveness and performance of the aggregation module with the attention mechanism.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Despite the huge success of applying deep CNN in image-based face recognition task, little attention has been drawn to CNN feature aggregation to our knowledge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, training a deep CNN usually necessitates a large volume of labeled data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While millions of still images can be obtained for training nowadays [35,28,31], it appears not practical to collect such amount of distinctive face videos or sets.",
+              "tag": "Other"
+            },
+            {
+              "sent": "We leave an endto-end training of the NAN as our future work.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "This section evaluates the performance of the proposed NAN network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We will begin with introducing our training details and the baseline methods, followed by reporting the results on three video face recognition datasets: the IARPA Janus Benchmark A (IJBA) [19], the YouTube Face dataset [42], and the Celebrity-1000 dataset [23].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training details",
+      "selected_sentences": [
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "As mentioned in Section 2.3, two networks are trained separately in this work.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To train the CNN, we use about 3M face images of 50K identities crawled from the Internet to perform image-based identification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The faces are detected using the JDA method [5], and aligned with the LBF method [29].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The input image size is 224x224.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After training, the CNN is fixed and we focus on analyzing the effectiveness of the neural aggregation module.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "The aggregation module is trained on each video face dataset we tested on with standard backpropagation and an RMSProp solver [36].",
+              "tag": "Method"
+            },
+            {
+              "sent": "An all-zero parameter initialization is used, ie, we start from average pooling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The batch size, learning rate, and iteration are tuned for each dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As the network is quite simple and image features are compact (128-d), the training process is quite efficient: training on 5K video pairs with \u223c1M images in total only takes less than 2 minutes on a CPU of a desktop PC.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Baseline methods",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results on IJB-A dataset",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "Figure 3 has shown some typical examples of the weighting results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "NAN exhibits the ability to choose high-quality and more discriminative face images while repelling poor face images.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results on YouTube Face dataset",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results on Celebrity-1000 dataset",
+      "selected_sentences": [
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "The results are presented in Table 4.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that [23] and [22] are not using deep learning and no deep network based method reported result on this dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "So we mainly compare with our baselines in the following.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It can be seen from Table 4 and Figure 7 (a) that NAN consistently outperforms the baseline methods for both 'VideoAggr' and 'Sub-jectAggr'.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Significant improvements upon the baseline are achieved for the 'SubjectAggr' approach.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is interesting to see that, 'SubjectAggr' leads to a clear performance drop for CNN+AvePool compared to its 'VideoAggr'.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This indicates that the naive aggregation gets even worse when applied on the subject level with multiple videos.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, our NAN can benefit from 'SubjectAggr', yielding results consistently better than or on par with the 'VideoAggr' approach and delivers a considerable accuracy boost compared to the baseline.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This suggests our NAN works quite well on handling large data variations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then test our NAN with the close-set protocol.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first train the network on the provided training video sequences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the testing stage, we take the 'Subjec-tAggr' approach described before to build a highly-compact face representation for each gallery subject.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Identification is perform simply by comparing the L 2 distances between aggregated face representations.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 57,
+          "sentences": [
+            {
+              "sent": "The results in both Table 5 and Figure 7 (b) show that our NAN significantly reduces the error of the baseline CNN+AvePool.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This again suggests that in the presence of large face variances, the widely used strategies such as average-pooling aggregation and the pairwise distance computation are far from optimal.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "In such cases, our learned NAN model is clearly more powerful, and the aggregated feature representation by it is more favorable for the video face recognition task.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 58,
+          "sentences": [
+            {
+              "sent": "We have presented a Neural Aggregation Network for video face representation and recognition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It fuses all input frames with a set of content adaptive weights, resulting in a compact representation that is invariant to the input frame order.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The aggregation scheme is simple with small computation and memory footprints, but can generate quality face representations after training.",
+              "tag": "Other"
+            },
+            {
+              "sent": "The proposed NAN can be used for general video or set representation, and we plan to apply it to other vision tasks in our future work.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Neural Aggregation Network for Video Face Recognition"
+}

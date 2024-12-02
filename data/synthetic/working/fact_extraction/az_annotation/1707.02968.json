@@ -1,0 +1,800 @@
+{
+  "paper_id": "1707.02968",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "The success of deep learning in vision can be attributed to: (a) models with high capacity; (b) increased computational power; and (c) availability of large-scale labeled data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since 2012, there have been significant advances in representation capabilities of the models and computational capabilities of GPUs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But the size of the biggest dataset has surprisingly remained constant.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "What will happen if we increase the dataset size by 10\u00d7 or 100\u00d7?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper takes a step towards clearing the clouds of mystery surrounding the relationship between 'enormous data' and visual deep learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By exploiting the JFT-300M dataset which has more than 375M noisy labels for 300M images, we investigate how the performance of current vision tasks would change if this data was used for representation learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our paper delivers some surprising (and some expected) findings.",
+              "tag": "Result"
+            },
+            {
+              "sent": "First, we find that the performance on vision tasks increases logarithmically based on volume of training data size.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, we show that representation learning (or pretraining) still holds a lot of promise.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One can improve performance on many vision tasks by just training a better base model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, as expected, we present new state-of-theart results for different vision tasks including image classification, object detection, semantic segmentation and human pose estimation.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Our sincere hope is that this inspires vision community to not undervalue the data and develop collective efforts in building larger datasets.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "There is unanimous agreement that the current ConvNet revolution is a product of big labeled datasets (specifically, 1M labeled images from ImageNet [35]) and large computational power (thanks to GPUs).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Every year we get further increase in computational power (a newer and faster GPU) but our datasets have not been so fortunate.",
+              "tag": "Method"
+            },
+            {
+              "sent": "ImageNet, a dataset of 1M labeled images based on 1000 categories, was used to train AlexNet [25] more than five years ago.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Curi- ously, while both GPUs and model capacity have continued to grow, datasets to train these models have remained stagnant.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Even a 101-layer ResNet with significantly more capacity and depth is still trained with 1M images from Im-ageNet circa 2011.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Have we once again belittled the importance of data in front of deeper models and computational power?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "What will happen if we scale up the amount of training data 10\u00d7 or 100\u00d7, will the performance double?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper takes the first steps towards clearing the clouds of mystery surrounding the relationship between 'enormous data' and deep learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We exploit the al-ready existing JFT-image dataset, first introduced by Hinton et al [17] and expanded by [7].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The JFT dataset has more than 300M images that are labeled with 18291 categories.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The annotations have been automatically obtained and, therefore, are noisy and not exhaustive.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These annotations have been cleaned using complex algorithms to increase the precision of labels; however there is still approximately 20% error in precision.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We will use this data to investigate the nature of relationship between amount of data and performance on vision tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, we will look into the power of data for visual representation learning (pre-training).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We evaluate our learned representation on a variety of vision tasks: image classification, object detection, semantic segmentation and human pose estimation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our experiments yield some surprising (and some expected) findings:",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Our first observation is that large-scale data helps in representation learning as evidenced by improvement in performance on each and every vision task we study.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "\u2022 Performance increases logarithmically based on volume of training data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We find there is a logarithmic relationship between performance on vision tasks and the amount of training data used for representation learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Note that previous papers on large-scale learning [23] have shown diminishing returns even on log-scale.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "\u2022 Training with Long-tail: Our data has quite a long tail and yet the representation learning seems to work.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This long-tail does not seem to adversely affect the stochastic training of ConvNets (training still converges).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "Ever since the seminal work by Krizhevsky et al [25] showcased the power of Convolutional Neural Networks (ConvNets) on large-scale image recognition task, a lot of work has been done to make them more accurate.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A common approach is to increase the complexity of these networks by increasing the width or depth of these networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, Simonyan and Zisserman [37] proposed the VGG-19 model which uses smaller convolutional filters and has depth of 19 layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since then the representational power and depth of these models have continued to grow every year.",
+              "tag": "Method"
+            },
+            {
+              "sent": "GoogleNet [39] was a 22-layer network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this paper, we perform all our experiments with the ResNet models proposed by He et al [16].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The core idea is to add residual connections between layers which helps in optimization of very-deep models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This results in new stateof-the-art performances on a number of recognition tasks.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Convolutional neural networks learn a hierarchy of visual representations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These visual representations have been shown to be effective on a wide range of computer vision tasks [1,4,14,22,29,33,36]. Learning these visual representations require large-scale training data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the biggest detection and segmentation datasets are still on the order of hundreds of thousands of images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, most of these approaches employ pre-training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The original model is learning using million labeled images in Ima-geNet and then further trained on target tasks (fine-tuning) to yield better performance [4,14,33].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Huang et al [18] thoroughly evaluated the influence of multiple ConvNet architectures on object detection performance, and found that it is closely correlated with the models' capacity and classification performances on ImageNet.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "While there has been significant work on increasing the representational capacity of ConvNets, the amount of training data for pre-training has remain kind of fixed over years.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The prime reason behind this is the lack of human verified image datasets larger than ImageNet.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In order to overcome the bottleneck, there have been recent efforts on visual representation learning using web-supervision [2,5,6,9,21,23,24,27] or unsupervised [10,11,31,32,34,42,43] paradigms.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, most of these efforts are still are still exploratory in nature and far lower in performance compared to fully-supervised learning.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "In this paper, we aim to shift the discussion from models to data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our paper is inspired from several papers which have time and again paid closer look to impact and properties of data rather than models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In 2009, Pereira et al [30] presented a survey paper to look into impact of data in fields such as natural language processing and computer vision.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They argued unlike physics, areas in AI are more likely to see an impact using more data-driven approaches.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another related work is the empirical study by Torralba and Efros [41] that highlighted the dataset biases in current com-puter vision approaches and how it impacts future research.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Specifically, we focus on understanding the relationship between data and visual deep learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "There have been some efforts to understand this relationship.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, Oquab et al [28] showed that expanding the training data to cover 1512 labels from ImageNet-14M further improves the object detection performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similarly, Huh et al [19] showed that using a smaller subset of images for training from ImageNet hurts performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Both these studies also show that selection of categories for training is important and random addition of categories tends to hurt the performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But what happens when the number of categories are increased 10x? Do we still need manual selection of categories?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similarly, neither of these efforts demonstrated data effects at significantly larger scale.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "The JFT-300M Dataset",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "We now introduce the JFT-300M dataset used throughout this paper.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "JFT-300M is a follow up version of the dataset introduced by [7,17].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The JFT-300M dataset is closely related and derived from the data which powers the Image Search.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this version, the dataset has 300M images and 375M labels, on average each image has 1.26 labels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These images are labeled with 18291 categories: eg, 1165 type of animals and 5720 types of vehicles are labeled in the dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These categories form a rich hierarchy with the maximum depth of hierarchy being 12 and maximum number of child for parent node being 2876.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "The images are labeled using an algorithm that uses complex mixture of raw web signals, connections between webpages and user feedback.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The algorithm starts from over one billion image label pairs, and ends up with 375M labels for 300M images with the aim to select labeled images with high precision.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, there is still some noise in the labels: approximately 20% of the labels in this dataset are noisy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since there is no exhaustive annotation, we have no way to estimate the recall of the labels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 2 shows the kind of noise that exists in the dataset.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Because the labels are generated automatically, there is a problem of 'tortoise'  being confused with 'tortoise-shell glasses'.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training and Evaluation Framework",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "We now describe our training and evaluation framework for the paper.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training on JFT-300M Data",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "To allow asynchrounous training of models on 50 GPUs, we adopt the Downpour SGD training scheme [8], where we use 17 parameter servers to store and update the model weights.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The final classification fully-connected layer with 2048 input units and over 18K output units has over 36M parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To handle this in our parameter servers, we split it vertically into 50 equal sized sub-fc layers, and distribute them around different parameter servers.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "ImageNet baseline: As observed by [7], hyperparameters that are selected to train with JFT-300M data yield sub-optimal performance when training on ImageNet (IVSVRC 2012 image classification dataset with 1.2M images).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, for ImageNet, we use a momentum optimizer with the momentum of 0.9, and set the initial learning rate to 5 \u00d7 10 \u22122 and batch size to 32.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Learning rate is reduced by a factor of 10 every 30 epochs ( 1.2M steps), and we train the model for a total of 5M steps.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similar to JFT-300M training, we use asynchronous gradient descent training on 50 NVIDIA K80 GPUs and 17 parameter servers.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Monitoring Training Progress",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Evaluating the Visual Representations",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "We use two approaches to evaluate the quality of visual representations learned from 300M training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first approach is to freeze the model weights and use these models as pure feature extractors.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second approach is to use the model weights as initialization and fine-tune the weights for other tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For evaluating visual representations, we select three representative computer vision tasks: object detection, semantic segmentation and human pose estimation.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "We will perform a more rigorous ablative analysis to observe the effect of dataset size, vocabulary size, etc on the object detection task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the other tasks, we will just show how JFT-300M provides significant improvement compared to baseline ImageNet ResNet.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "We present results of fine-tuning JFT-300M ResNet-101 checkpoints on four tasks: image classification, object detection, semantic segmentation and human pose estimation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Image Classification",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Object Detection",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "\u2022 Is the number of classes a key factor in learning visual representation?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "\u2022 How could clean data (eg, ImageNet) help improve the visual representations?",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experimental Setup",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Comparison with ImageNet Models",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "We first present the performance comparison with Ima-geNet checkpoints.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 2 shows the detection performance on COCO 'test-dev' split.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To show that our Faster RCNN baseline is competitive, we also report results from the Faster RCNN paper [16], which uses both box refinement and context information.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can see that our Ima-geNet baseline performs competitively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate JFT-300M trained from scratch ('300M') and from ImageNet initialization ('ImageNet+300M').",
+              "tag": "Result"
+            },
+            {
+              "sent": "Both models outperforms the ImageNet baseline by large margins, with 3.3% and 4.4% boost in mAP@.5, 2.4% and 3.1% in mAP@[.5,.95] respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As a reference, we also show the performance of ImageNet trained InceptionResNetv2 in Table 2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We would like to point out that the gain is even more significant than recently achieved by doubling the number of layers on Inception ResNet [18].",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This clearly indicates that while there are indications of a plateauing effect on model representation capacity; in terms of data there is still a lot that can be easily gained.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Impact of Epochs",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "We study how the number of training epochs affects the object detection performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this experiment we report results on COCO minival * set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 4 shows the performance comparison when the JFT-300M model has been trained for 1.3, 2.6 and 4 epochs respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can see that as the number of training steps increases, the perfor-  mance also improves.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As a comparison, in Table 5 we show the ImageNet counterpart when trained for 3, 6, 12 and 150 epochs, we can see that the performance of ImageNet checkpoints improves faster than JFT-300M with respect to the number of epochs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We would also like to point out that our learning schedules have been developed using the experience from smaller datasets.",
+              "tag": "Other"
+            },
+            {
+              "sent": "One can envision better learning schedules which provide more improvement as more epochs are used.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Impact of Data Size",
+      "selected_sentences": [
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "For this experiment, we randomly sample a subset of 10M, 30M and 100M images from the JFT-300M training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the same training schedule as the JFT-300M model training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We pick the checkpoints corresponding to the 4th epoch for each subset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To study the impact of learned visual representations, we also conduct an experiments to freeze the model weights for all layers before the conv5 block.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this set of experiments we change the learning rate decay to happen at 900K steps, and the total number of training steps to 1.5M, as we find they tend to converge earlier.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "In Figure 4, we show the mAP@[.5,.95] with checkpoints trained on different JFT-300M subsets, the blue curve corresponds to the regular faster RCNN training (with finetuning), while the red curve corresponds to freezing feature extractors.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Not surprisingly, fine-tuning offers significantly better performance on all data sizes.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Most interestingly, we can see that the performance grows logarithmically as pretraining data expands, this is particularly true when feature extraction layers are frozen.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Impact of Classes",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "JFT-300M has 18K labels in total.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To understand what the large number of classes brings us, we select a subset of 941 labels which have direct correspondence to the 1000 Ima-geNet labels, and sample JFT-300M images which contain  at least one of such labels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This results in a subset of 30M images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then train on this dataset for 4 epochs using the same training scheme.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Impact of Model Capacity",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Semantic Segmentation",
+      "selected_sentences": [
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "In Figure 6 (right), we further present analysis of impact of training data size by randomly sampling a subset of 10M, 30M and 100M images from the JFT-300M for training base checkpoints (same as Section 5.2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Once again we observe that the performance increases logarithmically as the pre-training dataset increases.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Human Pose Estimation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Discussions",
+      "selected_sentences": [
+        {
+          "par_id": 58,
+          "sentences": [
+            {
+              "sent": "Is it to be expected that performance of computer vision algorithms would always improve with more and more data?",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In our personal correspondences with several researchers, the general consensus seems to be that everyone expects some gain in performance numbers if the dataset size is increased dramatically, with decreasing marginal performance as the dataset grows.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Yet, while a tremendous amount of time is spent on engineering and parameter sweeps; little to no time has been spent collectively on data.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "Our paper is an attempt to put the focus back on the data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The models seem to be plateauing but when it comes to the performance with respect to data -but modest performance improvements are still possible for exponential increases of the data.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Another major finding of our paper is that having better models is not leading to substantial gains because ImageNet is no more sufficient to use all the parameters or their representational power.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "Representation learning: One of the underlying debates is that should we spend more time collecting data for individual tasks such as detection and segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our findings show there is still a lot to be gained from representation learning.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Improved base models or base features can lead to significant gains in performance.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 61,
+          "sentences": [
+            {
+              "sent": "Disclaimer Large scale learning: We would like to highlight that the training regime, learning schedules and parameters used in this paper are based on our understanding of training ConvNets with 1M images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Searching the right set of hyper-parameters requires significant more effort: even training a JFT model for 4 epochs needed 2 months on 50 K-80 GPUs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, in some sense the quantitative performance reported in this paper underestimates the impact of data for all reported image volumes.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Original",
+      "selected_sentences": [
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "We do not conduct de-duplication experiments of COCO testdev dataset for object detection and pose estimation as their groundtruth annotations are not publicly available.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Revisiting Unreasonable Effectiveness of Data in Deep Learning Era"
+}

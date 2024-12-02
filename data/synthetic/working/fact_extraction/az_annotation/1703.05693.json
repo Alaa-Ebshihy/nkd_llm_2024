@@ -1,0 +1,849 @@
+{
+  "paper_id": "1703.05693",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "This paper proposes the SVDNet for retrieval problems, with focus on the application of person re-identification (reID).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We view each weight vector within a fully connected (FC) layer in a convolutional neuron network (CNN) as a projection basis.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is observed that the weight vectors are usually highly correlated.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This problem leads to correlations among entries of the FC descriptor, and compromises the retrieval performance based on the Euclidean distance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To address the problem, this paper proposes to optimize the deep representation learning process with Singular Vector Decomposition (SVD).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, with the restraint and relaxation iteration (RRI) training scheme, we are able to iteratively integrate the orthogonality constraint in CNN training, yielding the so-called SVDNet.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We conduct experiments on the Market-1501, CUHK03, and DukeMTMC-reID datasets, and show that RRI effectively reduces the correlation among the projection vectors, produces more discriminative FC descriptors, and significantly improves the reID accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the Market-1501 dataset, for instance, rank-1 accuracy is improved from 55.3% to 80.5% for CaffeNet, and from 73.8% to 82.3% for ResNet-50.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "This paper considers the problem of pedestrian retrieval, also called person re-identification (reID).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This task aims at retrieving images containing the same person to the query.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Person reID is different from image classification in that the training and testing sets contain entirely different classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "So a popular deep learning method for reID consists of 1) training a classification deep model on the training set, 2) extracting image descriptors using the fullyconnected (FC) layer for the query and gallery images, and 3) computing similarities based on Euclidean distance before returning the sorted list [33,31,26,10].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Our work is motivated by the observation that after trainFigure 1: A cartoon illustration of the correlation among weight vectors and its negative effect.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The weight vectors are contained in the last fully connected layer, eg, FC8 layer of CaffeNet [12] or FC layer of ResNet-50 [11].",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are three training IDs in red, pink and blue clothes from the DukeMTMC-reID dataset [17].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dotted green and black vectors denote feature vectors of two testing samples before the last FC layer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Under the baseline setting, the red and the pink weight vectors are highly correlated and introduce redundancy to the descriptors.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "ing a convolutional neural network (CNN) for classification, the weight vectors within a fully-connected layer (FC) are usually highly correlated.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This problem can be attributed to two major reasons.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The first reason is related to the non-uniform distribution of training samples.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This problem is especially obvious when focusing on the last FC layer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The output of each neuron in the last FC layer represents the similarity between the input image and a corresponding identity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After training, neurons corresponding to similar persons (ie, the persons who wear red and pink clothes) learns highly correlated weight vectors, as shown in Figure 1.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "The second is that during the training of CNN, there exists few, if any, constraints for learning orthogonalization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus the learned weight vectors may be naturally correlated.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Correlation among weight vectors of the FC layer com-promises the descriptor significantly when we consider the retrieval task under the Euclidean distance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In fact, a critical assumption of using Euclidean distance (or equivalently the cosine distance after 2 -normalization) for retrieval is that the entries in the feature vector should be possibly independent.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, when the weight vectors are correlated, the FC descriptor -the projection on these weight vectors of the output of a previous CNN layer -will have correlated entries.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This might finally lead to some entries of the descriptor dominating the Euclidean distance, and cause poor ranking results.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For example, during testing, the images of two different persons are passed through the network to generate the green and black dotted feature vectors and then projected onto the red, pink and blue weight vectors to form the descriptors, as shown in Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The projection values on both red and pink vectors are close, making the two descriptors appear similar despite of the difference projected on the blue vector.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "As a consequence, it is of vital importance to reduce the redundancy in the FC descriptor to make it work under the Euclidean distance.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "To address the correlation problem, we proposes SVDNet, which is featured by an FC layer containing decorrelated weight vectors.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also introduce a novel three-step training scheme.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the first step, the weight matrix undergoes the singular vector decomposition (SVD) and is replaced by the product of the left unitary matrix and the singular value matrix.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, we keep the orthogonalized weight matrix fixed and only fine-tune the remaining layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Third, the weight matrix is unfixed and the network is trained for overall optimization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The three steps are iterated to approximate orthogonality on the weight matrix.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experimental results on three large-scale reID datasets demonstrate significant improvement over the baseline network, and our results are on par with the state of the art.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "In person reID task, deep learning methods can be classified into two classes: similarity learning and representation learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The former is also called deep metric learning, in which image pairs or triplets are used as input to the network [25,24,1,13,5,19].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the two early works, Yi et al [29] and Li et al [13] use image pairs and inject part priors into the learning process.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In later works, Varior et al [25] incorporate long short-term memory (LSTM) modules into a siamese network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "LSTMs process image parts sequentially so that the spatial connections can be memorized to enhance the discriminative ability of the deep features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Varior et al [24] insert a gating function after each convolutional layer to capture effective subtle patterns between image pairs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The above-mentioned methods are effective in learning image similarities in an adaptive manner, but may have efficiency problems under large-scale galleries.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "The second type of CNN-based reID methods focuses on feature learning, which categorizes the training samples into pre-defined classes and the FC descriptor is used for retrieval [33,21,26].",
+              "tag": "Method"
+            },
+            {
+              "sent": "In [33,34], the classification CNN model is fine-tuned using either the video frames or image bounding boxes to learn a discriminative embedding for pedestrian retrieval.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Xiao et al [26] propose learning generic feature representations from multiple reID datasets jointly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To deal with spatial misalignment, Zheng et al [31] propose the PoseBox structure similar to the pictorial structure [6] to learn pose invariant embeddings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To take advantage of both the feature learning and similarity learning, Zheng et al [35] and Geng et al [10] combine the contrastive loss and the identification loss to improve the discriminative ability of the learned feature embedding, following the success in face verification [22].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper adopts the classification mode, which is shown to produce competitive accuracy without losing efficiency potentials.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Truncated SVD [8,28] is widely used for CNN model compression.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "SVDNet departs from it in two aspects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, truncated SVD decomposes the weight matrix in FC layers and reconstructs it with several dominant singular vectors and values.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "SVDNet does not reconstruct the weight matrix but replaces it with an orthogonal matrix, which is the product of the left unitary matrix and the singular value matrix.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, Truncated SVD reduces the model size and testing time at the cost of acceptable precision loss, while SVDNet significantly improves the retrieval accuracy without impact on the model size.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Proposed Method",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "SVDNet mostly follows the backbone networks, eg, CaffeNet and ResNet-50.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The only difference is that SVDNet uses the Eigenlayer as the second last FC layer, as shown in Figure 2, the Eigenlayer contains an orthogonal weight matrix and is a linear layer without bias.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The reason for not using bias is that the bias will disrupt the learned orthogonality.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In fact, our preliminary experiments indicate that adding the ReLU activation and the bias term slightly compromises the reID performance, so we choose to implement the Eigenlayer based on a linear layer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The reason for positioning Eigenlayer at the second last FC layer, rather than the last one is that the model fails to converge when orthogonality is enforced on the last FC layer, which might be due to that the correlation of weight vectors in the last FC layer is determined by the training sample distribution, as explained in the introduction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "During training, the input feature from a previous layer is passed through the Eigenlayer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Its inner products with the weight vectors of the Eigenlayer form the output feature, which is fully connected to the last layer of c-dim, where c denotes the number of training classes.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training SVDNet",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "The algorithm of training SVDNet is presented in Alg. 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first briefly introduce Step 0 and then describe the restraint and relaxation Iteration (RRI) (Step 1, 2, 3).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Step 0. We first add a linear layer to the network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then the network is fine-tuned till convergence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that after Step 0, the weight vectors in the linear layer are still highly correlated.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the experiment, we will present the reID performance of the CNN model after Step 0. Various output dimensions of the linear layer will be evaluated.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "where W is the weight matrix of the linear layer, U is the left-unitary matrix, S is the singular value matrix, and V is the right-unitary matrix.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After the decomposition, we replace W with U S. Then the linear layer uses all the eigenvectors of W W T as weight vectors and is named as Eigenlayer.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Mechanism Study",
+      "selected_sentences": [
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "Our key idea is to find a set of orthogonal projection directions based on what CNN has already learned from training set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Basically, for a linear layer, a set of basis in the range space of W (ie, linear subspace spanned by column vectors of W ) is a potential solution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In fact, there exists numerous sets of orthogonal basis.",
+              "tag": "Method"
+            },
+            {
+              "sent": "So we decide to use the singular vectors of W as new projection directions and to weight the projection results with the corresponding singular values.",
+              "tag": "Method"
+            },
+            {
+              "sent": "That is, we replace W = U SV T with U S. By doing this, the discriminative ability of feature representation over the whole sample space will be maintained.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We make a mathematical proof as follows:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Replace W with U S (denoted by U S).",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Replace",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "As proven above, Step 1 in Alg. 1, ie, replacing W = U SV T with U S, does not bring an immediate accuracy improvement, but keeps it unchanged.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Nevertheless, after this operation, the model has been pulled away from the original fine-tuned solution, and the classification loss on the training set will increase by a certain extent.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, Step 2 and Step 3 in Alg. 1 aim to fix this problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The major effect of these two steps is to improve the discriminative ability of the input feature as well as the output feature of the Eigenlayer (Figure 2).",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the one hand, the restraint step learns the upstream and downstream layers of the Eigenlayer, which still preserves the orthogonal property.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show in Figure 5 that this step improves the accuracy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On the other hand, the relaxation step will make the model deviate from orthogonality again, but it reaches closer to convergence.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This step, as shown in Figure 5, deteriorates the performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "But within an RRI, the overall performance improves.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Interestingly, when educating children, an alternating rhythm of relaxation and restraint is also encouraged.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": ". S(W ) achieves the largest value 1 only when W is an orthogonal matrix, ie, g ij = 0, if i = j.",
+              "tag": "Result"
+            },
+            {
+              "sent": "S(W ) has the smallest value 1 k when all the weight vectors are totally the same, ie, g ij = 1, \u2200i, j.",
+              "tag": "Result"
+            },
+            {
+              "sent": "So when S(W ) is close to 1/k or is very small, the weight matrix has a high correlation extent.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, in our baseline, when directly fine-tuning a CNN model (without SVDNet training) using CaffeNet, S(W FC7 ) = 0.0072, indicating that the weight vectors in the FC7 layer are highly correlated.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As we will show in Section 4.5, S is an effective indicator to the convergence of SVDNet training.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "When to stop RRI is a non-trivial problem, especially in application.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We employ Eq. 5 to evaluate the orthogonality of W after the relaxation step and find that S(W ) increases as the iteration goes on.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It indicates that the correlation among the weight vectors in W is reduced step-by-step with RRI.",
+              "tag": "Result"
+            },
+            {
+              "sent": "So when S(W ) becomes stable, the model converges, and RRI stops.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Detailed observations can be accessed in Figure 5.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Datasets and Settings",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "This paper uses three datasets for evaluation, ie, Market-1501 [32], CUHK03 [13] and DukeMTMC-reID [18,37].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The Market-1501 dataset contains 1,501 identities, 19,732 gallery images and 12,936 training images captured by 6 cameras.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All the bounding boxes are generated by the DPM detector [9].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Most experiments relevant to mechanism study are carried out on Market-1501.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The CUHK03 dataset contains 13,164 images of 1,467 identities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each identity is observed by 2 cameras.",
+              "tag": "Method"
+            },
+            {
+              "sent": "CUHK03 offers both hand-labeled and DPM-detected bounding boxes, and we use the latter in this paper.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For CUHK03, 20 random train/test splits are performed, and the averaged results are reported.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The DukeMTMC-reID dataset is collected with 8 cameras and used for crosscamera tracking.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adopt its reID version benchmarked in [37].",
+              "tag": "Method"
+            },
+            {
+              "sent": "It contains 1,404 identities (one half for training, and the other for testing), 16,522 training images, 2,228 queries, and 17,661 gallery images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For Market-1501 and DukeMTMC-reID, we use the evaluation packages provided by [32] and [37], respectively.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "We mainly use two networks pre-trained on ImageNet [7] as backbones, ie, CaffeNet [12] and ResNet-50 [11].",
+              "tag": "Method"
+            },
+            {
+              "sent": "When using CaffeNet as the backbone, we directly replace the original FC7 layer with the Eigenlayer, in case that one might argue that the performance gain is brought by deeper architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When using ResNet-50 as the backbone, we have to insert the Eigenlayer before the last FC layer because ResNet has no hidden FC layer and the influence of adding a layer into a 50-layer architecture can be neglected.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In several experiments on Market-1501, we additionally use VGGNet [20] and a Tiny CaffeNet as backbones to demonstrate the effectiveness of SVDNet on different architectures.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The Tiny CaffeNet is generated by reducing the FC6 and FC7 layers of CaffeNet to containing 1024 and 512 dimensions, respectively.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Implementation Details",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "On Market-1501, CaffeNet and Resnet-50 achieves rank-1 accuracy of 55.3% (73.8%) with the FC6 (Pool5) descriptor, which is consistent with the results in [33].",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "CaffeNet-backboned SVDNet takes 25 RRIs to reach final convergence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For both the restraint stage and the relaxation stage within each RRI except the last one, we use 2000 iterations and fix the learning rate at 0.001.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the last restraint training, we use 5000 iterations (learning rate 0.001) + 3000 iterations (learning rate 0.0001).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The batch size is set to 64.",
+              "tag": "Method"
+            },
+            {
+              "sent": "ResNet-backboned SVDNet takes 7 RRIs to reach final convergence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For both the restraint stage and the relaxation stage within each RRI, we use 8000 iterations and divide the learning rate by 10 after 5000 iterations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The initial learning rate for the 1st to the 3rd RRI is set to 0.001, and the initial learning rate for the rest RRIs is set to 0.0001.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The batch size is set to 32.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Performance Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "We comprehensively evaluate the proposed SVDNet on all the three reID benchmarks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The overall results are shown in Table 2.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "The improvements achieved on both backbones are significant: When using CaffeNet as the backbone, the Rank-1 accuracy on Market-1501 rises from 55.3% to 80.5%, and the mAP rises from 30.4% to 55.9%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On CUHK03 (DukeMTMC-reID) dataset, the Rank-1 accuracy rises by +26.3% (+20.7%), and the mAP rises by +24.7% (+17.5%).",
+              "tag": "Result"
+            },
+            {
+              "sent": "When using ResNet as the backbone, the Rank-1 accuracy rises by +8.4%, +15.6% and +11.2% respectively on Market-1501, CUHK03 and DukeMTMC-reID dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The mAP rises by +14.2%, +13.7% and +12.7% correspondingly.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Some retrieval examples on Market-1501 are shown in Figure 3.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Methods",
+      "selected_sentences": [
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "DukeMTMC-reID CUHK03NP rank-1 mAP rank-1 mAP BoW+kissme [32] 25 the unpublished Arxiv papers, (some of) our numbers are slightly lower than [10] and [35].",
+              "tag": "Other"
+            },
+            {
+              "sent": "Both works [10] and [35] combine the verification and classification losses, and we will investigate into integrating this strategy into SVDNet.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Moreover, the performance of SVDNet based on relatively simple CNN architecture is impressive.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On Market-1501, CaffeNet-backboned SVDNet achieves 80.5% rank-1 accuracy and 55.9% mAP, exceeding other CaffeNet-based methods by a large margin.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Additionally, using VGGNet and Tiny CaffeNet as backbone achieves 79.7% and 77.4% rank-1 accuracy respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On CUHK03, CaffeNetbackboned SVDNet even exceeds some ResNet-based competing methods except DLCE(R).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This observation suggests that our method can achieve acceptable performance with high computing effectiveness.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Impact of Output Dimension",
+      "selected_sentences": [
+        {
+          "par_id": 57,
+          "sentences": [
+            {
+              "sent": "We vary the dimension of the output of Eigenlayer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Results of CaffeNet and ResNet-50 are drawn in Figure 4.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RRI Boosting Procedure",
+      "selected_sentences": [
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "This experiment reveals how the reID performance changes after each restraint step and each relaxation step, and how SVDNet reaches the stable performance step by step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiment, we use 25 epochs for both the re-  Results are shown in Figure 5, from which four conclusions can be drawn.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, within each RRI, rank-1 accuracy takes on a pattern of \"increase and decrease\" echoing the restraint and relaxation steps: When W is fixed to maintain orthogonality during restraint training, the performance increases, implying a boosting in the discriminative ability of the learned feature.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Then during relaxation training, W is unfixed, and the performance stagnates or even decreases slightly.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Second, as the RRI goes, the overall accuracy increases, and reaches a stable level when the model converges.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Third, it is reliable to use S(W ) -the degree of orthogonality -as the convergence criteria for RRI.",
+              "tag": "Result"
+            },
+            {
+              "sent": "During RRI training, S(W ) gradually increases until reaching stability, while without RRI training, S(W ) fluctuates slightly around a relatively low value, indicating high correlation among weight vectors.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Fourth, ResNet-backboned SVDNet needs much fewer RRIs to converge than CaffeNet-backboned SVDNet.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Comparison of Decorrelation Methods",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 63,
+          "sentences": [
+            {
+              "sent": "In this paper, SVDNet is proposed for representation learning in pedestrian retrieval, or re-identification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Decorrelation is enforced among the projection vectors in the weight matrix of the FC layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Through iterations of \"restraint and relaxation\", the extent of vector correlation is gradually reduced.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In this process, the reID performance undergoes iterative \"increase and decrease\", and finally reaches a stable accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Due to elimination of correlation of the weight vectors, the learned embedding better suits the retrieval task under the Euclidean distance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Significant performance improvement is achieved on the Market-1501, CUHK03, and DukeMTMC-reID datasets, and the reID accuracy is competitive with the state of the art.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "SVDNet for Pedestrian Retrieval"
+}

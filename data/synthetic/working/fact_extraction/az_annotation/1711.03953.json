@@ -1,0 +1,486 @@
+{
+  "paper_id": "1711.03953",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We formulate language modeling as a matrix factorization problem, and show that the expressiveness of Softmax-based models (including the majority of neural language models) is limited by a Softmax bottleneck.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given that natural language is highly context-dependent, this further implies that in practice Softmax with distributed word embeddings does not have enough capacity to model natural language.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We propose a simple and effective method to address this issue, and improve the state-of-the-art perplexities on Penn Treebank and WikiText-2 to 47.69 and 40.68 respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The proposed method also excels on the large-scale 1B Word dataset, outperforming the baseline by over 5.6 points in perplexity. 1 * Equal contribution.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this work, we study the expressiveness of the aforementioned Softmax-based recurrent language models from a perspective of matrix factorization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We show that learning a Softmax-based recurrent language model with the standard formulation is essentially equivalent to solving a matrix factorization problem.",
+              "tag": "Result"
+            },
+            {
+              "sent": "More importantly, due to the fact that natural language is highly context-dependent, the matrix to be factorized can be high-rank.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This further implies that standard Softmax-based language models with distributed (output) word embeddings do not have enough capacity to model natural language.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We call this the Softmax bottleneck.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "We propose a simple and effective method to address the Softmax bottleneck.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we introduce discrete latent variables into a recurrent language model, and formulate the next-token probability distribution as a Mixture of Softmaxes (MoS).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Mixture of Softmaxes is more expressive than Softmax and other surrogates considered in prior work.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, we show that MoS learns matrices that have much larger normalized singular values and thus much higher rank than Softmax and other baselines on real-world datasets.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "We evaluate our proposed approach on standard language modeling benchmarks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "MoS substantially improves over the current state-of-the-art results on benchmarks, by up to 3.6 points in terms of perplexity, reaching perplexities 47.69 on Penn Treebank and 40.68 on WikiText-2.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We further apply MoS to a dialog dataset and show improved performance over Softmax and other baselines.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "First, we identify the Softmax bottleneck by formulating language modeling as a matrix factorization problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, we propose a simple and effective method that substantially improves over the current state-of-the-art results.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "LANGUAGE MODELING AS MATRIX FACTORIZATION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "SOFTMAX",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "This is essentially a matrix factorization problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We want the model to learn matrices H \u03b8 and W \u03b8 that are able to factorize some matrix A \u2208 F (A). First, note that for a valid factorization to exist, the rank of H \u03b8 W \u03b8 has to be at least as large as the rank of A .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Further, since The above corollary indicates that when the dimension d is too small, Softmax does not have the capacity to express the true data distribution.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Clearly, this conclusion is not restricted to a finite language L. When L is infinite, one can always take a finite subset and the Softmax bottleneck still exists.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Next, we discuss why the Softmax bottleneck is an issue by presenting our hypothesis that A is high-rank for natural language.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "HYPOTHESIS: NATURAL LANGUAGE IS HIGH-RANK",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "\u2022 Natural language is highly context-dependent (Mikolov & Zweig, 2012).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, the token \"north\" is likely to be followed by \"korea\" or \"korean\" in a news article on international politics, which however is unlikely in a textbook on U.S. domestic history.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We hypothesize that such subtle context dependency should result in a high-rank matrix A.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "Given the hypothesis that natural language is high-rank, it is clear that the Softmax bottleneck limits the expressiveness of the models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In practice, the embedding dimension d is usually set at the scale of 10 2 , while the rank of A can possibly be as high as M (at the scale of 10 5 ), which is orders of magnitude larger than d.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Softmax is effectively learning a low-rank approximation to A, and our experiments suggest that such approximation loses the ability to model context dependency, both qualitatively and quantitatively (Cf",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "EASY FIXES?",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "Identifying the Softmax bottleneck immediately suggests some possible \"easy fixes\".",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, as considered by a lot of prior work, one can employ a non-parametric model, namely an Ngram model (Kneser & Ney, 1995).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Ngram models are not constrained by any parametric forms so it can universally approximate any natural language, given enough parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, it is possible to increase the dimension d (eg, to match M ) so that the model can express a high-rank matrix A.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MIXTURE OF SOFTMAXES: A HIGH-RANK LANGUAGE MODEL",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "We propose a high-rank language model called Mixture of Softmaxes (MoS) to alleviate the Softmax bottleneck issue.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "MoS formulates the conditional distribution as",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MIXTURE OF CONTEXTS: A LOW-RANK BASELINE",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "MAIN RESULTS",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "\u2022 Following previous work (Krause et al, 2017;Merity et al, 2017;Melis et al, 2017), we evaluate the proposed MoS model on two widely used language modeling datasets, namely Penn Treebank (PTB) (Mikolov et al, 2010) and WikiText-2 (WT2) (Merity et al, 2016) based on perplexity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For fair comparison, we closely follow the regularization and optimization techniques introduced by Merity et al (2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We heuristically and manually search hyper-parameters for MoS based on the validation performance while limiting the model size (see Appendix B.1 for our hyper-parameters).",
+              "tag": "Method"
+            },
+            {
+              "sent": "\u2022 To investigate whether the effectiveness of MoS can be extended to even larger datasets, we conduct an additional language modeling experiment on the 1B Word dataset (Chelba et al, 2013).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we lower-case the text and choose the top 100K tokens as the vocabulary.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A standard neural language model with 2 layers of LSTMs followed by a Softmax output layer is used as the baseline.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Again, the network size of MoS is adjusted to ensure a comparable number of parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For evaluation, we include both the perplexity and the precision/recall of Smoothed Sentence-level BLEU, as suggested by Zhao et al (2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "When generating responses, we use beam search with beam size 10, restrict the maximum length to 30, and retain the top-5 responses.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "ABLATION STUDY",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "VERIFY THE ROLE OF RANK",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "\u2022 Firstly, we verify that MoS does induce a high-rank log-probability matrix empirically, while MoC and Softmax fail.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the validation or test set of PTB with tokens X = {X 1 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", X T }, we compute the log probabilities {log P (X i | X <i ) \u2208 R M } T t=1 for each token using all three models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then, for each model, we stack all T log-probability vectors into a T \u00d7 M matrix, resulting in \u00c2MoS , \u00c2MoC and \u00c2Softmax .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Theoretically, the number of non-zero singular values of a matrix is equal to its rank.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, performing singular value decomposition of real valued matrices using numerical approaches often encounter roundoff errors.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, we adopt the expected roundoff error suggested by Press (2007) when estimating the ranks of \u00c2MoS , \u00c2MoC and \u00c2Softmax .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The estimated ranks are shown in Table 6.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As predicted by our theoretical analysis, the matrix ranks induced by Softmax and MoC are both limited by the corresponding embedding sizes.",
+              "tag": "Result"
+            },
+            {
+              "sent": "By contrast, the matrix rank obtained from MoS does not suffer from this constraint, almost reaching full rank (M = 10000).",
+              "tag": "Result"
+            },
+            {
+              "sent": "In appendix C.1, we give additional evidences for the higher rank of MoS.",
+              "tag": "Result"
+            },
+            {
+              "sent": "\u2022 Secondly, we show that, before reaching full rank, increasing the number of mixture components in MoS also increases the rank of the log-probability matrix, which in turn leads to improved performance (lower perplexity).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Specifically, on PTB, with other hyper-parameters fixed as used in section 3.1, we vary the number of mixtures used in MoS and compare the corresponding empirical rank and test perplexity without finetuning.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This clear positive correlation between rank and performance strongly supports the our theoretical analysis in section 2.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, note that after reaching almost full rank (ie, using 15 mixture components), further increasing the number of components degrades the performance due to overfitting (as we inspected the training and test perplexities).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "\u2022 In addition, as performance improvement can often come from better regularization, we investigate whether MoS has a better, though unexpected, regularization effect compared to Softmax.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We consider the 1B word dataset where overfitting is unlikely and no explicit regularization technique (eg, dropout) is employed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As we can see from the left part of Table 3, MoS and Softmax achieve a similar generalization gap, ie, the performance gap between the test set and the training set.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It suggests both models have similar regularization effects.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Meanwhile, MoS has a lower training perplexity compared to Softmax, indicating that the improvement of MoS results from improved expressiveness.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MoS computational time",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "RELATED WORK",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CONCLUSIONS",
+      "selected_sentences": [
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "Under the matrix factorization framework, the expressiveness of Softmax-based language models is limited by the dimension of the word embeddings, which is termed as the Softmax bottleneck.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our proposed MoS model improves the expressiveness over Softmax, and at the same time avoids overfitting compared to non-parametric models and naively increasing the word embedding dimensions.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "Our method improves the current state-of-the-art results on standard benchmarks by a large margin, which in turn justifies our theoretical reasoning: it is important to have a high-rank model for natural language.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Proof of Property 1",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Proof of Property 2",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B EXPERIMENT SETTING AND HYPER-PARAMETERS B.1 PTB AND WT2",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B.2 1B WORD DATASET",
+      "selected_sentences": [
+        {
+          "par_id": 76,
+          "sentences": [
+            {
+              "sent": "Here, we detail the inverse experiment, which shows that when Softmax does not suffer from a rank limitation, using MoS will not improve the performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Notice that character-level language modeling (CharLM) is exactly such a problem, because the rank of the log-likelihood matrix is upper bounded by the vocabulary size, and CharLM usually has a very limited vocabulary (tens of characters).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this case, with the embedding size being hundreds in practice, Softmax is no longer a bottleneck in this task.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Hence, we expect MoS to yield similar performance to Softmax on CharLM.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 78,
+          "sentences": [
+            {
+              "sent": "We employ a 1-layer 1024-unit LSTM followed by Softmax as the baseline.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For MoS, we consider 7 or 10 mixtures and reduce the hidden and/or embedding size to match the baseline capacity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When decreasing the hidden and/or embedding size, we either keep both the same, or make the hidden size relatively larger.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The results are summarized in  indicates Softmax and MoS use the same batch sizes on one GPU.",
+              "tag": "Method"
+            },
+            {
+              "sent": "\"best-1\" and \"best-3\" refer to the settings where Softmax and MoS obtain their own best perplexity, with 1 and 3 GPUs respectively.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "C.4 QUALITATIVE ANALYSIS",
+      "selected_sentences": []
+    }
+  ],
+  "title": "BREAKING THE SOFTMAX BOTTLENECK: A HIGH-RANK RNN LANGUAGE MODEL"
+}

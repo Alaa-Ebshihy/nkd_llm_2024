@@ -1,0 +1,534 @@
+{
+  "paper_id": "1805.02474",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Bi-directional LSTMs are a powerful tool for text representation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On the other hand, they have been shown to suffer various limitations due to their sequential nature.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We investigate an alternative LSTM structure for encoding text, which consists of a parallel state for each word.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Recurrent steps are used to perform local and global information exchange between words simultaneously, rather than incremental reading of a sequence of words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Results on various classification and sequence labelling benchmarks show that the proposed model has strong representation power, giving highly competitive performances compared to stacked BiLSTM models with similar parameter numbers.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Neural models have become the dominant approach in the NLP literature.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared to handcrafted indicator features, neural sentence representations are less sparse, and more flexible in encoding intricate syntactic and semantic information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among various neural networks for encoding sentences, bi-directional LSTMs (BiLSTM) (Hochreiter and Schmidhuber, 1997) have been a dominant method, giving state-of-the-art results in language modelling (Sundermeyer et al, 2012), machine translation (Bahdanau et al, 2015), syntactic parsing (Dozat and Manning, 2017) and question answering (Tan et al, 2015).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Despite their success, BiLSTMs have been shown to suffer several limitations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, their inherently sequential nature endows computation non-parallel within the same sentence (Vaswani et al, 2017), which can lead to a computational bottleneck, hindering their use in the in- dustry.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition, local ngrams, which have been shown a highly useful source of contextual information for NLP, are not explicitly modelled (Wang et al, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Finally, sequential information flow leads to relatively weaker power in capturing longrange dependencies, which results in lower performance in encoding longer sentences (Koehn and Knowles, 2017).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "We investigate an alternative recurrent neural network structure for addressing these issues.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As shown in Figure 1, the main idea is to model the hidden states of all words simultaneously at each recurrent step, rather than one word at a time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, we view the whole sentence as a single state, which consists of sub-states for individual words and an overall sentence-level state.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To capture local and non-local contexts, states are updated recurrently by exchanging information between each other.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Consequently, we refer to our model as sentence-state LSTM, or SLSTM in short.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Empirically, SLSTM can give effective sentence encoding after 3 -6 recurrent steps.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In contrast, the number of recurrent steps necessary for BiLSTM scales with the size of the sentence.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "At each recurrent step, information exchange is conducted between consecutive words in the sentence, and between the sentence-level state and each word.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, each word receives information from its predecessor and successor simultaneously.",
+              "tag": "Method"
+            },
+            {
+              "sent": "From an initial state without information exchange, each word-level state can obtain 3-gram, 5-gram and 7-gram information after 1, 2 and 3 recurrent steps, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Being connected with every word, the sentence-level state vector serves to exchange non-local information with each word.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, it can also be used as a global sentence-level representation for classification tasks.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Results on both classification and sequence labelling show that SLSTM gives better accuracies compared to BiLSTM using the same number of parameters, while being faster.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We release our code and models at https://github.com/ leuchine/SLSTM, which include all baselines and the final model.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "LSTM (Graves and Schmidhuber, 2005) showed its early potentials in NLP when a neural machine translation system that leverages LSTM source encoding gave highly competitive results compared to the best SMT models (Bahdanau et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "LSTM encoders have since been explored for other tasks, including syntactic parsing (Dyer et al, 2015), text classification (Yang et al, 2016) and machine reading (Hermann et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Bidirectional extensions have become a standard configuration for achieving state-of-the-art accuracies among various tasks (Wen et al, 2015;Ma and Hovy, 2016;Dozat and Manning, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "SLSTMs are similar to BiLSTMs in their recurrent bi-directional message flow between words, but different in the design of state transition.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "SLSTM is inspired by message passing over graphs (Murphy et al, 1999;Scarselli et al, 2009).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Graph-structure neural models have been used for computer program verification (Li et al, 2016) and image object detection (Liang et al, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The closest previous work in NLP includes the use of convolutional neural networks (Bastings et al, 2017; and DAG LSTMs (Peng et al, 2017) for modelling syntactic structures.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared to our work, their motivations and network structures are highly different.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, the DAG LSTM of Peng et al (2017) is a natural extension of tree LSTM (Tai et al, 2015), and is sequential rather than parallel in nature.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To our knowledge, we are the first to investigate a graph RNN for encoding sentences, proposing parallel graph states for integrating word-level and sentence-level information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this perspective, our contribution is similar to that of Kim (2014) and Bahdanau et al (2015) in introducing a neural representation to the NLP literature.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "We additionally make comparisons with stacked CNNs and hierarchical attention (Vaswani et al, 2017), shown in Table 3 (the CNN and Transformer rows), where N indicates the number of attention layers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "CNN is the most efficient among all models compared, with the smallest model size.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On the other hand, a 3-layer stacked CNN gives an accuracy of 81.46%, which is also Model Accuracy Train (s) Test (s) Socher et al (2011)  the lowest compared with BiLSTM, hierarchical attention and SLSTM.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The best performance of hierarchical attention is between single-layer and two-layer BiLSTMs in terms of both accuracy and efficiency.",
+              "tag": "Result"
+            },
+            {
+              "sent": "SLSTM gives significantly better accuracies compared with both CNN and hierarchical attention.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "Table 3 additionally shows the results of BiLSTM and SLSTM when external attention is used as described in Section 3.3.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Attention leads to improved accuracies for both BiLSTM and SLSTM in classification, with SLSTM still outperforming BiLSTM significantly.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The result suggests that external techniques such as attention can play orthogonal roles compared with internal recurrent structures, therefore benefiting both BiLSTMs and SLSTMs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Similar observations are found using external CRF layers for sequence labelling.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Baseline BiLSTM",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "The baseline BiLSTM model consists of two LSTM components, which process the input in the forward left-to-right and the backward rightto-left directions, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In each direction, the reading of input words is modelled as a recurrent process with a single hidden state.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given an initial value, the state changes its value recurrently, each time consuming an incoming word.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "A single hidden vector representation g of the whole input sentence can be obtained using the final state values of the two LSTM components:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "Stacked BiLSTM Multiple layers of BiLTMs can be stacked for increased representation power, where the hidden vectors of a lower layer are used as inputs for an upper layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Different model parameters are used in each stacked BiLSTM layer.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Sentence-State LSTM",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "which consists of a sub state h t i for each word w i and a sentence-level sub state g t .",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "SLSTM uses a recurrent state transition process to model information exchange between sub states, which enriches state representations incrementally.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the initial state H 0 , we set h 0 i = g 0 = h 0 , where h 0 is a parameter.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The state transition from H t\u22121 to H t consists of sub state transitions from h t\u22121 i to h t i and from g t\u22121 to g t .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We take an LSTM structure similar to the baseline BiLSTM for modelling state transition, using a recurrent cell c t i for each w i and a cell c t g for g.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 1, the value of each",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Contrast with BiLSTM",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "The difference between SLSTM and BiLSTM can be understood with respect to their recurrent states.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While BiLSTM uses only one state in each direction to represent the subsequence from the beginning to a certain word, SLSTM uses a structural state to represent the full sentence, which consists of a sentence-level sub state and n + 2 word-level sub states, simultaneously.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Different from BiLSTMs, for which h t at different time steps are used to represent w 0 , . . .",
+              "tag": "Claim"
+            },
+            {
+              "sent": ", w n+1 , respectively, the word-level states h t i and sentence-level state g t of SLSTMs directly correspond to the goal outputs h i and g, as introduced in the beginning of this section.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As t increases from 0, h t i and g t are enriched with increasingly deeper context information.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "From the perspective of information flow, BiLSTM passes information from one end of the sentence to the other.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a result, the number of time steps scales with the size of the input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In contrast, SLSTM allows bi-directional information flow at each word simultaneously, and additionally between the sentence-level state and every wordlevel state.",
+              "tag": "Method"
+            },
+            {
+              "sent": "At each step, each h i captures an increasing larger ngram context, while additionally communicating globally to all other h j via g.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The optimal number of recurrent steps is decided by the end-task performance, and does not necessarily scale with the sentence size.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As a result, SLSTM can potentially be both more efficient and more accurate compared with BiLSTMs.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Task settings",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Development Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "In Table 2, the number of recurrent state transition steps of SLSTM is decided according to the best development performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Figure 2 draws the development accuracies of SLSTMs with various window sizes against the number of recurrent steps.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As can be seen from the figure, when the number of time steps increases from 1 to 11, the accuracies generally increase, before reaching a maximum value.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This shows the effectiveness of recurrent information exchange in SLSTM state transition.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Final Results for Classification",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "As shown in Table 4, the final results on the movie review dataset are consistent with the development results, where SLSTM outperforms BiLSTM significantly, with a faster speed.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Observations on CNN and hierarchical attention are consistent with the development results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "SLSTM also gives highly competitive results when compared with existing methods in the literature.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown in Table 5, among the 16 datasets of Liu et al (2017), SLSTM gives the best results on 12, compared with BiLSTM and 2 layered BiLSTM models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The average accuracy of SLSTM is 85.6%, significantly higher compared with 84.9% by 2-layer stacked BiLSTM.",
+              "tag": "Result"
+            },
+            {
+              "sent": "3-layer stacked BiLSTM gives an average accuracy of 84.57%, which is lower compared to a 2-layer stacked BiLSTM, with a training time per epoch of 423.6 seconds.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The relative speed advantage of SLSTM over BiLSTM is larger on the 16 datasets as compared to the movie review test test.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is because the average length of inputs is larger on the 16 datasets (see Section 4.5).",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Final Results for Sequence Labelling",
+      "selected_sentences": [
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "Bi-directional RNNCRF structures, and in particular BiLSTMCRFs, have achieved the state of the art in the literature for sequence labelling tasks, including POS-tagging and NER.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare SLSTMCRF with BiLSTMCRF for sequence labelling, using the same settings as decided on the movie review development experiments for both BiLSTMs and SLSTMs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the latter, we decide the number of recurrent steps on the respective development sets for sequence labelling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The POS accuracies and NER F1-scores against the number of recurrent steps are shown in Figure 3 (a) and (b), respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For POS tagging, the best step number is set to 7, with a development accuracy of 97.58%.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For NER, the step number is set to 9, with a development F1-score of 94.98%.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "We have investigated SLSTM, a recurrent neural network for encoding sentences, which offers richer contextual information exchange with more parallelism compared to BiLSTMs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Results on a range of classification and sequence labelling tasks show that SLSTM outperforms BiLSTMs using the same number of parameters, demonstrating that SLSTM can be a useful addition to the neural toolbox for encoding sentences.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Sentence-State LSTM for Text Representation"
+}

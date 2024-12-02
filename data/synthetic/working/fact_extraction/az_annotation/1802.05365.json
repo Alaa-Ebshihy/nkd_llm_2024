@@ -1,0 +1,442 @@
+{
+  "paper_id": "1802.05365",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We introduce a new type of deep contextualized word representation that models both (1) complex characteristics of word use (eg, syntax and semantics), and (2) how these uses vary across linguistic contexts (ie, to model polysemy).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our word vectors are learned functions of the internal states of a deep bidirectional language model (biLM), which is pretrained on a large text corpus.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show that these representations can be easily added to existing models and significantly improve the state of the art across six challenging NLP problems, including question answering, textual entailment and sentiment analysis.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We also present an analysis showing that exposing the deep internals of the pre-trained network is crucial, allowing downstream models to mix different types of semi-supervision signals.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Pre-trained word representations (Mikolov et al, 2013;Pennington et al, 2014) are a key component in many neural language understanding models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, learning high quality representations can be challenging.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They should ideally model both (1) complex characteristics of word use (eg, syntax and semantics), and (2) how these uses vary across linguistic contexts (ie, to model polysemy).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we introduce a new type of deep contextualized word representation that directly addresses both challenges, can be easily integrated into existing models, and significantly improves the state of the art in every considered case across a range of challenging language understanding problems.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Our representations differ from traditional word type embeddings in that each token is assigned a representation that is a function of the entire input sentence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use vectors derived from a bidirectional LSTM that is trained with a coupled lan-guage model (LM) objective on a large text corpus.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this reason, we call them ELMo (Embeddings from Language Models) representations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unlike previous approaches for learning contextualized word vectors (Peters et al, 2017;McCann et al, 2017), ELMo representations are deep, in the sense that they are a function of all of the internal layers of the biLM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More specifically, we learn a linear combination of the vectors stacked above each input word for each end task, which markedly improves performance over just using the top LSTM layer.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Combining the internal states in this manner allows for very rich word representations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using intrinsic evaluations, we show that the higher-level LSTM states capture context-dependent aspects of word meaning (eg, they can be used without modification to perform well on supervised word sense disambiguation tasks) while lowerlevel states model aspects of syntax (eg, they can be used to do part-of-speech tagging).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Simultaneously exposing all of these signals is highly beneficial, allowing the learned models select the types of semi-supervision that are most useful for each end task.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Extensive experiments demonstrate that ELMo representations work extremely well in practice.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We first show that they can be easily added to existing models for six diverse and challenging language understanding problems, including textual entailment, question answering and sentiment analysis.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The addition of ELMo representations alone significantly improves the state of the art in every case, including up to 20% relative error reductions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For tasks where direct comparisons are possible, ELMo outperforms CoVe (McCann et al, 2017), which computes contextualized representations using a neural machine translation encoder.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, an analysis of both ELMo and CoVe reveals that deep representations outperform those derived from just the top layer of an LSTM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our trained models and code are publicly available, and we expect that ELMo will provide similar gains for many other NLP problems. 1",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related work",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Due to their ability to capture syntactic and semantic information of words from large scale unlabeled text, pretrained word vectors (Turian et al, 2010;Mikolov et al, 2013;Pennington et al, 2014) are a standard component of most state-ofthe-art NLP architectures, including for question answering , textual entailment (Chen et al, 2017) and semantic role labeling .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, these approaches for learning word vectors only allow a single contextindependent representation for each word.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Other recent work has also focused on learning context-dependent representations. context2vec (Melamud et al, 2016) uses a bidirectional Long Short Term Memory (LSTM; Hochreiter and Schmidhuber, 1997) to encode the context around a pivot word.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Other approaches for learning contextual embeddings include the pivot word itself in the representation and are computed with the encoder of either a supervised neural machine translation (MT) system (CoVe;McCann et al, 2017) or an unsupervised language model (Peters et al, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Both of these approaches benefit from large datasets, although the MT approach is limited by the size of parallel corpora.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this paper, we take full advantage of access to plentiful monolingual data, and train our biLM on a corpus with approximately 30 million sentences (Chelba et al, 2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We also generalize these approaches to deep contextual representations, which we show work well across a broad range of diverse NLP tasks.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Previous work has also shown that different layers of deep biRNNs encode different types of information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, introducing multi-task syntactic supervision (eg, part-of-speech tags) at the lower levels of a deep LSTM can improve overall performance of higher level tasks such as dependency parsing (Hashimoto et al, 2017) or CCG super tagging (S\u00f8gaard and Goldberg, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In an RNN-based encoder-decoder machine translation system, Belinkov et al (2017) showed that the representations learned at the first layer in a 2layer LSTM encoder are better at predicting POS tags then second layer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Finally, the top layer of an LSTM for encoding word context (Melamud et al, 2016) has been shown to learn representations of word sense.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that similar signals are also induced by the modified language model objective of our ELMo representations, and it can be very beneficial to learn models for downstream tasks that mix these different types of semi-supervision.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Dai and Le (2015) and Ramachandran et al (2017) pretrain encoder-decoder pairs using language models and sequence autoencoders and then fine tune with task specific supervision.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In contrast, after pretraining the biLM with unlabeled data, we fix the weights and add additional taskspecific model capacity, allowing us to leverage large, rich and universal biLM representations for cases where downstream training data size dictates a smaller supervised model.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "ELMo: Embeddings from Language Models",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "Unlike most widely used word embeddings (Pennington et al, 2014), ELMo word representations are functions of the entire input sentence, as described in this section.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They are computed on top of two-layer biLMs with character convolutions (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "3.1), as a linear function of the internal network states (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This setup allows us to do semi-supervised learning, where the biLM is pretrained at a large scale (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "3.4) and easily incorporated into a wide range of existing neural NLP architectures (Sec.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Bidirectional language models",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "ELMo",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Using biLMs for supervised NLP tasks",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "First consider the lowest layers of the supervised model without the biLM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Most supervised NLP models share a common architecture at the lowest layers, allowing us to add ELMo in a consistent, unified manner.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given a sequence of tokens (t 1 , . . .",
+              "tag": "Method"
+            },
+            {
+              "sent": ", t N ), it is standard to form a context-independent token representation x k for each token position using pre-trained word embeddings and optionally character-based representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then, the model forms a context-sensitive representation h k , typically using either bidirectional RNNs, CNNs, or feed forward networks.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Pre-trained bidirectional language model architecture",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Table 1 shows the performance of ELMo across a diverse set of six benchmark NLP tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In every task considered, simply adding ELMo establishes a new state-of-the-art result, with relative error reductions ranging from 6 -20% over strong base models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is a very general result across a diverse set model architectures and language understanding tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In the remainder of this section we provide high-level sketches of the individual task results; see the supplemental material for full experimental details.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "Question answering The Stanford Question Answering Dataset (SQuAD) (Rajpurkar et al, 2016) contains 100K+ crowd sourced questionanswer pairs where the answer is a span in a given Wikipedia paragraph.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our baseline model (Clark and Gardner, 2017) is an improved version of the Bidirectional Attention Flow model in Seo et al (BiDAF;.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It adds a self-attention layer after the bidirectional attention component, simplifies some of the pooling operations and substitutes the LSTMs for gated recurrent units (GRUs; Cho et al, 2014).",
+              "tag": "Result"
+            },
+            {
+              "sent": "After adding ELMo to the baseline model, test set F 1 improved by 4.7% from 81.1% to 85.8%, a 24.9% relative error reduction over the baseline, and improving the overall single model state-of-the-art by 1.4%.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A 11 member ensemble pushes F 1 to 87.4, the overall state-of-the-art at time of submission to the leaderboard.",
+              "tag": "Result"
+            },
+            {
+              "sent": "2 The increase of 4.7% with ELMo is also significantly larger then the 1.8% improvement from adding CoVe to a baseline model (McCann et al, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Textual entailment Textual entailment is the task of determining whether a \"hypothesis\" is true, given a \"premise\".",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The Stanford Natural Language Inference (SNLI) corpus (Bowman et al, 2015) provides approximately 550K hypothesis/premise pairs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our baseline, the ESIM sequence model from Chen et al (2017), uses a biLSTM to encode the premise and hypothesis, followed by a matrix attention layer, a local inference layer, another biLSTM inference composition layer, and finally a pooling operation before the output layer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Overall, adding ELMo to the ESIM model improves accuracy by an average of 0.7% across five random seeds.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A five member ensemble pushes the overall accuracy to 89.3%, exceeding the previous ensemble best of 88.9% (Gong et al, 2018).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Sentiment analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Analysis",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "This section provides an ablation analysis to validate our chief claims and to elucidate some interesting aspects of ELMo representations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "5.1 shows that using deep contextual representations in downstream tasks improves performance over previous work that uses just the top layer, regardless of whether they are produced from a biLM or MT encoder, and that ELMo representations provide the best overall performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "5.3 explores the different types of contextual information captured in biLMs and uses two intrinsic evaluations to show that syntactic information is better represented at lower layers while semantic information is captured a higher layers, consistent with MT encoders.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It also shows that our biLM consistently provides richer representations then CoVe.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Additionally, we analyze the sensitivity to where ELMo is included in the task model (Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "5.4), and visualize the ELMo learned weights across the tasks (Sec.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Alternate layer weighting schemes",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Where to include ELMo?",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "What information is captured by the biLM's representations?",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Sample efficiency",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Visualization of learned weights",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Deep contextualized word representations",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.1 Fine tuning biLM",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.2 Importance of \u03b3 in Eqn. (1)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.3 Textual Entailment",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.4 Question Answering",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.5 Semantic Role Labeling",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.6 Coreference resolution",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Deep contextualized word representations"
+}

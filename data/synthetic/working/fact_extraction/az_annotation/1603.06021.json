@@ -1,0 +1,416 @@
+{
+  "paper_id": "1603.06021",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Tree-structured neural networks exploit valuable syntactic parse information as they interpret the meanings of sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, they suffer from two key technical problems that make them slow and unwieldy for large-scale NLP tasks: they usually operate on parsed sentences and they do not directly support batched computation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We address these issues by introducing the Stackaugmented ParserInterpreter Neural Network (SPINN), which combines parsing and interpretation within a single treesequence hybrid model by integrating treestructured sentence interpretation into the linear sequential structure of a shift-reduce parser.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our model supports batched computation for a speedup of up to 25\u00d7 over other tree-structured models, and its integrated parser can operate on unparsed data with little loss in accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate it on the Stanford NLI entailment task and show that it significantly outperforms other sentence-encoding models.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Of these, the TreeRNN appears to be the principled choice, since meaning in natural language sentences is known to be constructed recursively according to a tree structure (Dowty, 2007, i.a.).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "TreeRNNs have shown promise (Tai et al, 2015;Li et al, 2015;Bowman et al, 2015b), but have largely been overlooked in favor of sequencebased RNNs because of their incompatibility with batched computation and their reliance on external parsers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Batched computation-performing synchronized computation across many examples at once-yields order-of-magnitude improvements in model run time, and is crucial in enabling neural networks to be trained efficiently on large datasets.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Because TreeRNNs use a different model structure for each sentence, as in Figure 1, efficient batching is impossible in standard implementations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Partly to address efficiency problems, standard TreeRNN models commonly only operate on sentences that have already been processed by a syntactic parser, which slows and complicates the use of these models at test time for most applications.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "This paper introduces a new model to address both these issues: the Stack-augmented ParserInterpreter Neural Network, or SPINN, shown in Figure 2. SPINN executes the computations of a tree-structured model in a linearized sequence, and can incorporate a neural network parser that produces the required parse structure on the fly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This design improves upon the TreeRNN architecture in three ways: At test time, it can simultaneously parse and interpret unparsed sentences, removing the dependence on an external parser at nearly no additional computational cost.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Secondly, it supports batched computation for both parsed and unparsed sentences, yielding dramatic speedups over standard TreeRNNs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, it supports a novel tree-sequence hybrid architecture for handling local linear context in sentence interpretation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This model is a basically plausible model of human sentence processing and yields substantial accuracy gains over pure sequence-or tree-based models.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "We evaluate SPINN on the Stanford Natural Language Inference entailment task (SNLI, Bowman et al, 2015a), and find that it significantly outperforms other sentence-encoding-based models, even with a relatively simple and underpowered implementation of the built-in parser.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also find that SPINN yields speed increases of up to 25\u00d7 over a standard TreeRNN implementation.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related work",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "There is a fairly long history of work on building neural network-based parsers that use the core operations and data structures from transition-based parsing, of which shift-reduce parsing is a variant (Henderson, 2004;Emami and Jelinek, 2005;Titov and Henderson, 2010;Chen and Manning, 2014;Buys and Blunsom, 2015;Dyer et al, 2015;Kiperwasser and Goldberg, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition, there has been recent work proposing models de-signed primarily for generative language modeling tasks that use this architecture as well Dyer et al, 2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To our knowledge, SPINN is the first model to use this architecture for the purpose of sentence interpretation, rather than parsing or generation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Socher et al (2011a,b) present versions of the TreeRNN model which are capable of operating over unparsed inputs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, these methods require an expensive search process at test time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our model presents a much faster alternative approach.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "3 Our model: SPINN 3.1 Background: Shift-reduce parsing SPINN is inspired by shift-reduce parsing (Aho and Ullman, 1972), which builds a tree structure over a sequence (eg, a natural language sentence) by a single left-to-right scan over its tokens.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The formalism is widely used in natural language parsing (eg, Shieber, 1983;Nivre, 2003).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Composition and representation",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "SPINN is based on a shift-reduce parser, but it is designed to produce a vector representation of a sentence as its output, rather than a tree as in standard shift-reduce parsing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It modifies the shiftreduce formalism by using fixed length vectors to represent each entry in the stack and the buffer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Correspondingly, its reduce operation combines two vector representations from the stack into another vector using a neural network function.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Word representations We use word representations based on the 300D vectors provided with",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "The tracking LSTM",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Parsing: Predicting transitions",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "For SPINN to operate on unparsed inputs, it needs to produce its own transition sequence a rather than relying on an external parser to supply it as part of the input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To do this, the model predicts a t at each step using a simple two-way softmax classifier whose input is the state of the tracking LSTM:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "This stack representation requires substantially less space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It stores each element involved in the feedforward computation exactly once, meaning that this representation can still support efficient backpropagation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, all of the updates to S and Q can be performed batched and in-place on a GPU, yielding substantial speed gains over both a more na\u00efve SPINN implementation and a standard TreeRNN implementation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We describe speed results in Section 3.7.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "Handling variable sentence lengths For any sentence model to be trained with batched computation, it is necessary to pad or crop sentences to a fixed length.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We fix this length at N = 25 words, longer than about 98% of sentences in SNLI.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Transition sequences a are cropped at the left or padded at the left with shifts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Token sequences x are then cropped or padded with empty tokens at the left to match the number of shifts added or removed from a, and can then be padded with empty tokens at the right to meet the desired length N.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "TreeRNN-equivalence",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "Without the addition of the tracking LSTM, SPINN (in particular the SPINNPINT variant, for parsed input, no tracking) is precisely equivalent to a conventional tree-structured neural network model in the function that it computes, and therefore it also has the same learning dynamics.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In both, the representation of each sentence consists of the representations of the words combined recursively using a TreeRNN composition function (in our case, the TreeLSTM function).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "SPINN, however, is dramatically faster, and supports both integrated parsing and a novel approach to context through the tracking LSTM.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Inference speed",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "NLI Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "We evaluate SPINN on the task of natural language inference (NLI, a.k.a. recognizing textual entailment, or RTE; Dagan et al, 2006).",
+              "tag": "Method"
+            },
+            {
+              "sent": "NLI is a sentence pair classification task, in which a model reads two sentences (a premise and a hypothesis), and outputs a judgment of entailment, contradiction, or neutral, reflecting the relationship between the meanings of the two sentences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Below is an example sentence pair and judgment from the SNLI corpus which we use in our experiments:",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Applying SPINN to SNLI",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Models evaluated",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Both SPINNPI and the full SPINN significantly outperform all previous sentence-encoding models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Most notably, these models outperform the tree-based CNN of Mou et al (2016), which also uses tree-structured composition for local feature extraction, but uses simpler pooling techniques to build sentence features in the interest of efficiency.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our results show that a model that uses tree-structured composition fully (SPINN) outper-forms one which uses it only partially (tree-based CNN), which in turn outperforms one which does not use it at all (RNN).",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "While all four models under study have trouble with negation, the tree-structured SPINN models do quite substantially better on these pairs.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This is likely due to the fact that parse trees make the scope of any instance of negation (the portion of the sentence's content that is negated) relatively easy to identify and separate from the rest of the sentence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For test set sentence pairs like the one below where negation (not or n't) does not appear in the premise but does appear in the hypothesis, the RNN shows 67% accuracy, while all three treestructured models exceed 73%.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Only the RNN got the below example wrong:",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Label: entailment",
+      "selected_sentences": [
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "We suspect that the hybrid nature of the full SPINN model is also responsible for its surprising ability to perform better than an RNN baseline even when its internal parser is relatively ineffective at producing correct full-sentence parses.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "It may act somewhat like the tree-based CNN, only with access to larger trees: using tree structure to build up local phrase meanings, and then using the tracking LSTM, at least in part, to combine those meanings.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusions and future work",
+      "selected_sentences": [
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "We introduce a model architecture (SPINNPINT) that is equivalent to a TreeLSTM, but an or-der of magnitude faster at test time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We expand that architecture into a tree-sequence hybrid model (SPINNPI), and show that this yields significant gains on the SNLI entailment task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we show that it is possible to exploit the strengths of this model without the need for an external parser by integrating a fast parser into the model (as in the full SPINN), and that the lack of external parse information yields little loss in accuracy.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "Because this paper aims to introduce a general purpose model for sentence encoding, we do not pursue the use of soft attention (Bahdanau et al, 2015;Rockt\u00e4schel et al, 2016), despite its demonstrated effectiveness on the SNLI task. 4 However, we expect that it should be possible to productively combine our model with soft attention to reach state-of-the-art performance.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 58,
+          "sentences": [
+            {
+              "sent": "For a more ambitious goal, we expect that it should be possible to implement a variant of SPINN on top of a modified stack data structure with differentiable push and pop operations (as in Grefenstette et al, 2015;Joulin and Mikolov, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This would make it possible for the model to learn to parse using guidance from the semantic representation objective, which currently is blocked from influencing the key parsing parameters by our use of hard shift/reduce decisions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This change would allow the model to learn to produce parses that are, in aggregate, better suited to supporting semantic interpretation than those supplied in the training data.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "A Fast Unified Model for Parsing and Sentence Understanding"
+}

@@ -1,0 +1,532 @@
+{
+  "paper_id": "1804.09337",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Most existing methods of semantic segmentation still suffer from two aspects of challenges: intra-class inconsistency and inter-class indistinction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To tackle these two problems, we propose a Discriminative Feature Network (DFN), which contains two sub-networks: Smooth Network and Border Network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, to handle the intra-class inconsistency problem, we specially design a Smooth Network with Channel Attention Block and global average pooling to select the more discriminative features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, we propose a Border Network to make the bilateral features of boundary distinguishable with deep semantic boundary supervision.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Based on our proposed DFN, we achieve stateof-the-art performance 86.2% mean IOU on PASCAL VOC 2012 and 80.3% mean IOU on Cityscapes dataset.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Semantic segmentation is a fundamental technique for numerous computer vision applications like scene understanding, human parsing and autonomous driving.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With the recent development of the convolutional neural network, especially the Fully Convolutional Network (FCN) [27], a lot of great work such as [40,6,19,30] have obtained promising results on the benchmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the features learned by these methods are usually not discriminative to differentiate 1) the patches which share the same semantic label but different appearances, named intra-class inconsistency as shown in the first row of Figure 1; 2) the two adjacent patches which have different semantic labels but with similar appearances, named inter-class indistinction as shown in the second row of Figure 1.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "To address these two challenges, we rethink the semantic segmentation task from a more macroscopic point of view.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this way, we regard the semantic segmentation as Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The second column is the output of FCN based model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The third column is the output of our proposed approach.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the first row, the left bottom corner of the cow is recognized as a horse.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is the Intra-class Inconsistency problem.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In the second row, the computer case has the similar blue light and black shell with the computer screen, which is hard to distinguish.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is the Inter-class Indistinction problem.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Our DFN involves two components: Smooth Network and Border Network, as Figure 2 illustrates.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The Smooth Network is designed to address the intra-class inconsistency issue.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To learn a robust feature representation for intra-class consistency, we usually consider two crucial factors.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On the one hand, we need multi-scale and global context features to encode the local and global information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, the small white patch only in Figure 1(a) usually cannot predict the correct category due to the lack of sufficient context information.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On the other hand, as multi-scale context is introduced, for a certain scale of thing, the features have different extent of discrimination, some of which may predict a false label.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, it is necessary to select the discriminative and effective features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Motivated by these two aspects, our Smooth Network is presented based on the U-shape [30,19,31,11,36] structure to capture the multi-scale context information, with the global average pooling [21,24,40,6] to capture the global context.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Also, we propose a Channel Attention Block (CAB), which utilizes the high-level features to guide the selection of lowlevel features stage-by-stage.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Recently, lots of approaches based on FCN have achieved high performance on different benchmarks [42,9,8].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most of them are still constrained by intra-class inconsistency and inter-class indistinction issues.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Encoder-Decoder:",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Method",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "In this section, we first detailedly introduce our proposed Discriminative Feature Network containing Smooth Network and Border Network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Then, we elaborate how these two networks specifically handle the intra-class consistency issue and the inter-class distinction issue.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we describe the complete encoder-decoder network architecture, Discriminative Feature Network.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "Ours + 86.2 puts to further improve the performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, since the PASCAL VOC 2012 dataset provides higher quality of annotation than the augmented datasets [12], we further fine-tune our model on PASCAL VOC 2012 train set for evaluation on validation set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More performance details are listed in Table 4.",
+              "tag": "Method"
+            },
+            {
+              "sent": "And then for evaluation on test set, we use the PASCAL VOC 2012 trainval set to further fine-tune our proposed method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the end, our proposed approach respectively achieves performance of 82.7% and 86.2% with and without MSCOCO [23] fine-tuning, as shown in Table 5.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that, we do not use DenseCRF [4] postprocessing for our method.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Smooth network",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "In the task of semantic segmentation, most of modern methods consider it as a dense prediction issue.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the prediction sometimes has incorrect results in some parts, especially the parts of large regions and complex scenes, which is named intra-class inconsistency issue.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "The intra-class inconsistency problem is mainly due to the lack of context.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, we introduce the global context with global average pooling [24,21,40,6].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, global context just has the high semantic information, which is not helpful for recovering the spatial information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Consequently, we further need the multi-scale receptive view and context to refine the spatial information, as most modern approaches [40,6,30] do.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Nevertheless, there exists a problem that the different scales of receptive views produce the features with different extents of discrimination, leading to inconsistent results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, we need to select more discriminative features to predict the unified semantic label of one certain category.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "In Equation 1, it implicitly indicates that the weights of different channels are equal.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, as mentioned in Section 1, the features in different stages have different degrees of discrimination, which results in different consistency of prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In order to obtain the intra-class consistent prediction, we should extract the discriminative features and inhibit the indiscriminative features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, in Equation 3, the \u03b1 value applies on the feature maps x, which represents the feature selection with CAB.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With this design, we can make the network to obtain discriminative features stage-wise to make the prediction intra-class consistent.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Border network",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "In the semantic segmentation task, the prediction is confused with the different categories with similar appearances, especially when they are adjacent spatially.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, we need to amplify the distinction of features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With this motivation, we adopt a semantic boundary to guide the feature learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To extract the accurate semantic boundary, we apply the explicit supervision of semantic boundary, which makes the network learn a feature with strong inter-class distinctive ability.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, we propose a Border Network to enlarge the inter-class distinction of features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It directly learns a semantic boundary with an explicit semantic boundary supervision, similar to a semantic boundary detection task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This makes the features on both sides of semantic boundary distinguishable.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "The Border Network mainly focuses on the semantic boundary which separates the classes on two sides of the boundary.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For extracting accurate semantic boundary, the features on both sides will become more distinguishable.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This exactly reaches our goal to make the features with inter-class distinction as much as possible.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "While the Smooth Network pays attention to the intra-class consistency, the Border Network focuses on the inter-class indistinction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Due to the accurate boundary supervisory signal, the network amplifies the distinction of bilateral feature to extract the semantic boundary.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we integrate the Border Network into the Smooth Network.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This improves the performance from 79.54% to 79.67%, as shown in Table 3.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The Border Network optimizes the semantic boundary, which is a comparably small part of the whole image, so this design makes a minor improvement.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We visualize the effect of Border Network, as shown in Figure 5.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, Figure 6 shows the predicted semantic boundary of Border Network.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can obviously observe that the Border Network can focus on the semantic boundary preferably. stage-wise mechanism, the Smooth Network and Border Network respectively refine the segmentation and boundary prediction, as shown in Figure 7.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The gradually accurate predictions validate the effectiveness of the stage-wise mechanism.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Network Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "We use pre-trained ResNet [14] as a base network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the Smooth Network, we add the global average pooling layer on the top of the network to get the strongest consistency.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we utilize the channel attention block to change the weights of channels to further enhance the consistency.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Meanwhile, in the Border Network, with the explicit semantic boundary supervision, the network obtains accurate semantic boundary and makes the bilateral features more distinct.",
+              "tag": "Result"
+            },
+            {
+              "sent": "With the support of both sub-networks, the intra-class features become more consistent, while the inter-class ones grow more distinct.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "For explicit feature refinement, we use deep supervision to get better performance and make the network easier to optimize.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the Smooth Network, we use the softmax loss to supervise the each stage's upsampled output excluding the global average pooling layer, while we use the focal loss to supervise the outputs of Border Network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we use a parameter \u03bb to balance the segmentation loss s and the boundary loss b , as Equation 7shows.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experimental Results",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "We evaluate our approach on two public datasets: PASCAL VOC 2012 [9] and Cityscapes [8].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first introduce the datasets and report the implementation details.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then we evaluate each component of the proposed method, and analyze the results in detail.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we present the comparison results with other state-of-the-art methods.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "PASCAL VOC 2012:",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Implementation details",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "Data augmentation: We use mean subtraction and random horizontal flip in training for both PASCAL VOC 2012 and Cityscapes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, we find it is crucial to randomly scale the input images, which improves the performance obviously.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use 5 scales {0.5, 0.75, 1, 1.5, 1.75} on both datasets.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Ablation study",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "In this subsection, we will step-wise decompose our approach to reveal the effect of each component.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the following experiments, we evaluate all comparisons on PASCAL VOC 2012 dataset [9].",
+              "tag": "Method"
+            },
+            {
+              "sent": "And we report the comparison results in PASCAL VOC 2012 dataset [9] and Cityscapes dataset [8].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Ablation for deep supervision:",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "We redefine the semantic segmentation from a macroscopic view of point, regarding it as a task to assign a consistent semantic label to one category of objects, rather than to each single pixel.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Inherently, this task requires the intra-class consistency and inter-class distinction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Aiming to consider both sides, we propose a Discriminative Feature Network, which contains two sub-networks: Smooth Network and Border Network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With the bidirectional stagewise mechanism, our approach can capture the discriminative features for semantic segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our experimental results show that the proposed approach can significantly improve the performance on the PASCAL VOC 2012 and Cityscapes benchmarks.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Learning a Discriminative Feature Network for Semantic Segmentation"
+}

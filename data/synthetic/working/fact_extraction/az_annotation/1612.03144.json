@@ -1,0 +1,730 @@
+{
+  "paper_id": "1612.03144",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Feature pyramids are a basic component in recognition systems for detecting objects at different scales.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But recent deep learning object detectors have avoided pyramid representations, in part because they are compute and memory intensive.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we exploit the inherent multi-scale, pyramidal hierarchy of deep convolutional networks to construct feature pyramids with marginal extra cost.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A topdown architecture with lateral connections is developed for building high-level semantic feature maps at all scales.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This architecture, called a Feature Pyramid Network (FPN), shows significant improvement as a generic feature extractor in several applications.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Using FPN in a basic Faster RCNN system, our method achieves state-of-the-art singlemodel results on the COCO detection benchmark without bells and whistles, surpassing all existing single-model entries including those from the COCO 2016 challenge winners.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition, our method can run at 6 FPS on a GPU and thus is a practical and accurate solution to multi-scale object detection.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Code will be made publicly available.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "However, image pyramids are not the only way to compute a multi-scale feature representation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A deep ConvNet computes a feature hierarchy layer by layer, and with subsampling layers the feature hierarchy has an inherent multiscale, pyramidal shape.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This in-network feature hierarchy produces feature maps of different spatial resolutions, but introduces large semantic gaps caused by different depths.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The high-resolution maps have low-level features that harm their representational capacity for object recognition.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Similar architectures adopting top-down and skip connections are popular in recent research [28,17,8,26].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Their goals are to produce a single high-level feature map of a fine resolution on which the predictions are to be made (Figure 2 top).",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the contrary, our method leverages the architecture as a feature pyramid where predictions (eg, object detections) are independently made on each level (Figure 2 bottom).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model echoes a featurized image pyramid, which has not been explored in these works.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "We evaluate our method, called a Feature Pyramid Network (FPN), in various systems for detection and segmentation [11,29,27].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Without bells and whistles, we report a state-of-the-art single-model result on the challenging COCO detection benchmark [21] simply based on FPN and where predictions are made on the finest level (eg, [28]).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Bottom: our model that has a similar structure but leverages it as a feature pyramid, with predictions made independently at all levels.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "a basic Faster RCNN detector [29], surpassing all existing heavily-engineered single-model entries of competition winners.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In ablation experiments, we find that for bounding box proposals, FPN significantly increases the Average Recall (AR) by 8.0 points; for object detection, it improves the COCO-style Average Precision (AP) by 2.3 points and PASCAL-style AP by 3.8 points, over a strong single-scale baseline of Faster RCNN on ResNets [16].",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our method is also easily extended to mask proposals and improves both instance segmentation AR and speed over state-of-the-art methods that heavily depend on image pyramids.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "In addition, our pyramid structure can be trained end-toend with all scales and is used consistently at train/test time, which would be memory-infeasible using image pyramids.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As a result, FPNs are able to achieve higher accuracy than all existing state-of-the-art methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, this improvement is achieved without increasing testing time over the single-scale baseline.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We believe these advances will facilitate future research and applications.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our code will be made publicly available.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Hand-engineered features and early neural networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "SIFT features [25] were originally extracted at scale-space extrema and used for feature point matching.",
+              "tag": "Method"
+            },
+            {
+              "sent": "HOG features [5], and later SIFT features as well, were computed densely over entire image pyramids.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These HOG and SIFT pyramids have been used in numerous works for image classification, object detection, human pose estimation, and more.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "There has also been significant interest in computing featurized image pyramids quickly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Doll\u00e1r et al [6] demonstrated fast pyramid computation by first computing a sparsely sampled (in scale) pyramid and then interpolating missing levels.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Before HOG and SIFT, early work on face detection with ConvNets [38,32] computed shallow networks over image pyramids to detect faces across scales.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "With the development of modern deep ConvNets [19], object detectors like OverFeat [34] and RCNN [12] showed dramatic improvements in accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "OverFeat adopted a strategy similar to early neural network face detectors by applying a ConvNet as a sliding window detector on an image pyramid.",
+              "tag": "Method"
+            },
+            {
+              "sent": "RCNN adopted a region proposal-based strategy [37] in which each proposal was scale-normalized before classifying with a ConvNet.",
+              "tag": "Method"
+            },
+            {
+              "sent": "SPPnet [15] demonstrated that such region-based detectors could be applied much more efficiently on feature maps extracted on a single image scale.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent and more accurate detection methods like Fast RCNN [11] and Faster RCNN [29] advocate using features computed from a single scale, because it offers a good trade-off between accuracy and speed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Multi-scale detection, however, still performs better, especially for small objects.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "There are recent methods exploiting lateral/skip connections that associate low-level feature maps across resolutions and semantic levels, including UNet [31] and SharpMask [28] for segmentation, Recombinator networks [17] for face detection, and Stacked Hourglass networks [26] for keypoint estimation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Ghiasi et al [8] present a Laplacian pyramid presentation for FCNs to progressively refine segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although these methods adopt architectures with pyramidal shapes, they are unlike featurized image pyramids [5,7,34] where predictions are made independently at all levels, see Figure 2. In fact, for the pyramidal architecture in Figure 2 (top), image pyramids are still needed to recognize objects across multiple scales [28].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Feature Pyramid Networks",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Our goal is to leverage a ConvNet's pyramidal feature hierarchy, which has semantics from low to high levels, and build a feature pyramid with high-level semantics throughout.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The resulting Feature Pyramid Network is generalpurpose and in this paper we focus on sliding window proposers (Region Proposal Network, RPN for short) [29] and region-based detectors (Fast RCNN) [11].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also generalize FPNs to instance segmentation proposals in Sec. 6.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Our method takes a single-scale image of an arbitrary size as input, and outputs proportionally sized feature maps at multiple levels, in a fully convolutional fashion.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This process is independent of the backbone convolutional architectures (eg, [19,36,16]), and in this paper we present results using ResNets [16].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The construction of our pyramid involves a bottom-up pathway, a top-down pathway, and lateral connections, as introduced in the following.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "The bottom-up pathway is the feedforward computation of the backbone ConvNet, which computes a feature hierarchy consisting of feature maps at several scales with a scaling step of 2. There are often many layers producing output maps of the same size and we say these layers are in the same network stage.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For our feature pyramid, we define one pyramid level for each stage.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We choose the output of the last layer of each stage as our reference set of feature maps, which we will enrich to create our pyramid.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This choice is natural since the deepest layer of each stage should have the strongest features.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "The topdown pathway hallucinates higher resolution features by upsampling spatially coarser, but semantically stronger, feature maps from higher pyramid levels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These features are then enhanced with features from the bottom-up pathway via lateral connections.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each lateral connection merges feature maps of the same spatial size from the bottom-up pathway and the top-down pathway.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The bottom-up feature map is of lower-level semantics, but its activations are more accurately localized as it was subsampled fewer times.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "Because all levels of the pyramid use shared classifiers/regressors as in a traditional featurized image pyramid, we fix the feature dimension (numbers of channels, denoted as d) in all the feature maps.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We set d = 256 in this paper and thus all extra convolutional layers have 256-channel outputs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are no non-linearities in these extra layers, which we have empirically found to have minor impacts.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Applications",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "Our method is a generic solution for building feature pyramids inside deep ConvNets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the following we adopt our method in RPN [29] for bounding box proposal generation and in Fast RCNN [11] for object detection.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To demonstrate the simplicity and effectiveness of our method, we make minimal modifications to the original systems of [29,11] when adapting them to our feature pyramid.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Feature Pyramid Networks for RPN",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Feature Pyramid Networks for Fast R-CNN",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "Fast RCNN [11] is a region-based object detector in which Region-ofInterest (RoI) pooling is used to extract features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Fast RCNN is most commonly performed on a single-scale feature map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To use it with our FPN, we need to assign RoIs of different scales to the pyramid levels.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments on Object Detection",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "As is common practice [12], all network backbones are pre-trained on the ImageNet1k classification set [33] and then fine-tuned on the detection dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the pre-trained ResNet-50 and ResNet-101 models that are publicly available. 2",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our code is a reimplementation of py-faster-rcnn 3 using Caffe2. 4",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Region Proposal with RPN",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Ablation Experiments",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "How important is top-down enrichment? Table 1(d)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "How important are lateral connections? Table 1(e)",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "shows the ablation results of a top-down feature pyramid without the 1\u00d71 lateral connections.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This top-down pyramid has strong semantic features and fine resolutions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But we argue that the locations of these features are not precise, because these maps have been downsampled and upsampled several times.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More precise locations of features can be directly passed from the finer levels of the bottom-up maps via the lateral connections to the top-down maps.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As a results, FPN has an AR 1k score 10 points higher than Table 1",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "(e).",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "Instead of resorting to pyramid representations, one can attach the head to the highest-resolution, strongly semantic feature maps of P 2 (ie, the finest level in our pyramids).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similar to the single-scale baselines, we assign all anchors to the P 2 feature map.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This variant (Table 1(f)) is better than the baseline but inferior to our approach.",
+              "tag": "Result"
+            },
+            {
+              "sent": "RPN is a sliding window detector with a fixed window size, so scanning over pyramid levels can increase its robustness to scale variance.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Object Detection with Fast/Faster R-CNN",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Fast R-CNN (on fixed proposals)",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "Table 2(c) shows the results of our FPN in Fast RCNN.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Comparing with the baseline in Table 2(a), our method improves AP by 2.0 points and small object AP by 2.1 points.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Comparing with the baseline that also adopts a 2fc head (Table 2(b)), our method improves AP by 5.1 points. 5",
+              "tag": "Result"
+            },
+            {
+              "sent": "These comparisons indicate that our feature pyramid is superior to single-scale features for a region-based object detector.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table 4. Comparisons of single-model results on the COCO detection benchmark.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Some results were not available on the test-std set, so we also include the test-dev results (and for Multipath [40] on minival).",
+              "tag": "Method"
+            },
+            {
+              "sent": "\u00a7 : This entry of AttractioNet [10] adopts VGG-16 for proposals and Wide ResNet [39] for object detection, so is not strictly a single-model result.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 50,
+          "sentences": [
+            {
+              "sent": "nections or removing lateral connections leads to inferior results, similar to what we have observed in the above subsection for RPN.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is noteworthy that removing top-down connections (Table 2(d)) significantly degrades the accuracy, suggesting that Fast RCNN suffers from using the low-level features at the high-resolution maps.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Faster R-CNN (on consistent proposals)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "ResNet-50",
+      "selected_sentences": [
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "With feature sharing, our FPN-based Faster RCNN system has inference time of 0.148 seconds per image on a single NVIDIA M40 GPU for ResNet-50, and 0.172 seconds for ResNet-101. 6",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a comparison, the single-scale ResNet-50 baseline in Table 3(a) runs at 0.32 seconds.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our method introduces small extra cost by the extra layers in the FPN, but has a lighter weight head.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Overall our system is faster than the ResNet-based Faster RCNN counterpart.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We believe the efficiency and simplicity of our method will benefit future research and applications.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Comparing with COCO Competition Winners",
+      "selected_sentences": [
+        {
+          "par_id": 57,
+          "sentences": [
+            {
+              "sent": "We find that our ResNet-101 model in Table 5 is not sufficiently trained with the default learning rate schedule.",
+              "tag": "Method"
+            },
+            {
+              "sent": "So we increase the number of mini-batches by 2\u00d7 at each learning rate when training the Fast RCNN step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This increases AP on minival to 35.6, without sharing features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This model is the one we submitted to the COCO detection leaderboard, shown in Table 4.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We have not evaluated its feature-sharing version due to limited time, which should be slightly better as implied by Table 5.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 4 compares our method with the single-model results of the COCO competition winners, including the 2016 winner GRMI and the 2015 winner Faster RCNN+++.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Without adding bells and whistles, our single-model entry has surpassed these strong, heavily engineered competitors.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On the test-dev set, our method increases over the existing best results by 0.5 points of AP (36.2 vs. 35.7) and 3.4 points of AP@0.5 (59.1 vs. 55.7).",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is worth noting that our method does not rely on image pyramids and only uses a single input image scale, but still has outstanding AP on small-scale objects.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This could only be achieved by highresolution image inputs with previous methods.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Moreover, our method does not exploit many popular improvements, such as iterative regression [9], hard negative mining [35], context modeling [16], stronger data augmentation [22], etc",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "These improvements are complementary to FPNs and should boost accuracy further.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 58,
+          "sentences": [
+            {
+              "sent": "Recently, FPN has enabled new top results in all tracks of the COCO competition, including detection, instance segmentation, and keypoint estimation.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Extensions: Segmentation Proposals",
+      "selected_sentences": [
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "Our method is a generic pyramid representation and can be used in applications other than object detection.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this section we use FPNs to generate segmentation proposals, following the DeepMask/SharpMask framework [27,28].",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Segmentation Proposal Results",
+      "selected_sentences": [
+        {
+          "par_id": 64,
+          "sentences": [
+            {
+              "sent": "Existing mask proposal methods [27,28,4] are based on densely sampled image pyramids (eg, scaled by 2 {\u22122:0.5:1} in [27,28]), making them computationally expensive.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our approach, based on FPNs, is substantially faster (our models run at 6 to 7 FPS).",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results demonstrate that our model is a generic feature extractor and can replace image pyramids for other multi-scale detection problems.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 65,
+          "sentences": [
+            {
+              "sent": "We have presented a clean and simple framework for building feature pyramids inside ConvNets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our method shows significant improvements over several strong baselines and competition winners.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Thus, it provides a practical solution for research and applications of feature pyramids, without the need of computing image pyramids.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Finally, our study suggests that despite the strong representational power of deep ConvNets and their implicit robustness to scale variation, it is still critical to explicitly address multiscale problems using pyramid representations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A. Implementation of Segmentation Proposals",
+      "selected_sentences": [
+        {
+          "par_id": 67,
+          "sentences": [
+            {
+              "sent": "We construct the feature pyramid with P 2\u22126 using the same architecture as described in Sec.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each level of our feature pyramid is used for predicting masks at a different scale.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As in DeepMask, we define the scale of a mask as the max of its width and height.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Masks with scales of {32, 64, 128, 256, 512} pixels map to {P 2 , P 3 , P 4 , P 5 , P 6 }, respectively, and are handled by a 5\u00d75 MLP.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As DeepMask uses a pyramid with half octaves, we use a second slightly larger MLP of size 7\u00d77 (7 \u2248 5 \u221a 2) to handle half-octaves in our model (eg, a 128 \u221a 2 scale mask is predicted by the 7\u00d77 MLP on P 4 ).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Objects at intermediate scales are mapped to the nearest scale in log space.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Feature Pyramid Networks for Object Detection"
+}

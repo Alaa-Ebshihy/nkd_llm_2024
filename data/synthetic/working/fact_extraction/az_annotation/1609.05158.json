@@ -1,0 +1,583 @@
+{
+  "paper_id": "1609.05158",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Recently, several models based on deep neural networks have achieved great success in terms of both reconstruction accuracy and computational performance for single image super-resolution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In these methods, the low resolution (LR) input image is upscaled to the high resolution (HR) space using a single filter, commonly bicubic interpolation, before reconstruction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This means that the super-resolution (SR) operation is performed in HR space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We demonstrate that this is sub-optimal and adds computational complexity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we present the first convolutional neural network (CNN) capable of real-time SR of 1080p videos on a single K2 GPU.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To achieve this, we propose a novel CNN architecture where the feature maps are extracted in the LR space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, we introduce an efficient sub-pixel convolution layer which learns an array of upscaling filters to upscale the final LR feature maps into the HR output.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By doing so, we effectively replace the handcrafted bicubic filter in the SR pipeline with more complex upscaling filters specifically trained for each feature map, whilst also reducing the computational complexity of the overall SR operation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluate the proposed approach using images and videos from publicly available datasets and show that it performs significantly better (+0.15dB on Images and +0.39dB on Videos) and is an order of magnitude faster than previous CNN-based methods.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "The recovery of a high resolution (HR) image or video from its low resolution (LR) counter part is topic of great interest in digital image processing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This task, referred to as super-resolution (SR), finds direct applications in many areas such as HDTV [15], medical imaging [28,33], satellite imaging [38], face recognition [17] and surveil-lance [53].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The global SR problem assumes LR data to be a low-pass filtered (blurred), downsampled and noisy version of HR data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is a highly ill-posed problem, due to the loss of high-frequency information that occurs during the non-invertible low-pass filtering and subsampling operations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, the SR operation is effectively a one-to-many mapping from LR to HR space which can have multiple solutions, of which determining the correct solution is non-trivial.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A key assumption that underlies many SR techniques is that much of the high-frequency data is redundant and thus can be accurately reconstructed from low frequency components.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "SR is therefore an inference problem, and thus relies on our model of the statistics of images in question.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Many methods assume multiple images are available as LR instances of the same scene with different perspectives, ie with unique prior affine transformations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These can be categorised as multi-image SR methods [1,11] and exploit explicit redundancy by constraining the ill-posed problem with additional information and attempting to invert the downsampling process.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, these methods usually require computationally complex image registration and fusion stages, the accuracy of which directly impacts the quality of the result.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "An alternative family of methods are single image super-resolution (SISR) techniques [45].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These techniques seek to learn implicit redundancy that is present in natural data to recover missing HR information from a single LR instance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This usually arises in the form of local spatial correlations for images and additional temporal correlations in videos.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this case, prior information in the form of reconstruction constraints is needed to restrict the solution space of the reconstruction.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "The goal of SISR methods is to recover a HR image from a single LR input image [14].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent popular SISR methods can be classified into edge-based [35], image statistics- based [9,18,46,12] and patch-based [2,43,52,13,54,40,5] methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A detailed review of more generic SISR methods can be found in [45].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One family of approaches that has recently thrived in tackling the SISR problem is sparsity-based techniques.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Sparse coding is an effective mechanism that assumes any natural image can be sparsely represented in a transform domain.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This transform domain is usually a dictionary of image atoms [25,10], which can be learnt through a training process that tries to discover the correspondence between LR and HR patches.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This dictionary is able to embed the prior knowledge necessary to constrain the ill-posed problem of super-resolving unseen data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This approach is proposed in the methods of [47,8].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A drawback of sparsity-based techniques is that introducing the sparsity constraint through a nonlinear reconstruction is generally computationally expensive.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Motivations and contributions",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "With the development of CNN, the efficiency of the algorithms, especially their computational and memory cost, gains importance [36].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The flexibility of deep network models to learn nonlinear relationships has been shown to attain superior reconstruction accuracy compared to previously hand-crafted models [27,7,44,31,3].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To super-resolve a LR image into HR space, it is necessary to increase the resolution of the LR image to match that of the HR image at some point.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In Osendorfer et al [27], the image resolution is increased in the middle of the network gradually.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another popular approach is to increase the resolution before or at the first layer of the network [7,44,3].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, this approach has a number of drawbacks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Firstly, increasing the resolution of the LR images before the image enhancement step increases the computational complexity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is especially problematic for convolutional networks, where the processing speed directly depends on the input image resolution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Secondly, interpolation methods typically used to accomplish the task, such as bicubic interpolation [7,44,3], do not bring additional information to solve the ill-posed reconstruction problem.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Learning upscaling filters was briefly suggested in the footnote of Dong et.al.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the importance of integrating it into the CNN as part of the SR operation was not fully recognised and the option not explored.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Additionally, as noted by Dong et al [6], there are no efficient implementations of a convolution layer whose output size is larger than the input size and well-optimized implementations such as convnet [21] do not trivially allow such behaviour.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "In this paper, contrary to previous works, we propose to increase the resolution from LR to HR only at the very end of the network and super-resolve HR data from LR feature maps.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This eliminates the need to perform most of the SR operation in the far larger HR resolution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this purpose, we propose an efficient sub-pixel convolution layer to learn the upscaling operation for image and video super-resolution.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "\u2022 In our network, upscaling is handled by the last layer of the network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This means each LR image is directly fed to the network and feature extraction occurs through nonlinear convolutions in LR space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Due to the reduced input resolution, we can effectively use a smaller filter size to integrate the same information while maintaining a given contextual area.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The resolution and filter size reduction lower the computational and memory complexity substantially enough to allow super-resolution of high definition (HD) videos in realtime as shown in Sec.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "\u2022 For a network with L layers, we learn n L\u22121 upscaling filters for the n L\u22121 feature maps as opposed to one upscaling filter for the input image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, not using an explicit interpolation filter means that the network implicitly learns the processing necessary for SR.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Thus, the network is capable of learning a better and more complex LR to HR mapping compared to a single fixed filter upscaling at the first layer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This results in additional gains in the reconstruction accuracy of the model as shown in Sec.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "We validate the proposed approach using images and videos from publicly available benchmarks datasets and compared our performance against previous works including [7,3,31].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show that the proposed model achieves state-of-art performance and is nearly an order of magnitude faster than previously published methods on images and videos.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Method",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "The task of SISR is to estimate a HR image I SR given a LR image I LR downscaled from the corresponding original HR image I HR .",
+              "tag": "Method"
+            },
+            {
+              "sent": "The downsampling operation is deterministic and known: to produce I LR from I HR , we first convolve I HR using a Gaussian filter -thus simulating the camera's point spread function -then downsample the image by a factor of r.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We will refer to r as the upscaling ratio.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In general, both I LR and I HR can have C colour channels, thus they are represented as real-valued tensors of size H \u00d7 W \u00d7 C and rH \u00d7 rW \u00d7 C, respectively.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "To solve the SISR problem, the SRCNN proposed in [7] recovers from an upscaled and interpolated version of I LR instead of I LR .",
+              "tag": "Method"
+            },
+            {
+              "sent": "To recover I SR , a 3 layer convolutional network is used.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section we propose a novel network architecture, as illustrated in Figure 1, to avoid upscaling I LR before feeding it into the network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our architecture, we first apply a l layer convolutional neural network directly to the LR image, and then apply a sub-pixel convolution layer that upscales the LR feature maps to produce I SR .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Deconvolution layer",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "The addition of a deconvolution layer is a popular choice for recovering resolution from max-pooling and other image down-sampling layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This approach has been successfully used in visualizing layer activations [49] and for generating semantic segmentations using high level features from the network [24].",
+              "tag": "Other"
+            },
+            {
+              "sent": "It is trivial to show that the bicubic interpolation used in SRCNN is a special case of the deconvolution layer, as suggested already in [24,7].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The deconvolution layer proposed in [50] can be seen as multiplication of each input pixel by a filter element-wise with stride r, and sums over the resulting output windows also known as backwards convolution [24].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Efficient sub-pixel convolution layer",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "The convolution operator W L thus has shape n L\u22121 \u00d7 r 2 C \u00d7 k L \u00d7 k L .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that we do not apply nonlinearity to the outputs of the convolution at the last layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is easy to see that when k L = ks r and mod (k s , r) = 0 it is equivalent to sub-pixel convolution in the LR space with the filter W s .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We will refer to our new layer as the sub-pixel convolution layer and our network as efficient sub-pixel convolutional neural network (ESPCN).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This last layer produces a HR image from LR feature maps directly with one upscaling",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "The detailed report of quantitative evaluation including the original data including images and videos, downsampled data, super-resolved data, overall and individual scores and run-times on a K2 GPU are provided in the supplemental material 1 .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "For video experiments we use 1080p HD videos from the publicly available Xiph database 2 , which has been used to report video SR results in previous methods [37,23].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The database contains a collection of 8 HD videos approximately 10 seconds in length and with width and height 1920 \u00d7 1080.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, we also use the Ultra Video    Group database 3 , containing 7 videos of 1920 \u00d7 1080 in size and 5 seconds in length.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Implementation details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Benefits of the sub-pixel convolution layer",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "In this section, we demonstrate the positive effect of the subpixel convolution layer as well as tanh activation function.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We first evaluate the power of the sub-pixel convolution layer by comparing against SRCNN's standard 9-1-5 model [6].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Here, we follow the approach in [6], using relu as the activation function for our models in this experiment, and training a set of models with 91 images and another set with images from ImageNet.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results are shown in Tab. 1. ESPCN with relu trained on ImageNet images achieved statistically significantly better performance compared to SRCNN models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is noticeable that ESPCN (91) performs very similar to SRCNN (91).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Training with more images using ESPCN has a far more significant impact on PSNR compared to SRCNN with similar number of parameters (+0.33 vs +0.07).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "To make a visual comparison between our model with the sub-pixel convolution layer and SRCNN, we visualized weights of our ESPCN (ImageNet) model against SRCNN 9-5-5 ImageNet model from [7] in Figure 3 and Figure 4. The weights of our first and last layer filters have a strong similarity to designed features including the logGabor filters [48], wavelets [20] and Haar features [42].",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is noticeable that despite each filter is independent in LR space, our independent filters is actually smooth in the HR space after PS.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared to SRCNN's last layer filters, our final layer filters has complex patterns for different feature maps, it also has much richer and more meaningful representations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Comparison to the state-of-the-art",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Video super-resolution results",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Run time evaluations",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "In this section, we evaluated our best model's run time on Set14 4 with an upscale factor of 3. We evaluate the run time of other methods [2,51,39] from the Matlab codes provided by [40] and [31].",
+              "tag": "Method"
+            },
+            {
+              "sent": "For methods which use convolutions including our own, a python/theano implementation is used to improve the efficiency based on the Matlab codes provided in [7,3].",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results are presented in Figure 2. Our model runs a magnitude faster than the fastest methods published so far.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Compared to SRCNN 9-5-5 ImageNet model, the number of convolution required to super-resolve one image is r \u00d7 r times smaller and the number of total parameters of the model is 2.5 times smaller.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The total complexity of the super-resolution operation is thus 2.5 \u00d7 r \u00d7 r times lower.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We have achieved a stunning average speed of 4.7ms for super-resolving one single image from Set14 on a K2 GPU.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Utilising the amazing speed of the network, it will be interesting to explore ensemble prediction using independently trained models as discussed in [36] to achieve better SR performance in the future.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "In this paper, we demonstrate that a non-adaptive upscaling at the first layer provides worse results than an adaptive upscaling for SISR and requires more computational complexity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To address the problem, we propose to perform the feature extraction stages in the LR space instead of HR space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To do that we propose a novel sub-pixel convolution layer which is capable of super-resolving LR data into HR space with very little additional computational cost compared to a deconvolution layer [50] at training time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Evaluation performed on an extended bench mark data set with upscaling factor of 4 shows that we have a significant speed (> 10\u00d7) and performance (+0.15dB on Images and +0.39dB on videos) boost compared to the previous CNN approach with more parameters [7] (5-3-3 vs 9-5-5).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This makes our model the first CNN model that is capable of SR HD videos in real time on a single GPU.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Future work",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network"
+}

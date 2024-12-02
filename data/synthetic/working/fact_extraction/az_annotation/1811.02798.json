@@ -1,0 +1,35 @@
+{
+  "paper_id": "1811.02798",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": []
+        }
+      ]
+    },
+    {
+      "section_name": "Autoencoder Architecture for Link Prediction and Node Classification",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Output Prediction",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Link Prediction",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Multi-Task Learning",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Baseline",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Multi-Task Graph Autoencoders"
+}

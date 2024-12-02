@@ -1,0 +1,725 @@
+{
+  "paper_id": "1504.01013",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Recent advances in semantic image segmentation have mostly been achieved by training deep convolutional neural networks (CNNs).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We show how to improve semantic segmentation through the use of contextual information; specifically, we explore 'patch-patch' context between image regions, and 'patch-background' context.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For learning from the patch-patch context, we formulate Conditional Random Fields (CRFs) with CNN-based pairwise potential functions to capture semantic correlations between neighboring patches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Efficient piecewise training of the proposed deep structured model is then applied to avoid repeated expensive CRF inference for back propagation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For capturing the patch-background context, we show that a network design with traditional multi-scale image input and sliding pyramid pooling is effective for improving performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our experimental results set new state-of-the-art performance on a number of popular semantic segmentation datasets, including NYUDv2, PASCAL VOC 2012, PASCALContext, and SIFT-flow.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, we achieve an intersection-overunion score of 78.0 on the challenging PASCAL VOC 2012 dataset.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Semantic image segmentation aims to predict a category label for every image pixel, which is an important yet challenging task for image understanding.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent approaches have applied convolutional neural network (CNNs) [13,32,3] to this pixel-level labeling task and achieved remarkable success.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among these CNN-based methods, fully convolutional neural networks (FCNNs) [32,3] have become a popular choice, because of their computational efficiency for dense prediction and end-to-end style learning.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Contextual relationships are ubiquitous and provide important cues for scene understanding tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Spatial context can be formulated in terms of semantic compatibility relations between one object and its neighboring objects or image patches (stuff), in which a compatibility relation is an indication of the co-occurrence of visual patterns.",
+              "tag": "Method"
+            },
+            {
+              "sent": "An illustration of the prediction process of our method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Both our unary and pairwise potentials are formulated as multiscale CNNs for capturing semantic relations between image regions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our method outputs low-resolution prediction after CRF inference, then the prediction is up-sampled and refined in a standard post-processing stage to output the final prediction.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "We explore two types of spatial context to improve the segmentation performance: patch-patch context and patchbackground context.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The patch-patch context is the semantic relation between the visual patterns of two image patches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Likewise, patch-background context is the semantic relation between a patch and a large background region.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Explicitly modeling the patch-patch contextual relations has not been well studied in recent CNN-based segmentation methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we propose to explicitly model the contextual relations using conditional random fields (CRFs).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We formulate CNN-based pairwise potential functions to capture semantic correlations between neighboring patches.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Some recent methods combine CNNs and CRFs for semantic segmentation, eg, the dense CRFs applied in [3,40,48,5].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The purpose of applying the dense CRFs in these methods is to refine the upsampled low-resolution prediction to sharpen object/region boundaries.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These methods consider Potts-model-based pairwise potentials for enforcing local smoothness.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "There the pairwise potentials are conventional log-linear functions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In contrast, we learn more general pairwise potentials using CNNs to model the semantic compatibility between image regions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our CNN pairwise potentials aim to improve the coarse-level prediction rather than doing local smoothness, and thus have a different purpose compared to Potts-model-based pairwise potentials.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since these two types of potentials have different effects, they can be combined to improve the segmentation system.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 1 illustrates our prediction process.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In contrast to patch-patch context, patch-background context is widely explored in the literature.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For CNNbased methods, background information can be effectively captured by combining features from a multi-scale image network input, and has shown good performance in some recent segmentation methods [13,33].",
+              "tag": "Method"
+            },
+            {
+              "sent": "A special case of capturing patch-background context is considering the whole image as the background region and incorporating the image-level label information into learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our approach, to encode rich background information, we construct multi-scale networks and apply sliding pyramid pooling on feature maps.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The traditional pyramid pooling (in a sliding manner) on the feature map is able to capture information from background regions of different sizes.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Incorporating general pairwise (or high-order) potentials usually involves expensive inference, which brings challenges for CRF learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To facilitate efficient learning we apply piecewise training of the CRF [43] to avoid repeated inference during back propagation training.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "1. We formulate CNN-based general pairwise potential functions in CRFs to explicitly model patch-patch semantic relations.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "2. Deep CNN-based general pairwise potentials are challenging for efficient CNNCRF joint learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We perform approximate training, using piecewise training of CRFs [43], to avoid the repeated inference at every stochastic gradient descent iteration and thus achieve efficient learning.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "3. We explore background context by applying a network architecture with traditional multi-scale image input [13] and sliding pyramid pooling [26].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We empirically demonstrate the effectiveness of this network architecture for semantic segmentation.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "4. We set new state-of-the-art performance on a number of popular semantic segmentation datasets, including NYUDv2, PASCAL VOC 2012, PASCALContext, and SIFT-flow.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In particular, we achieve an intersection-overunion score of 78.0 on the PASCAL VOC 2012 dataset, which is the best reported result to date.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related work",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "The most successful recent methods for semantic image segmentation are based on CNNs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A number of these CNNbased methods for segmentation are region-proposal-based methods [14,19], which first generate region proposals and then assign category labels to each.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Very recently, FCNNs [32,3,5] have become a popular choice for semantic segmentation, because of their effective feature generation and end-to-end training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "FCNNs have also been applied to a range of other dense-prediction tasks recently, such as image restoration [10], image super-resolution [8] and depth estimation [11,29].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The method we propose here is similarly built upon fully convolution-style networks.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Combining the strengths of CNNs and CRFs for segmentation has been the focus of several recently developed approaches.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DeepLabCRF in [3] trains FCNNs and applies a dense CRF [24] method as a post-processing step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "CRFRNN [48] and the method in [40] extend DeepLab and [25] by jointly learning the dense CRFs and CNNs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "They consider Potts-model based pairwise potential functions which enforce smoothness only.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The CRF model in these methods is for refining the up-sampled prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unlike these methods, our approach learns CNNbased pairwise potential functions for modeling semantic Jointly learning CNNs and CRFs has also been explored in other applications apart from segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The recent work in [29,30] proposes to jointly learn continuous CRFs and CNNs for depth estimation from single monocular images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The work in [45] combines CRFs and CNNs for human pose estimation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The authors of [4] explore joint training of Markov random fields and deep neural networks for predicting words from noisy images and image s classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Different from these methods, we explore efficient piecewise training of CRFs with CNN pairwise potentials.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given an image, we first apply a convolutional network to generate a feature map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We refer to this network as 'FeatMapNet'.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The resulting feature map is at a lower resolution than the original image because of the downsampling operations in the pooling layers.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Modeling semantic pairwise relations",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Contextual Deep CRFs",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Unary potential functions",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Pairwise potential functions",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Exploiting background context",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "CNNs with multi-scale image network inputs have shown good performance in some recent segmentation methods [13,33].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The traditional pyramid pooling (in a sliding manner) on the feature map is able to capture information from background regions of different sizes.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe that these two techniques (multi-scale network design and pyramid pooling) for encoding background information are very effective for improving performance.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "Applying CNNs on multi-scale images has shown good performance in some recent segmentation methods [13,33].",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our multi-scale network, an input image is first resized into 3 scales, then each resized image goes through 6 convolution blocks to output one feature map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our experiment, the 3 scales for the input image are set to 1.2, 0.8 and 0.  Block 6\" in the figure) which captures scale-dependent information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The resulting 3 feature maps (corresponding to 3 scales) are of different resolutions, therefore we upscale the two smaller ones to the size of the largest feature map using bilinear interpolation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These feature maps are then concatenated to form one feature map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We perform spatial pyramid pooling [26] (a modified version using sliding windows) on the feature map to capture information from background regions in multiple sizes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This increases the field-of-view for the feature map and thus it is able to capture the information from a large image region.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Increasing the field-of-view generally helps to improve performance [3].",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Prediction",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Coarse-level prediction stage",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Prediction refinement stage",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CRF training",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "Generally the size of the output space Y is exponential in the number of nodes, which prohibits the direct calculation of Z and its gradient.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The CRF graph we considered for segmentation here is a loopy graph (not tree-structured), for which the inference is generally computationally expensive.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More importantly, usually a large number of SGD iterations (tens or hundreds of thousands) are required for training CNNs.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Piecewise training of CRFs",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "Instead of directly solving the optimization in ( 6), we propose to apply an approximate CRF learning method.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the literature, there are two popular types of learning methods which approximate the CRF objective : pseudolikelihood learning [1] and piecewise learning [43].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The main advantage of these methods in term of training deep CRF is that they do not involve marginal inference for gradient calculation, which significantly improves the efficiency of training.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Decision tree fields [37] and regression tree fields [22] are based on pseudo-likelihood learning, while piecewise learning has been applied in the work [43,23].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 53,
+          "sentences": [
+            {
+              "sent": "Compared to the objective in ( 6) for direct maximum likelihood learning, the above objective does not involve the global partition function Z(x; \u03b8).",
+              "tag": "Method"
+            },
+            {
+              "sent": "To calculate the gradient of the above objective, we only need to calculate the gradient \u2207 \u03b8 U log P U and \u2207 \u03b8 V log P V .",
+              "tag": "Method"
+            },
+            {
+              "sent": "With the definition in ( 8), P U is a conventional Softmax normalization function over only K (the number of classes) elements.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similar analysis can also be applied to P V .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, we can easily calculate the gradient without involving expensive inference.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Moreover, we are able to perform parallel training of potential functions, since the above objective is formulated as a summation of independent log-likelihoods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As previously discussed, CNN training usually involves a large number of gradient update iterations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However this means that expensive inference during every gradient iteration becomes impractical.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Our piecewise approach here provides a practical solution for learning CRFs with CNN potentials on large-scale data.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "We evaluate our method on 4 popular semantic segmentation datasets: PASCAL VOC 2012, NYUDv2, PASCALContext and SIFT-flow.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The segmentation performance is measured by the intersection-over-union (IoU) score [12], the pixel accuracy and the mean accuracy [32].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results on NYUDv2",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Component Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "We evaluate the performance contribution of different components of the FeatMapNet for capturing patch-background context on the NYUDv2 dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We present the results of adding different components of FeatMapNet in Table 2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We start from a baseline setting of our FeatMapNet (\"FullyConvNet Baseline\" in the result table), for which multi-scale and sliding pooling is removed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This baseline setting is the conventional fully convolution network for segmentation, which can be considered as our implementation of the FCN method in [32].",
+              "tag": "Result"
+            },
+            {
+              "sent": "The result shows that our CNN baseline implementation (\"FullyConvNet\") achieves very similar performance (slightly better) than the FCN method.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Applying multiscale network design and sliding pyramid pooling significantly improve the performance, which clearly shows the benefits of encoding rich background context in our approach.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Applying the dense CRF method [24] for boundary refinement gains further improvement.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, adding our contextual CNN pairwise potentials brings significant further improvement, for which we achieve the best performance in this dataset.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results on PASCAL VOC 2012",
+      "selected_sentences": [
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "PASCAL VOC 2012 [12] is a well-known segmentation evaluation dataset which consists of 20 object categories   and one background category.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset is split into a training set, a validation set and a test set, which respectively contain 1464, 1449 and 1456 images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following a conventional setting in [19,3], the training set is augmented by extra annotated VOC images provided in [17], which results in 10582 training images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We verify our performance on the PASCAL VOC 2012 test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare with a number of recent methods with competitive performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since the ground truth labels are not available for the test set, we report the result through the VOC evaluation server.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The results of IoU scores are shown in the last column of Table 3.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first train our model only using the VOC images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We achieve 75.3 IoU score which is the best result amongst methods that only use the VOC training data.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "For further improvement, we also exploit the the middlelayer features as in the recent methods [3,32,18].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We learn extra refinement layers on the feature maps from middle layers to refine the coarse prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The feature maps from the middle layers encode lower level visual information which helps to predict details in the object boundaries.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we add 3 refinement convolution layers on top of the feature maps from the first 5 max-pooling layers and the input image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The resulting feature maps and the coarse prediction score map are then concatenated and go through another 3 refinement convolution layers to output the refined prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The resolution of the prediction is increased from 1/16 (coarse prediction) to 1/4 of the input image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With this refined prediction, we further perform boundary refinement [24] to generate the final prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we achieve an IoU score of 78.0, which is best reported result on this challenging dataset. 1 The results for each category are shown in Table 3.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We outperform competing methods in most categories.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For only using the VOC training set, our method outperforms the second best method, DPN [31], on 18 categories out of 20.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using VOC+COCO training set, our method outperforms DPN [31] on 15 categories out of 20.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Some prediction examples of our method are shown in Figure 7.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results on PASCAL-Context",
+      "selected_sentences": [
+        {
+          "par_id": 63,
+          "sentences": [
+            {
+              "sent": "The PASCALContext [34] dataset provides the segmentation labels of the whole scene (including the \"stuff\" la- 1 The result link at the VOC evaluation server: http://host. robots.ox.ac.uk:8080/anonymous/XTTRFF.html bels) for the PASCAL VOC images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the segmentation labels which contain 60 classes (59 classes plus the \" background\" class ) for evaluation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the provided training/test splits.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The training set contains 4998 images and the test set has 5105 images.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results on SIFT-flow",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusions",
+      "selected_sentences": [
+        {
+          "par_id": 66,
+          "sentences": [
+            {
+              "sent": "We have proposed a method which combines CNNs and CRFs to exploit complex contextual information for semantic image segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We formulate CNN based pairwise potentials for modeling semantic relations between image regions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our method shows best performance on several popular datasets including the PASCAL VOC 2012 dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The proposed method is potentially widely applicable to other vision tasks.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Efficient Piecewise Training of Deep Structured Models for Semantic Segmentation"
+}

@@ -1,0 +1,489 @@
+{
+  "paper_id": "1606.06357",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "In statistical relational learning, the link prediction problem is key to automatically understand the structure of large knowledge bases.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As in previous studies, we propose to solve this problem through latent factorization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, here we make use of complex valued embeddings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The composition of complex embeddings can handle a large variety of binary relations, among them symmetric and antisymmetric relations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared to state-of-the-art models such as Neural Tensor Network and Holographic Embeddings, our approach based on complex embeddings is arguably simpler, as it only uses the Hermitian dot product, the complex counterpart of the standard dot product between real vectors.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our approach is scalable to large datasets as it remains linear in both space and time, while consistently outperforming alternative approaches on standard link prediction benchmarks. 1",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Web-scale knowledge bases (KBs) provide a structured representation of world knowledge, with projects such as DBPedia (Auer et al, 2007), Freebase (Bollacker et al, 2008) or the Google Knowledge Vault (Dong et al, 2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They enable a wide range of applications such as recommender systems, question answering or automated personal agents.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The incompleteness of these KBs has stimulated Proceedings of the 33 rd International Conference on Machine Learning, New York, NY, USA, 2016.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "research into predicting missing entries, a task known as link prediction that is one of the main problems in Statistical Relational Learning (SRL, Getoor & Taskar, 2007).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "To do so, an increasingly popular method is to state the link prediction task as a 3D binary tensor completion problem, where each slice is the adjacency matrix of one relation type in the knowledge graph.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Completion based on low-rank factorization or embeddings has been popularized with the Netflix challenge (Koren et al, 2009).",
+              "tag": "Method"
+            },
+            {
+              "sent": "A partially observed matrix or tensor is decomposed into a product of embedding matrices with much smaller rank, resulting in fixed-dimensional vector representations for each entity and relation in the database.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For a given fact r(s,o) in which subject s is linked to object o through relation r, the score can then be recovered as a multi-linear product between the embedding vectors of s, r and o (Nickel et al, 2016a).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "Binary relations in KBs exhibit various types of patterns: hierarchies and compositions like FatherOf, OlderThan or IsPartOf-with partial/total, strict/non-strict orders-and equivalence relations like IsSimilarTo.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As described in Bordes et al (2013a), a relational model should (a) be able to learn all combinations of these properties, namely reflexivity/irreflexivity, symmetry/antisymmetry and transitivity, and (b) be linear in both time and memory in order to scale to the size of present day KBs, and keep up with their growth.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Dot products of embeddings scale well and can naturally handle both symmetry and (ir-)reflexivity of relations; using an appropriate loss function even enables transitivity (Bouchard et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, dealing with antisymmetric relations has so far almost always implied an explosion of the number of parameters (Nickel et al, 2011;Socher et al, 2013) (see Table 1), making models prone to overfitting.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Finding the best ratio between expressiveness and parameter space size is the keystone of embedding models.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In this work we argue that the standard dot product between embeddings can be a very effective composition function, provided that one uses the right representation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead of using embeddings containing real numbers we discuss and demonstrate the capabilities of complex embeddings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "When using complex vectors, ie vectors with entries in C, the dot product is often called the Hermitian (or sesquilinear) dot product, as it involves the conjugate-transpose of one of the two vectors.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a consequence, the dot product is not symmetric any more, and facts about antisymmetric relations can receive different scores depending on the ordering of the entities involved.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus complex vectors can effectively capture antisymmetric relations while retaining the efficiency benefits of the dot product, that is linearity in both space and time complexity.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "To give a clear comparison with respect to existing approaches using only real numbers, we also present an equivalent reformulation of our model that involves only real embeddings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This should help practitioners when implementing our method, without requiring the use of complex numbers in their software implementation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Relations as Real Part of Low-Rank Normal Matrices",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "In this section we discuss the use of complex embeddings for low-rank matrix factorization and illustrate this by considering a simplified link prediction task with merely a single relation type.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Modelling Relations",
+      "selected_sentences": [
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Our goal is to find a generic structure for X that leads to a flexible approximation of common relations in real world KBs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Standard matrix factorization approximates X by a matrix product U V T , where U and V are two functionally independent n \u00d7 K matrices, K being the rank of the matrix.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Within this formulation it is assumed that entities appearing as subjects are different from entities appearing as objects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This means that the same entity will have two different embedding vectors, depending on whether it appears as the subject or the object of a relation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This extensively studied type of model is closely related to the singular value decomposition (SVD) and fits well to the case where the matrix X is rectangular.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, in many link prediction problems, the same entity can appear as both subject and object.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It then seems natural to learn joint embeddings of the entities, which entails sharing the embeddings of the left and right factors, as proposed by several authors to solve the link prediction problem (Nickel et al, 2011;Bordes et al, 2013b;Yang et al, 2015).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "E T = E \u22121 .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We are in this work however explicitly interested in problems where matrices -and thus the relations they represent -can also be antisymmetric.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In that case eigenvalue decomposition is not possible in the real space; there only exists a decomposition in the complex space where embeddings x \u2208 C K are composed of a real vector component Re(x) and an imaginary vector component Im(x).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With complex numbers, the dot product, also called the Hermitian product, or sesquilinear form, is defined as:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "where u and v are complex-valued vectors, ie u = Re(u) + iIm(u) with Re(u) \u2208 R K and Im(u) \u2208 R K corresponding to the real and imaginary parts of the vector u \u2208 C K , and i denoting the square root of \u22121.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We see here that one crucial operation is to take the conjugate of the first vector: \u016b = Re(u) \u2212 iIm(u).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A simple way to justify the Hermitian product for composing complex vectors is that it provides a valid topological norm in the induced vectorial space.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, xT x = 0 implies x = 0 while this is not the case for the bilinear form x T x as there are many complex vectors for which x T x = 0.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Low-Rank Decomposition",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "In a link prediction problem, the relation matrix is unknown and the goal is to recover it entirely from noisy observations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To enable the model to be learnable, ie to generalize to unobserved links, some regularity assumptions are needed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since we deal with binary relations, we assume that they have low sign-rank.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The sign-rank of a sign matrix is the smallest rank of a real matrix that has the same sign-pattern as Y :",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "2. By construction, it accurately describes both symmetric and antisymmetric relations.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "3. Learnable relations can be efficiently approximated by a simple low-rank factorization, using complex numbers to represent the latent factors.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Application to Binary Multi-Relational Data",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "\u2022 Changing the representation: Equation (10) would correspond to DistMult with real embeddings, but handles asymmetry thanks to the complex conjugate of one of the embeddings 2 .",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "One can easily check that this function is antisymmetric when w r is purely imaginary (ie its real part is zero), and symmetric when w r is real.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Interestingly, by separating the real and imaginary part of the relation embedding w r , we obtain a decomposition of the relation matrix X r as the sum of a symmetric matrix Re(E diag(Re(w r )) \u0112T ) and a antisymmetric matrix Im(E diag(\u2212Im(w r )) \u0112T ).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Relation embeddings naturally act as weights on each latent dimension: Re(w r ) over the symmetric, real part of e o , e s , and Im(w) over the antisymmetric, imaginary part of e o , e s .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Indeed, one has e o , e s = e s , e o , meaning that Re( e o , e s ) is symmetric, while Im( e o , e s ) is antisymmetric.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This enables us to accurately describe both symmetric and antisymmetric relations between pairs of entities, while still using joint representations of entities, whether they appear as subject or object of relations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "In order to evaluate our proposal, we conducted experiments on both synthetic and real datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The synthetic dataset is based on relations that are either symmetric or antisymmetric, whereas the real datasets comprise different types of relations found in different, standard KBs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We refer to our model as ComplEx, for Complex Embeddings.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Synthetic Task",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Datasets: FB15K and WN18",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Influence of Negative Samples",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "In the early age of spectral theory in linear algebra, complex numbers were not used for matrix factorization and mathematicians mostly focused on bi-linear forms (Beltrami, 1873).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The eigen-decomposition in the complex domain as taught today in linear algebra courses came 40 years later (Autonne, 1915).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similarly, most of the existing approaches for tensor factorization were based on decompositions in the real domain, such as the Canonical Polyadic (CP) decomposition (Hitchcock, 1927).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These methods are very effective in many applications that use different modes of the tensor for different types of entities.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "But in the link prediction problem, antisymmetry of relations was quickly seen as a problem and asymmetric extensions of tensors were studied, mostly by either considering independent embeddings (Sutskever, 2009) or considering relations as matrices instead of vectors in the RESCAL model (Nickel et al, 2011).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Direct extensions were based on uni-,bi-and trigram latent factors for triple data, as well as a low-rank relation matrix (Jenatton et al, 2012).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 60,
+          "sentences": [
+            {
+              "sent": "Pairwise interaction models were also considered to improve prediction performances.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For example, the Universal Schema approach (Riedel et al, 2013) factorizes a 2D unfolding of the tensor (a matrix of entity pairs vs. relations) while Welbl et al (2016) extend this also to other pairs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the Neural Tensor Network (NTN) model, Socher et al (2013) combine linear transformations and multiple bilinear forms of subject and object embeddings to jointly feed them into a nonlinear neural layer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Its non-linearity and multiple ways of including interactions between embeddings gives it an advantage in expressiveness over models with simpler scoring function like DistMult or RESCAL.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "As a downside, its very large number of parameters can make the NTN model harder to train and overfit more easily.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "A recent novel way to handle antisymmetry is via the Holographic Embeddings (HolE) model by (Nickel et al, 2016b).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In HolE the circular correlation is used for combining entity embeddings, measuring the covariance between embeddings at different dimension shifts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This generally suggests that other composition functions than the classical tensor product can be helpful as they allow for a richer interaction of embeddings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the asymmetry in the composition function in HolE stems from the asymmetry of circular correlation, an O(nlog(n)) operation, whereas ours is inherited from the complex inner product, in O(n).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 63,
+          "sentences": [
+            {
+              "sent": "We described a simple approach to matrix and tensor factorization for link prediction data that uses vectors with complex values and retains the mathematical definition of the dot product.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The class of normal matrices is a natural fit for binary relations, and using the real part allows for efficient approximation of any learnable relation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Results on standard benchmarks show that no more modifications are needed to improve over the state-of-the-art.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 65,
+          "sentences": [
+            {
+              "sent": "Also, if we were to use complex embeddings every time a model includes a dot product, eg in deep neural networks, would it lead to a similar systematic improvement? relations with very close embeddings, as Figure 4 shows.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is especially striking for the third and fourth principal component (bottom-left).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Conversely, ComplEx manages to oppose spatially the opposite relations.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Complex Embeddings for Simple Link Prediction"
+}

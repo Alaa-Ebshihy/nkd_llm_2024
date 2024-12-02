@@ -1,0 +1,511 @@
+{
+  "paper_id": "1511.04491",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We propose an image super-resolution method (SR) using a deeply-recursive convolutional network (DRCN).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our network has a very deep recursive layer (up to 16 recursions).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Increasing recursion depth can improve performance without introducing new parameters for additional convolutions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Albeit advantages, learning a DRCN is very hard with a standard gradient descent method due to exploding/vanishing gradients.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To ease the difficulty of training, we propose two extensions: recursive-supervision and skip-connection.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our method outperforms previous methods by a large margin.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "For image super-resolution (SR), receptive field of a convolutional network determines the amount of contextual information that can be exploited to infer missing highfrequency components.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, if there exists a pattern with smoothed edges contained in a receptive field, it is plausible that the pattern is recognized and edges are appropriately sharpened.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As SR is an ill-posed inverse problem, collecting and analyzing more neighbor pixels can possibly give more clues on what may be lost by downsampling.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "For image restoration problems such as super-resolution and denoising, image details are very important.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, most deep-learning approaches for such problems do not use pooling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Increasing depth by adding a new weight layer basically introduces more parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, the model becomes too huge to be stored and retrieved.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "To resolve these issues, we use a deeply-recursive convolutional network (DRCN).",
+              "tag": "Method"
+            },
+            {
+              "sent": "DRCN repeatedly applies the same convolutional layer as many times as desired.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The number of parameters do not increase while more recursions are performed.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our network has the receptive field of 41 by 41 and this is relatively large compared to SRCNN [5] (13 by 13).",
+              "tag": "Result"
+            },
+            {
+              "sent": "While DRCN has good properties, we find that DRCN optimized with the widely-used stochastic gradient descent method does not easily converge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is due to exploding/vanishing gradients [1].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Learning long-range dependencies between pixels with a single weight layer is very difficult.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Contributions In summary, we propose an image superresolution method deeply recursive in nature.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "It utilizes a very large context compared to previous SR methods with only a single recursive layer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We improve the simple recursive network in two ways: recursive-supervision and skipconnection.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our method demonstrates state-of-the-art performance in common benchmarks.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Single-Image Super-Resolution",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "We apply DRCN to single-image super-resolution (SR) [11,7,8].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Many SR methods have been proposed in the computer vision community.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Early methods use very fast interpolations but yield poor results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Some of the more powerful methods utilize statistical image priors [27,12] or internal patch recurrence [8,10].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, sophisticated learning methods have been widely used to model a mapping from LR to HR patches.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Many methods have paid attention to find better regression functions from LR to HR images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is achieved with various techniques: neighbor embedding [4,19], sparse coding [31,32,28,29], convolutional neural network (CNN) [5] and random forest [23].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Recursive Neural Network in Computer Vision",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Our network is similar to the above in the sense that recursive or recurrent layers are used with convolutions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We further increase the recursion depth and demonstrate that very deep recursions can significantly boost the performance for super-resolution.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We apply the same convolution up to 16 times (the previous maximum is three).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Basic Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Mathematical Formulation",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "Model Properties Now we have all components for our model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The recursive model has pros and cons.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While the recursive model is simple and powerful, we find training a deeply-recursive network very difficult.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This is in accordance with the limited success of previous methods using at most three recursions so far [17].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among many reasons, two severe problems are vanishing and exploding gradients [1,21].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "Exploding gradients refer to the large increase in the norm of the gradient during training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such events are due to the multiplicative nature of chained gradients.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Long term components can grow exponentially for deep recursions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The vanishing gradients problem refers to the opposite behavior.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Long term components approach exponentially fast to the zero vector.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Due to this, learning the relation between distant pixels is very hard.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another known issue is that storing an exact copy of information through many recursions is not easy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In SR, output is vastly similar to input and recursive layer needs to keep the exact copy of input image for many recursions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These issues are also observed when we train our basic recursive model and we did not succeed in training a deeply-recursive network.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "In addition to gradient problems, there exists an issue with finding the optimal number of recursions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "If recursions are too deep for a given task, we need to reduce the number of recursions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finding the optimal number requires training many networks with different recursion depths.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Advanced Model",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "Our recursive-supervision naturally eases the difficulty of training recursive networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Backpropagation goes through a small number of layers if supervising signal goes directly from loss layer to early recursion.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Summing all gradients backpropagated from different prediction losses gives a smoothing effect.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The adversarial effect of vanishing/exploding gradients along one backpropagation path is alleviated.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "By looking at weights of predictions, we can figure out the marginal gain from additional recursions.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "SkipConnection Now we describe our second extension: skip-connection.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For SR, input and output images are highly correlated.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Carrying most if not all of input values until the end of the network is inevitable but very inefficient.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Due to gradient problems, exactly learning a simple linear relation between input and output is very difficult if many recursions exist in between them.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "With recursive-supervision, we have D + 1 objectives to minimize: supervising D outputs from recursions and the final output.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For intermediate outputs, we have the loss function",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experimental Results",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "In this section, we evaluate the performance of our method on several datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first describe datasets used Ground Truth A+ [29] SRCNN [5] RFL [23] SelfEx   for training and testing our method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Next, our training setup is given.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We give several experiments for understanding our model properties.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The effect of increasing the number of recursions is investigated.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we compare our method with several state-of-the-art methods.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Training Setup",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Study of Deep Recursions",
+      "selected_sentences": [
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "We study the effect of increasing recursion depth.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We trained four models with different numbers of recursions: 1, 6, 11, and 16.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Four models use the same number of parameters except the weights used for ensemble.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In Figure 8, it is shown that as more recursions are performed, PSNR measures increase.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Increasing recursion depth with a larger image context and more nonlinearities boosts performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The effect of ensemble is also investigated.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first evaluate intermediate predictions made from recursions (Figure 9).",
+              "tag": "Result"
+            },
+            {
+              "sent": "The ensemble output significantly improves performances of individual predictions.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Comparisons with State-of-the-Art Methods",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "As some methods such as A+ [29] and RFL [23] do not predict image boundary, they require cropping pixels near borders.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For our method, this procedure is unnecessary as our network predicts the full-sized image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For fair comparison, however, we also crop pixels to the same amount.",
+              "tag": "Method"
+            },
+            {
+              "sent": "PSNRs can be slightly different from original papers as existing methods use slightly different evaluation frameworks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the public evaluation code used in [10].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "In this work, we have presented a super-resolution method using a deeply-recursive convolutional network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our network efficiently reuses weight parameters while exploiting a large image context.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To ease the difficulty of training the model, we use recursive-supervision and skipconnection.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We have demonstrated that our method outperforms existing methods by a large margin on benchmarked images.",
+              "tag": "Other"
+            },
+            {
+              "sent": "In the future, one can try more recursions in order to use image-level context.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We believe our approach is readily applicable to other image restoration problems such as denoising and compression artifact removal.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Deeply-Recursive Convolutional Network for Image Super-Resolution"
+}

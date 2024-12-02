@@ -1,0 +1,523 @@
+{
+  "paper_id": "1206.2944",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Machine learning algorithms frequently require careful tuning of model hyperparameters, regularization terms, and optimization parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unfortunately, this tuning is often a \"black art\" that requires expert experience, unwritten rules of thumb, or sometimes brute-force search.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Much more appealing is the idea of developing automatic approaches which can optimize the performance of a given learning algorithm to the task at hand.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we consider the automatic tuning problem within the framework of Bayesian optimization, in which a learning algorithm's generalization performance is modeled as a sample from a Gaussian process (GP).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The tractable posterior distribution induced by the GP leads to efficient use of the information gathered by previous experiments, enabling optimal choices about what parameters to try next.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Here we show how the effects of the Gaussian process prior and the associated inference procedure can have a large impact on the success or failure of Bayesian optimization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We show that thoughtful choices can lead to results that exceed expert-level performance in tuning machine learning algorithms.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also describe new algorithms that take into account the variable cost (duration) of learning experiments and that can leverage the presence of multiple cores for parallel experimentation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that these proposed algorithms improve on previous automatic procedures and can reach or surpass human expert-level optimization on a diverse set of contemporary algorithms including latent Dirichlet allocation, structured SVMs and convolutional neural networks.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Bayesian Optimization with Gaussian Process Priors.",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "As in other kinds of optimization, in Bayesian optimization we are interested in finding the minimum of a function f (x) on some bounded set X , which we will take to be a subset of R D .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "What makes Bayesian optimization different from other procedures is that it constructs a probabilistic model for f (x) and then exploits this model to make decisions about where in X to next evaluate the function, while integrating out uncertainty.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The essential philosophy is to use all of the information available from previous evaluations of f (x) and not simply rely on local gradient and Hessian approximations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This results in a procedure that can find the minimum of difficult non-convex functions with relatively few evaluations, at the cost of performing more computation to determine the next point to try.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "When evaluations of f (x) are expensive to perform -as is the case when it requires training a machine learning algorithm -it is easy to justify some extra computation to make better decisions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For an overview of the Bayesian optimization formalism, see, eg, Brochu et al (2010).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section we briefly review the general Bayesian optimization approach, before discussing our novel contributions in Section 3.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "There are two major choices that must be made when performing Bayesian optimization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, one must select a prior over functions that will express assumptions about the function being optimized.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this we choose the Gaussian process prior, due to its flexibility and tractability.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, we must choose an acquisition function, which is used to construct a utility function from the model posterior, allowing us to determine the next point to evaluate.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "The Gaussian process (GP) is a convenient and powerful prior distribution on functions, which we will take here to be of the form f : X \u2192 R. The GP is defined by the property that any finite set of N points {x n \u2208 X } N n=1 induces a multivariate Gaussian distribution on R N .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The nth of these points is taken to be the function value f (x n ), and the elegant marginalization properties of the Gaussian distribution allow us to compute marginals and conditionals in closed form.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The support and properties of the resulting distribution on functions are determined by a mean function m : X \u2192 R and a positive definite covariance function K : X \u00d7 X \u2192 R. We will discuss the impact of covariance functions in Section 3.1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For an overview of Gaussian processes, see Rasmussen and Williams (2006).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "We assume that the function f (x) is drawn from a Gaussian process prior and that our observations are of the form {x n , y n } N n=1 , where y n \u223c N (f (x n ), \u03bd) and \u03bd is the variance of noise introduced into the function observations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This prior and these data induce a posterior over functions; the acquisition function, which we denote by a : X \u2192 R + , determines what point in X should be evaluated next via a proxy optimization x next = argmax x a(x), where several different functions have been proposed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In general, these acquisition functions depend on the previous observations, as well as the GP hyperparameters; we denote this dependence as a(x ; {x n , y n }, \u03b8).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "There are several popular choices of acquisition function.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Under the Gaussian process prior, these functions depend on the model solely through its predictive mean function \u00b5(x ; {x n , y n }, \u03b8) and predictive variance function \u03c3 2 (x ; {x n , y n }, \u03b8).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the proceeding, we will denote the best current value as x best = argmin xn f (x n ), \u03a6(\u2022) will denote the cumulative distribution function of the standard normal, and \u03c6(\u2022) will denote the standard normal density function.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "A more recent development is the idea of exploiting lower confidence bounds (upper, when considering maximization) to construct acquisition functions that minimize regret over the course of their optimization (Srinivas et al, 2010).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These acquisition functions have the form",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "In this work we will focus on the expected improvement criterion, as it has been shown to be better-behaved than probability of improvement, but unlike the method of GP upper confidence bounds (GPUCB), it does not require its own tuning parameter.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We have found expected improvement to perform well in minimization problems, but wish to note that the regret formalization is more appropriate for many settings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We perform a direct comparison between our EI-based approach and GPUCB in Section 4.1.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Practical Considerations for Bayesian Optimization of Hyperparameters.",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Although an elegant framework for optimizing expensive functions, there are several limitations that have prevented it from becoming a widely-used technique for optimizing hyperparameters in machine learning problems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, it is unclear for practical problems what an appropriate choice is for the covariance function and its associated hyperparameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, as the function evaluation itself may involve a time-consuming optimization procedure, problems may vary significantly in duration and this should be taken into account.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Third, optimization algorithms should take advantage of multi-core parallelism in order to map well onto modern computational environments.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section, we propose solutions to each of these issues.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Covariance Functions and Treatment of Covariance Hyperparameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The power of the Gaussian process to express a rich distribution on functions rests solely on the shoulders of the covariance function.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While non-degenerate covariance functions correspond to infinite bases, they nevertheless can correspond to strong assumptions regarding likely functions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, the automatic relevance determination (ARD) squared exponential kernel",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "is often a default choice for Gaussian process regression.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, sample functions with this covariance function are unrealistically smooth for practical optimization problems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We instead propose the use of the ARD Mat\u00e9rn 5/2 kernel:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "After choosing the form of the covariance, we must also manage the hyperparameters that govern its behavior (Note that these \"hyperparameters\" are different than the ones which are being subjected to the overall Bayesian optimization.), as well as that of the mean function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For our problems of interest, typically we would have D + 3 Gaussian process hyperparameters: D length scales \u03b8 1:D , the covariance amplitude \u03b8 0 , the observation noise \u03bd, and a constant mean m.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The most commonly advocated approach is to use a point estimate of these parameters by optimizing the marginal likelihood under the Gaussian process",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "However, for a fullyBayesian treatment of hyperparameters (summarized here by \u03b8 alone), it is desirable to marginalize over hyperparameters and compute the integrated acquisition function:   where a(x) depends on \u03b8 and all of the observations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For probability of improvement and expected improvement, this expectation is the correct generalization to account for uncertainty in hyperparameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We can therefore blend acquisition functions arising from samples from the posterior over GP hyperparameters and have a Monte Carlo estimate of the integrated expected improvement.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These samples can be acquired efficiently using slice sampling, as described in Murray and Adams (2010).",
+              "tag": "Method"
+            },
+            {
+              "sent": "As both optimization and Markov chain Monte Carlo are computationally dominated by the cubic cost of solving an N -dimensional linear system (and our function evaluations are assumed to be much more expensive anyway), the fullyBayesian treatment is sensible and our empirical evaluations bear this out.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 1 shows how the integrated expected improvement changes the acquistion function.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Ultimately, the objective of Bayesian optimization is to find a good setting of our hyperparameters as quickly as possible.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Greedy acquisition procedures such as expected improvement try to make the best progress possible in the next function evaluation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "From a practial point of view, however, we are not so concerned with function evaluations as with wallclock time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Different regions of the parameter space may result in vastly different execution times, due to varying regularization, learning rates, etc",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To improve our performance in terms of wallclock time, we propose optimizing with the expected improvement per second, which prefers to acquire points that are not only likely to be good, but that are also likely to be evaluated quickly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This notion of cost can be naturally generalized to other budgeted resources, such as reagents or money.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Just as we do not know the true objective function f (x), we also do not know the duration function c(x) : X \u2192 R + .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We can nevertheless employ our Gaussian process machinery to model ln c(x) alongside f (x).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this work, we assume that these functions are independent of each other, although their coupling may be usefully captured using GP variants of multi-task learning (eg, Teh et al (2005); Bonilla et al (2008)).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Under the independence assumption, we can easily compute the predicted expected inverse duration and use it to compute the expected improvement per second as a function of x.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Monte Carlo Acquisition for Parallelizing Bayesian Optimization.",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "With the advent of multi-core computing, it is natural to ask how we can parallelize our Bayesian optimization procedures.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More generally than simply batch parallelism, however, we would like to be able to decide what x should be evaluated next, even while a set of points are being evaluated.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Clearly, we cannot use the same acquisition function again, or we will repeat one of the pending experiments.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We would ideally perform a roll-out of our acquisition policy, to choose a point that appropriately balanced information gain and exploitation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, such roll-outs are generally intractable.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead we propose a sequential strategy that takes advantage of the tractable inference properties of the Gaussian process to compute Monte Carlo estimates of the acquisiton function under different possible results from pending function evaluations.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "We used the code made publically available by Hoffman et al (2010) to run experiments with online LDA on a collection of Wikipedia articles.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We downloaded a random set of 249,560 articles, split into training, validation and test sets of size 200,000, 24,560 and 25,000 respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The documents are represented as vectors of word counts from a vocabulary of 7,702 words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As reported in Hoffman et al (2010), we used a lower bound on the per word perplixity of the validation set documents as the performance measure.",
+              "tag": "Method"
+            },
+            {
+              "sent": "One must also specify the number of topics and the hyperparameters \u03b7 for the symmetric Dirichlet prior over the topic distributions and \u03b1 for the symmetric Dirichlet prior over the per document topic mixing weights.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We followed Hoffman et al (2010) and used 100 topics and \u03b7 = \u03b1 = 0.01 in our experiments in order to emulate their analysis and repeated exactly the grid search reported in the paper 3 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each online LDA evaluation generally took between five to ten hours to converge, thus the grid search requires approximately 60 to 120 processor days to complete.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "Setting the hyperparameters, such as the regularisation term, C, of structured SVMs remains a challenge and these are typically set through a time consuming grid search procedure as is done in Miller et al (2012) and Yu and Joachims (2009).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Indeed, Kumar et al (2010) report that hyperparameter selection was avoided for the motif finding task due to being too computationally expensive.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, Miller et al (2012) demonstrate that classification results depend highly on the setting of the parameters, which differ for each protein.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "The assumption of the infinite differentiability of the underlying function as imposed by the commonly used squared exponential is too restrictive for this problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Neural networks and deep learning methods notoriously require careful tuning of numerous hyperparameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Multi-layer convolutional neural networks are an example of such a model for which a thorough exploration of architechtures and hyperparameters is beneficial, as demonstrated in Saxe et al (2011), but often computationally prohibitive.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While Saxe et al (2011) demonstrate a methodology for efficiently exploring model architechtures, numerous hyperparameters, such as regularisation parameters, remain.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this empirical analysis, we tune nine hyperparameters of a three-layer convolutional network, described in Krizhevsky (2009) on the CIFAR-10 benchmark dataset using the code provided 4 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "This model has been carefully tuned by a human expert (Krizhevsky, 2009) to achieve a highly competitive result of 18% test error, which matches the published state of the art 5 result (Coates and Ng, 2011) on CIFAR-10.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The parameters we explore include the number of epochs to run the model, the learning rate, four weight costs (one for each layer and the softmax output weights), and the width, scale and power of the response normalization on the pooling layers of the network.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "We optimize over the nine parameters for each strategy on a withheld validation set and report the mean validation error and standard error over five separate randomly initialized runs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Results are presented in Figure 6 and contrasted with the average results achieved using the best parameters found by the expert.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The best hyperparameters 6 found by the GP EI MCMC approach achieve an error on the test set of 14.98%, which is over 3% better than the expert and the state of the art on CIFAR-10.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion.",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "In this paper we presented methods for performing Bayesian optimization of hyperparameters associated with general machine learning algorithms.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduced a fully Bayesian treatment for expected improvement, and algorithms for dealing with variable time regimes and parallelized experiments.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our empirical analysis demonstrates the effectiveness of our approaches on three challenging recently published problems spanning different areas of machine learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The code used will be made publicly available.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The resulting Bayesian optimization finds better hyperparameters significantly faster than the approaches used by the authors.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Indeed our algorithms surpassed a human expert at selecting hyperparameters on the competitive CIFAR-10 dataset and as a result beat the state of the art by over 3%.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "PRACTICAL BAYESIAN OPTIMIZATION OF MACHINE LEARNING ALGORITHMS"
+}

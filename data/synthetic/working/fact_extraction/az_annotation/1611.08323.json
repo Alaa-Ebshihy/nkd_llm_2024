@@ -1,0 +1,589 @@
+{
+  "paper_id": "1611.08323",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Semantic image segmentation is an essential component of modern autonomous driving systems, as an accurate understanding of the surrounding scene is crucial to navigation and action planning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Current state-of-the-art approaches in semantic image segmentation rely on pretrained networks that were initially developed for classifying images as a whole.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While these networks exhibit outstanding recognition performance (ie, what is visible?), they lack localization accuracy (ie, where precisely is something located?).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, additional processing steps have to be performed in order to obtain pixel-accurate segmentation masks at the full image resolution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To alleviate this problem we propose a novel ResNet-like architecture that exhibits strong localization and recognition performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We combine multi-scale context with pixel-level accuracy by using two processing streams within our network: One stream carries information at the full image resolution, enabling precise adherence to segment boundaries.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The other stream undergoes a sequence of pooling operations to obtain robust features for recognition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The two streams are coupled at the full image resolution using residuals.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Without additional processing steps and without pretraining, our approach achieves an intersection-over-union score of 71.8% on the Cityscapes dataset.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recent years have seen an increasing interest in self driving cars and in driver assistance systems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A crucial aspect of autonomous driving is to acquire a comprehensive understanding of the surroundings in which a car is moving.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Semantic image segmentation [49,38,21,53,33], the task of assigning a set of predefined class labels to image pixels, is an important tool for modeling the complex relationships of the semantic entities usually found in street scenes, such as cars, pedestrians, road, or sidewalks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In automotive scenarios it is used in various ways, eg as a pre-processing step to discard image regions that are unlikely to contain objects of interest [42,15], to improve object detection [4,23,24,58], or in combination with 3D scene geometry [32,17,35].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Many of those applications require precise region boundaries [20].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we therefore pursue the goal of achieving high-quality semantic segmentation with precise boundary adherence.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Current state-of-the-art approaches for image segmentation all employ some form of fully convolutional network (FCNs) [38] that takes the image as input and outputs a probability map for each class.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Many papers rely on network architectures that have already been proven successful for image classification such as variants of the ResNet [25] or the VGG architecture [50].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Starting from pre-trained nets, where a large number of weights for the target task can be pre-set by an auxiliary classification task, reduces training time and often yields superior performance compared to training a network from scratch using the (possibly limited amount of) data of the target application.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, a main limitation of using such pre-trained networks is that they severely restrict the design space of novel approaches, since new network elements such as batch normalization [27] or new activation functions often cannot be added into an existing architecture.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "When performing semantic segmentation using FCNs, a common strategy is to successively reduce the spatial size of the feature maps using pooling operations or strided convolutions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is done for two reasons: First, it significantly increases the size of the receptive field and second, it makes the network robust against small translations in the image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While pooling operations are highly desirable for recognizing objects in images, they significantly deteriorate localization performance of the networks when applied to semantic image segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Several approaches exist to overcome this problem and obtain pixel-accurate segmentations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Noh et al [41] learn a mirrored VGG network as a decoder, Yu and Koltun [55] introduce dilated convolutions to reduce the pooling factor of their pre-trained network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Ghiasi et al [20] use multi-scale predictions to successively improve their boundary adherence.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "An alternative approach used by several methods is to apply post-processing steps such as CRF-smoothing [30].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose a novel network architecture that achieves state-of-the-art segmentation performance without the need for additional post-processing steps and without the limitations imposed by pre-trained architectures.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our proposed ResNet-like architecture unites strong recognition performance with precise localization capabilities by combining two distinct processing streams.",
+              "tag": "Method"
+            },
+            {
+              "sent": "One stream undergoes a sequence of pooling operations and is responsible for understanding large-scale relationships of image elements; the other stream carries feature maps at the full image resolution, resulting in precise boundary adherence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This idea is visualized in Figure 1, where the two processing streams are shown in blue and red.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The blue residual lane reflects the high-resolution stream.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It can be combined with classical residual units (left and right), as well as with our new full-resolution residual units (FRRU).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The FRRUs from the red pooling lane act as residual units for the blue stream, but also undergo pooling operations and carry high-level information through the network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This results in a network that successively combines and computes features at two resolutions.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "This paper makes the following contributions: (i) We propose a novel network architecture geared towards precise semantic segmentation in street scenes which is not limited to pre-trained architectures and achieves state-ofthe-art results.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "(ii) We propose to use two processing streams to realize strong recognition and strong localization performance: One stream undergoes a sequence of pooling operations while the other stream stays at the full image resolution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "(iii) In order to foster further research in this area, we publish our code and the trained models in Theano/Lasagne [1,14]",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "The dramatic performance improvements from using CNNs for semantic segmentation have brought about an increasing demand for such algorithms in the context of autonomous driving scenarios.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a large amount of annotated data is crucial in order to train such deep networks, multiple new datasets have been released to encourage further research in this area, including Synthia [45], Virtual KITTI [18], and Cityscapes [11].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we focus on Cityscapes, a recent large-scale dataset consisting of real-world imagery with well-curated annotations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given their success, we will constrain our literature review to deep learning based semantic segmentation approaches and deep learning network architectures.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "Over the last years, the most successful semantic segmentation approaches have been based on convolutional neural networks (CNNs).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Early approaches constrained their output to a bottom-up segmentation followed by a CNN based region classification [54].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Rather than classifying entire regions in the first place, the approach by Farabet et al performs pixel-wise classification using CNN features originating from multiple scales, followed by aggregation of these noisy pixel predictions over superpixel regions [16].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "The introduction of so-called fully convolutional networks (FCNs) for semantic image segmentation by Long et al [38] opened a wide range of semantic segmentation research using end-to-end training [13].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Long et al further reformulated the popular VGG architecture [50] as a fully convolutional network (FCN), enabling the use of pretrained models for this architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To improve segmentation performance at object boundaries, skip connections were added which allow information to propagate directly from early, high-resolution layers to deeper layers.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "Pooling layers in FCNs fulfill a crucial role in order to increase the receptive field size of later units and with it the classification performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, they have the downside that the resulting network outputs are at a lower resolution.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To overcome this, various strategies have been proposed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Some approaches extract features from intermediate layers via some sort of skip connections [38,8,36,7].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Noh et al propose an encoder/decoder network [41].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The encoder computes low-dimensional feature representations via a sequence of pooling and convolution operations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The decoder, which is stacked on top of the encoder, then learns an upscaling of these low-dimensional features via subsequent unpooling and deconvolution operations [56].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similarly, Badrinarayanan et al [2,3] use convolutions instead of deconvolutions in the decoder network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast, our approach preserves high-resolution information throughout the entire network by keeping a separate high-resolution processing stream.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Network Architectures for Segmentation",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "One commonly refers to this design as skip connection, because there is a connection from the input x n\u22121 to the output x n that skips the actual computation F. It has been empirically observed that ResNets have superior training properties over traditional feedforward networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This can be explained by an improved gradient flow within the network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In oder to understand this, consider the n-th and m-th residual units in a ResNet where m > n (ie, the m-th unit is closer to the output layer of the network).",
+              "tag": "Method"
+            },
+            {
+              "sent": "By applying the recursion (2) several times, He et al showed in [26] that the output of the m-th residual unit admits a representation of the form",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "In this paper, we unify the two above-mentioned principles of network design and propose full-resolution residual networks (FRRNs) that exhibit the same superior training properties as ResNets but have two processing streams.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The features on one stream, the residual stream, are computed by adding successive residuals, while the features on the other stream, the pooling stream, are the direct result of a sequence of convolution and pooling operations applied to the input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our design is motivated by the need to have networks that can jointly compute good high-level features for recognition and good low-level features for localization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Regardless of the specific network design, obtaining good highlevel features requires a sequence of pooling operations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The pooling operations reduce the size of the feature maps and increase the network's receptive field, as well as its robustness against small translations in the image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While this is crucial to obtaining robust high-level features, networks that employ a deep pooling hierarchy have difficulties tracking low-level features, such as edges and boundaries, in deeper layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This makes them good at recognizing the elements in a scene but bad at localizing them to pixel accuracy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "On the other hand, a network that does not employ any pooling operations behaves the opposite way.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is good at localizing object boundaries, but performs poorly at recognizing the actual objects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By using the two processing streams together, we are able to compute both kinds of features simultaneously.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While the residual stream of an FRRN computes successive residuals at the full image resolution, allowing low level features to propagate effortlessly through the network, the pooling stream undergoes a sequence of pooling and unpooling operations resulting in good high-level features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Figure 1 visualizes the concept of having two distinct processing streams.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training Procedure",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "Because each FRRU processes features at the full image resolution, training a full-resolution residual network is very memory intensive.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Recall that in order for the backpropagation algorithm [46] to work, the entire forward pass has to be stored in memory.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "If the memory required to store the forward pass for a given network exceeds the available GPU memory, we can no longer use the standard backpropagation algorithm.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The images and ground truth annotations originate from the twice-subsampled Cityscapes validation set [11].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Pixels that are labeled void are not considered for the bootstrapping process.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experimental Evaluation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Residual Network Baseline",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "Our network architecture can be described as a ResNet [25] encoder/decoder architecture, where the residuals remain at the full input resolution throughout the network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A natural baseline is thus a traditional ResNet encoder/decoder architecture with long-range skip connections [38,41].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In fact, such an architecture resembles a single deep hourglass module in the stacked hourglass network architecture [40].",
+              "tag": "Method"
+            },
+            {
+              "sent": "This baseline differs from our proposed architecture in two important ways: While the feature maps on our residual stream are processed by each FRRU, the feature maps on the long-range skip connections are not processed by intermediate layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, long-range skip connections are scale dependent, meaning that features at one scale travel over a different skip connection than features at another scale.",
+              "tag": "Other"
+            },
+            {
+              "sent": "This is in contrast to our network design, where the residual stream can carry upscaled features from several pooling stages simultaneously.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "In order to illustrate the benefits of our approach over the natural baseline, we converted the architecture FRRN A (Table 1a) to a ResNet as follows: We first replaced all FRRUs by RUs and then added skip connections that connect the input of each pooling layer to the output of the corresponding unpooling layer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The resulting ResNet has slightly fewer parameters than the original FRRN (16.7 \u00d7 10 6 vs. 17.7 \u00d7 10 6 ).",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is due to the fact that RUs lack the 1 \u00d7 1 convolutions that connect the pooling to the residual Table 2. IoU scores from the cityscapes test set.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We highlight the best published baselines for the different sampling rates.",
+              "tag": "Method"
+            },
+            {
+              "sent": "(Additional anonymous submissions exist as concurrent work.)",
+              "tag": "Result"
+            },
+            {
+              "sent": "Bold numbers represent the best, italic numbers the second best score for a class.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also indicate the subsampling factor used on the input images, whether additional coarsely annotated data was used, and whether the model was initialized with pre-trained weights.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Subsample",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Quantitative Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "Overview In Table 2 we compare our method to the best (published) performers on the Cityscapes leader board, namely LRR [20], Adelaide [23], and Dilation [55].",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that our network performs on par with the very complex and well engineered system by Ghiasi et al (LRR).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Among the top performers on Cityscapes, only ENet refrain from using a pre-trained network.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, they design their network for real time performance and thus do not obtain top scores.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To the best of our knowledge, we are the first to show that it is possible to obtain state-of-the-art results even without pre-training.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This gives credibility to our claim that network architectures can have a crucial effect on a system's overall performance.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Subsampling factor",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Boundary Adherence",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Due to several pooling operations (and subsequent upsampling) in many of today's FCN architectures, boundaries are often overly smooth, resulting in lost details and edge-bleeding.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This leads to suboptimal scores, but it also makes the output of a semantic segmentation approach harder to use without further post-processing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since inaccurate boundaries are often not apparent from the standard evaluation metric scores, a typical approach is a trimap evaluation in order to quantify detailed boundary adherence [29,30,20].",
+              "tag": "Method"
+            },
+            {
+              "sent": "During trimap evaluation, all predictions are ignored if they do not fall within a certain radius r of a ground truth label boundary.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 6 visualizes our trimap evaluation performed on the validation set for varying trimap widths r between 1 and 80 pixels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare to LRR [20] and Dilation [55], who made code and pre-trained models available.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We see that our approach outperforms the competition consistently for all radii r.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Furthermore, it shall be noted that the method of [20] is based on an architecture specifically designed for clean boundaries.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our method achieves better boundary adherence, both numerically and qualitatively (see Figure 7), with a much simpler architecture and without ImageNet pre-training.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "In this paper we propose a novel network architecture for semantic segmentation in street scenes.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our architecture is clean, does not require additional post-processing, can be trained from scratch, shows superior boundary adherence, and reaches state-of-the-art results on the Cityscapes benchmark.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We will provide code and all trained models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since we do not incorporate design choices specifically tailored towards semantic segmentation, we believe that our architecture will also be applicable to other tasks such as stereo or optical flow where predictions are performed per pixel.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Full-Resolution Residual Networks for Semantic Segmentation in Street Scenes"
+}

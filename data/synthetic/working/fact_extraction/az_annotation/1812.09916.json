@@ -1,0 +1,691 @@
+{
+  "paper_id": "1812.09916",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Generative adversarial nets (GANs) are widely used to learn the data sampling process and their performance may heavily depend on the loss functions, given a limited computational budget.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This study revisits MMDGAN that uses the maximum mean discrepancy (MMD) as the loss function for GAN and makes two contributions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, we argue that the existing MMD loss function may discourage the learning of fine details in data as it attempts to contract the discriminator outputs of real data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To address this issue, we propose a repulsive loss function to actively learn the difference among the real data by simply rearranging the terms in MMD.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, inspired by the hinge loss, we propose a bounded Gaussian kernel to stabilize the training of MMDGAN with the repulsive loss function.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The proposed methods are applied to the unsupervised image generation tasks on CIFAR-10, STL-10, CelebA, and LSUN bedroom datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Results show that the repulsive loss function significantly improves over the MMD loss at no additional computational cost and outperforms other representative loss functions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The proposed methods achieve an FID score of 16.21 on the CIFAR-10 dataset using a single DCGAN network and spectral normalization. 1",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Generative adversarial nets (GANs) (Goodfellow et al (2014)) are a branch of generative models that learns to mimic the real data generating process.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "GANs have been intensively studied in recent years, with a variety of successful applications (Karras et al (2018); Li et al (2017b); Lai et al (2017); Zhu et al (2017); Ho & Ermon (2016)).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The idea of GANs is to jointly train a generator network that attempts to produce artificial samples, and a discriminator network or critic that distinguishes the generated samples from the real ones.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Compared to maximum likelihood based methods, GANs tend to produce samples with sharper and more vivid details but require more efforts to train.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Recent studies on improving GAN training have mainly focused on designing loss functions, network architectures and training procedures.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The loss function, or simply loss, defines quantitatively the difference of discriminator outputs between real and generated samples.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The gradients of loss functions are used to train the generator and discriminator.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This study focuses on a loss function called maximum mean discrepancy (MMD), which is well known as the distance metric between two probability distributions and widely applied in kernel two-sample test (Gretton et al (2012)).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Theoretically, MMD reaches its global minimum zero if and only if the two distributions are equal.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, MMD has been applied to compare the generated samples to real ones directly (Li et al (2015); Dziugaite et al (2015)) and extended as the loss function to the GAN framework recently (Unterthiner et al (2018); Li et al (2017a); ).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this paper, we interpret the optimization of MMD loss by the discriminator as a combination of attraction and repulsion processes, similar to that of linear discriminant analysis.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We argue that the existing MMD loss may discourage the learning of fine details in data, as the discriminator attempts to minimize the within-group variance of its outputs for the real data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To address this issue, we propose a repulsive loss for the discriminator that explicitly explores the differences among real data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The proposed loss achieved significant improvements over the MMD loss on image generation tasks of four benchmark datasets, without incurring any additional computational cost.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, a bounded Gaussian kernel is proposed to stabilize the training of discriminator.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "As such, using a single kernel in MMDGAN is sufficient, in contrast to a linear combination of kernels used in Li et al (2017a) and .",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "By using a single kernel, the computational cost of the MMD loss can potentially be reduced in a variety of applications.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "The paper is organized as follows.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Section 2 reviews the GANs trained using the MMD loss (MMDGAN).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We propose the repulsive loss for discriminator in Section 3, introduce two practical techniques to stabilize the training process in Section 4, and present the results of extensive experiments in Section 5.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the last section, we discuss the connections between our model and existing work.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MMD-GAN",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "(3) MMDGAN has been shown to be more effective than the model that directly uses MMD as the loss function for the generator G (Li et al (2017a)).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Liu et al (2017) showed that MMD and Wasserstein metric are weaker objective functions for GAN than the JensenShannon (JS) divergence (related to minimax loss) and total variation (TV) distance (related to hinge loss).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The reason is that convergence of P G to P X in JS-divergence and TV distance also implies convergence in MMD and Wasserstein metric.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Weak metrics are desirable as they provide more information on adjusting the model to fit the data distribution (Liu et al (2017)).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Nagarajan & Kolter (2017) proved that the GAN trained using the minimax loss and gradient updates on model parameters is locally exponentially stable near equilibrium, while the GAN using Wasserstein loss is not.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In Appendix A, we demonstrate that the MMDGAN trained by gradient descent is locally exponentially stable near equilibrium.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "REPULSIVE LOSS FUNCTION",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "In this section, we interpret the training of MMDGAN (using L att D and L mmd G ) as a combination of attraction and repulsion processes, and propose a novel repulsive loss function for the discriminator by rearranging the components in L att D .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, consider a linear discriminant analysis (LDA) model as the discriminator.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The task is to find a projection w to maximize the between-group variance w T \u00b5 x \u2212 w T \u00b5 y and minimize the withingroup variance w T (\u03a3 x + \u03a3 y )w, where \u00b5 and \u03a3 are group mean and covariance.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "We argue that the attractive loss L att D (Eq. 3) has two issues that may slow down the GAN training:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "The discriminator D may focus more on the similarities among real samples (in order to contract {D(x)}) than the fine details that separate them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Initially, G produces low-quality samples and it may be adequate for D to learn the common features of {x} in order to distinguish between {x} and {y}.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Only when {D(y)} is sufficiently close to {D(x)} will D learn the fine details of {x} to be able to separate {D(x)} from {D(y)}.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Consequently, D may leave out some fine details in real samples, thus G has no access to them during training.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Therefore, we propose a repulsive loss for D to encourage repulsion of the real data scores {D(x)}:",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "REGULARIZATION ON MMD AND DISCRIMINATOR",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "KERNEL IN MMD",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "SPECTRAL NORMALIZATION IN DISCRIMINATOR",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "EXPERIMENTS",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "In this section, we empirically evaluate the proposed 1) repulsive loss L rep D (Eq. 4) on unsupervised training of GAN for image generation tasks; and 2) RBFB kernel to stabilize MMDGAN training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The generalized power iteration method is evaluated in Appendix C.3.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To show the efficacy of L rep D , we compared the loss functions (L rep D , L mmd G ) using Gaussian kernel (MMD-rep) with (L att D , L mmd G ) using Gaussian kernel (MMD-rbf) (Li et al (2017a)) and rational quadratic kernel (MMD-rq) ), as well as non-saturating loss (Goodfellow et al (2014)) and hinge loss (Tran et al (2017)).",
+              "tag": "Method"
+            },
+            {
+              "sent": "To show the efficacy of RBFB kernel, we applied it to both L att D and L rep D , resulting in two methods MMD-rbf-b and MMD-rep-b.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The Wasserstein loss was excluded for comparison because it cannot be directly used with spectral normalization ).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Dataset:",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "The loss functions were evaluated on four datasets: 1) CIFAR-10 (50K images, 32 \u00d7 32 pixels) (Krizhevsky & Hinton (2009)); 2) STL-10 (100K images, 48 \u00d7 48 pixels) (Coates et al (2011)); 3) CelebA (about 203K images, 64 \u00d7 64 pixels) (Liu et al (2015)); and 4) LSUN bedrooms (around 3 million images, 64\u00d764 pixels) (Yu et al (2015)).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The images were scaled to range [\u22121, 1] to avoid numeric issues.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "Network architecture: The DCGAN ) architecture was used with hyperparameters from  (see Appendix B.2 for details).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In all experiments, batch normalization (BN) (Ioffe & Szegedy (2015)) was used in the generator, and spectral normalization with the generalized power iteration (see Appendix C) in the discriminator.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For MMD related losses, the dimension of discriminator output layer was set to 16; for non-saturating loss and hinge loss, it was 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In Appendix D.2, we investigate the impact of discriminator output dimension on the performance of repulsive loss.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The models here differ only by the loss functions and dimension of discriminator outputs.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "Fine-tuning on learning rates may improve the model performance, but constant learning rates were used for simplicity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All models were trained for 100K iterations on CIFAR-10, STL-10, CelebA and LSUN bedroom datasets, with n dis = 1, ie, one discriminator update per generator update 4 .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "QUANTITATIVE ANALYSIS",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "Table 1 shows the Inception score, FID and MSSSIM of applying different loss functions on the benchmark datasets with the optimal learning rate combinations tested experimentally.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that the same training setup (ie, DCGAN + BN + SN + TTUR) was applied for each loss function.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observed that: 1) MMD-rep and MMD-rep-b performed significantly better than MMD-rbf and MMD-rbf-b respectively, showing the proposed repulsive loss L rep D (Eq. 4) greatly improved over the attractive loss L att D (Eq.",
+              "tag": "Result"
+            },
+            {
+              "sent": "3); 2) Using a single kernel, MMD-rbf-b performed better than MMD-rbf and MMD-rq which used a linear combination of five kernels, indicating that the kernel saturation may be an issue that slows down MMDGAN training; 3) MMD-rep-b performed comparable or better than MMD-rep on benchmark datasets where we found the RBFB kernel managed to stabilize MMDGAN training using repulsive loss.",
+              "tag": "Result"
+            },
+            {
+              "sent": "4) MMD-rep and MMD-rep-b performed significantly better than the non-saturating and hinge losses, showing the efficacy of the proposed repulsive loss.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "of MMDGAN with RBF and RBFB kernel 5 .",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that when \u03bb = \u22121, the models are essentially MMD-rbf (with a single Gaussian kernel) and MMD-rbf-b when RBF and RBFB kernel are used respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observed that: 1) the model performed well using repulsive loss (ie, \u03bb \u2265 0), with \u03bb = 0.5, 1 slightly better than \u03bb = \u22120.5, 0, 2; 2) the MMD-rbf model can be significantly improved by simply increasing \u03bb from \u22121 to \u22120.5, which reduces the attraction of discriminator on real sample scores; 3) larger \u03bb may lead to more diverged models, possibly because the discriminator focuses more on expanding the real sample scores over adversarial learning; note when \u03bb 1, the model would simply learn to expand all real sample scores and pull the generated sample scores to real samples', which is a divergent process; 4) the RBFB kernel managed to stabilize MMD-rep for most diverged cases but may occasionally cause the FID score to rise up.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "The proposed methods were further evaluated in Appendix A, C and D. In Appendix A.2, we used a simulation study to show the local stability of MMD-rep trained by gradient descent, while its global stability is not guaranteed as bad initialization may lead to trivial solutions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The problem may be alleviated by adjusting the learning rate for generator.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In Appendix C.3, we showed the proposed generalized power iteration (Section 4.2) imposes a stronger Lipschitz constraint than the method in , and benefited MMDGAN training using the repulsive loss.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Moreover, the RBFB kernel managed to stabilize the MMDGAN training for various configurations of the spectral normalization method.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In Appendix D.1, we showed the gradient penalty can also be used with the repulsive loss.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In Appendix D.2, we showed that it was better to use more than one neuron at the discriminator output layer for the repulsive loss.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "QUALITATIVE ANALYSIS",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "In addition, the performance gain of proposed repulsive loss (Eq.",
+              "tag": "Result"
+            },
+            {
+              "sent": "4) over the attractive loss (Eq.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "3) comes at no additional computational cost.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "In fact, by using a single kernel rather than a linear combination of kernels, MMD-rep and MMD-rep-b are simpler than MMD-rbf and MMD-rq.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Besides, given a typically small batch size and a small number of discriminator output neurons (64 and 16 in our experiments), the cost of MMD over the non-saturating and hinge loss is marginal compared to the convolution operations.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "DISCUSSION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Appendices",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.1 MAIN PROPOSITION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.2 SIMULATION STUDY",
+      "selected_sentences": [
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "In this section, we reused the example from Nagarajan & Kolter (2017) to show that GAN trained using the MMD loss in Eq.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Consider a two-parameter MMDGAN with uniform latent distribution (a) the data distribution P X is the same as P Z , ie, uniform over [\u22121, 1], thus P X is realizable; (b) P X is standard Gaussian, thus non-realizable for any w 1 \u2208 R.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A.3 PROOF OF PROPOSITION 1",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Now we can prove:",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.4 DISCUSSION ON ASSUMPTION 1",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B SUPPLEMENTARY METHODOLOGY B.1 REPRESENTATIVE LOSS FUNCTIONS IN LITERATURE",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B.2 NETWORK ARCHITECTURE",
+      "selected_sentences": [
+        {
+          "par_id": 94,
+          "sentences": [
+            {
+              "sent": "For unsupervised image generation tasks on CIFAR-10 and STL-10 datasets, the DCGAN architecture from  was used.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For CelebA and LSUN bedroom datasets, we added more layers to the generator and discriminator accordingly.",
+              "tag": "Method"
+            },
+            {
+              "sent": "See Table S1 and S2 for details.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 95,
+          "sentences": [
+            {
+              "sent": "Table S1: DCGAN models for image generation on CIFAR-10 (h = w = 4, H = W = 32) and STL-10 (h = w = 6, H = W = 48) datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For non-saturating loss and hinge loss, s = 1; for MMD-rand, MMD-rbf, MMD-rq, s = 16.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This section introduces the power iteration for convolution operation (PICO) method to estimate the spectral norm of a convolution kernel, and compare PICO with the power iteration for matrix (PIM) method used in .",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "C.1 METHOD FORMATION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "C.3 EXPERIMENTS",
+      "selected_sentences": [
+        {
+          "par_id": 107,
+          "sentences": [
+            {
+              "sent": "Experiment setup: We used a similar setup as Section 5.1 with the following adjustments.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Four loss functions were tested: hinge, MMD-rbf, MMD-rep and MMD-rep-b.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Either PICO or PIM was used at each layer of the discriminator.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For PICO, five coefficients C K were tested: 16, 32, 64, 128 and 256 (note this is the overall coefficient for K layers; K = 8 for CIFAR-10 and STL-10; K = 10 for CelebA and LSUN-bedroom; see Appendix B.2). FID was used to evaluate the performance of each combination of loss function and power iteration method, eg, hinge + PICO with C K = 16.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 109,
+          "sentences": [
+            {
+              "sent": "2) For CIFAR-10, STL-10 and CelebA datasets, PIM performed comparable to PICO with C K = 128 or 256 on four loss functions.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For LSUN bedroom dataset, it is likely that the performance of PIM corresponded to that of PICO with C K > 256.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This implies that PIM may result in a relatively loose Lipschitz constraint on deep convolutional networks.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 110,
+          "sentences": [
+            {
+              "sent": "3) MMD-rep-b performed generally better than hinge and MMD-rbf with tested power iteration methods and hyper-parameter configurations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using PICO, MMD-rep also achieved generally better FID scores than hinge and MMD-rbf.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This implies that, given a limited computational budget, the proposed repulsive loss may be a better choice than the hinge and MMD loss for the discriminator.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table S3 shows the best FID scores obtained by PICO and PIM where C K was fixed at 128 for hinge and MMD-rbf, and 64 for MMD-rep and MMD-rep-b.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For hinge and MMD-rbf, PICO performed significantly better than PIM on the LSUN-bedroom dataset and comparably on the rest datasets.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "D SUPPLEMENTARY EXPERIMENTS",
+      "selected_sentences": [
+        {
+          "par_id": 113,
+          "sentences": [
+            {
+              "sent": "D.1 LIPSCHITZ CONSTRAINT VIA GRADIENT PENALTY Gradient penalty has been widely used to impose the Lipschitz constraint on the discriminator arguably since Wasserstein GAN (Gulrajani et al (2017)).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This section explores whether the proposed repulsive loss can be applied with gradient penalty.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 116,
+          "sentences": [
+            {
+              "sent": "where the numerator L rep D \u2212 1 \u2264 0 so that the discriminator will always attempt to minimize both L rep D and the Frobenius norm of gradients \u2207D(x) w.r.t.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Meanwhile, the generator is trained using the MMD loss L mmd G (Eq. 2).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 118,
+          "sentences": [
+            {
+              "sent": "Results: Table S4 shows that the proposed repulsive loss can be used with gradient penalty to achieve reasonable results on CIFAR-10 dataset.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For comparison, we cited the Inception score and FID for Scaled MMDGAN (SMMDGAN) and Scaled MMDGAN with spectral normalization (SNSMMDGAN) from .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that SMMDGAN and SNSMMDGAN used the same DCGAN architecture as MMD-rep-gp, but were trained for 150k generator updates and 750k discriminator updates, much more than that of MMD-rep-gp (100k for both G and D).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Thus, the repulsive loss significantly improved over the attractive MMD loss for discriminator.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "D.2 OUTPUT DIMENSION OF DISCRIMINATOR",
+      "selected_sentences": [
+        {
+          "par_id": 120,
+          "sentences": [
+            {
+              "sent": "Experiment setup: We used a similar setup as Section 5.1 with the following adjustments.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The repulsive loss was tested on the CIFAR-10 dataset with a variety of discriminator output dimensions: d \u2208 {1, 4, 16, 64, 256}.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Spectral normalization was applied to discriminator with the proposed PICO method (see Appendix C) and the coefficients C K selected from {16, 32, 64, 128, 256}.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "D.3 SAMPLES OF UNSUPERVISED IMAGE GENERATION",
+      "selected_sentences": []
+    }
+  ],
+  "title": "IMPROVING MMD-GAN TRAINING WITH REPULSIVE LOSS FUNCTION"
+}

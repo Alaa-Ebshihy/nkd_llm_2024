@@ -1,0 +1,506 @@
+{
+  "paper_id": "1412.6806",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Most modern convolutional neural networks (CNNs) used for object recognition are built using the same principles: Alternating convolution and max-pooling layers followed by a small number of fully connected layers.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We re-evaluate the state of the art for object recognition from small images with convolutional networks, questioning the necessity of different components in the pipeline.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We find that max-pooling can simply be replaced by a convolutional layer with increased stride without loss in accuracy on several image recognition benchmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Following this finding -and building on other recent work for finding simple network structures -we propose a new architecture that consists solely of convolutional layers and yields competitive or state of the art performance on several object recognition datasets (CIFAR-10, CIFAR-100, ImageNet).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To analyze the network we introduce a new variant of the \"deconvolution approach\" for visualizing features learned by CNNs, which can be applied to a broader range of network structures than existing approaches.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION AND RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "The vast majority of modern convolutional neural networks (CNNs) used for object recognition are built using the same principles: They use alternating convolution and max-pooling layers followed by a small number of fully connected layers (eg",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Jarrett et al (2009); Krizhevsky et al (2012); Ciresan et al).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Within each of these layers piecewise-linear activation functions are used.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The networks are typically parameterized to be large and regularized during training using dropout.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A considerable amount of research has over the last years focused on improving the performance of this basic pipeline.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among these two major directions can be identified.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, a plethora of extensions were recently proposed to enhance networks which follow this basic scheme.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among these the most notable directions are work on using more complex activation functions (Goodfellow et al, 2013;Lin et al, 2014; techniques for improving class inference (Stollenga et al, 2014;Srivastava & Salakhutdinov, 2013) as well as procedures for improved regularization Springenberg & Riedmiller, 2013;Wan et al, 2013) and layer-wise pre-training using label information (Lee et al, 2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, the success of CNNs for large scale object recognition in the ImageNet challenge (Krizhevsky et al, 2012) has stimulated research towards experimenting with the different architectural choices in CNNs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most notably the top entries in the 2014 ImageNet challenge deviated from the standard design principles by either introducing multiple convolutions in between pooling layers  or by building heterogeneous modules performing convolutions and pooling at multiple scales in each layer (Szegedy et al, 2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since all of these extensions and different architectures come with their own parameters and training procedures the question arises which components of CNNs are actually necessary for achieving state of the art performance on current object recognition datasets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We take a first step towards answering this question by studying the most simple architecture we could conceive: a homogeneous network solely consisting of convolutional layers, with occasional dimensionality reduction by using a stride of 2. Surprisingly, we find that this basic architecture -trained using vanilla stochastic gradient descent with momentum -reaches state of the art performance without the need for complicated activation functions, any response normalization or max-pooling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We empirically study the effect of transitioning from a more standard architecture to our simplified CNN by performing an ablation study on CIFAR-10 and compare our model to the state of the art on CIFAR-10, CIFAR-100 and the ILSVRC-2012 ImageNet dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our results both confirm the effectiveness of using small convolutional layers as recently proposed by  and give rise to interesting new questions about the necessity of pooling in CNNs.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Since dimensionality reduction is performed via strided convolution rather than max-pooling in our architecture it also naturally lends itself to studying questions about the invertibility of neural networks (Estrach et al, 2014).",
+              "tag": "Method"
+            },
+            {
+              "sent": "For a first step in that direction we study properties of our network using a deconvolutional approach similar to Zeiler & Fergus (2014).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MODEL DESCRIPTION -THE ALL CONVOLUTIONAL NETWORK",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "The models we use in our experiments differ from standard CNNs in several key aspects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Firstand most interestingly -we replace the pooling layers, which are present in practically all modern CNNs used for object recognition, with standard convolutional layers with stride two.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To understand why this procedure can work it helps to recall the standard formulation for defining convolution and pooling operations in CNNs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let f denote a feature map produced by some layer of a CNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It can be described as a 3-dimensional array of size W \u00d7 H \u00d7 N where W and H are the width and height and N is the number of channels (in case f is the output of a convolutional layer, N is the number of filters in this layer).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then p-norm subsampling (or pooling) with pooling size k (or half-length k/2) and stride r applied to the feature map f is a 3-dimensional array s(f ) with the following entries:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "1. We can remove each pooling layer and increase the stride of the convolutional layer that preceded it accordingly.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "The second difference of the network model we consider to standard CNNs is that -similar to models recently used for achieving state-of-the-art performance in the ILSVRC-2012 competition Szegedy et al, 2014) -we make use of small convolutional layers with k < 5 which can greatly reduce the number of parameters in a network and thus serve as a form of regularization.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Additionally, to unify the architecture further, we make use of the fact that if the image area covered by units in the topmost convolutional layer covers a portion of the image large enough to recognize its content (ie the object we want to recognize) then fully connected layers can also be replaced by simple 1-by-1 convolutions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This leads to predictions of object classes at different positions which can then simply be averaged over the whole image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This scheme was first described by Lin et al (2014) and further regularizes the network as the one by one convolution has much less parameters than a fully connected layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Overall our architecture is thus reduced to consist only of convolutional layers with rectified linear non-linearities and an averaging + softmax layer to produce predictions over the whole image.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "Table 1: The three base networks used for classification on CIFAR-10 and CIFAR-100.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "EXPERIMENTS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "EXPERIMENTAL SETUP",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "In experiments on CIFAR-10 and CIFAR-100 we use three different base network models which are intended to reflect current best practices for setting up CNNs for object recognition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Architectures of these networks are described in Table 1.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Starting from model A (the simplest model) the depth and number of parameters in the network gradually increases to model C. Several things are to be noted here.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, as described in the table, all base networks we consider use a 1-by-1 convolution at the top to produce 10 outputs of which we then compute an average over all positions and a softmax to produce class-probabilities (see Section 2 for the rationale behind this approach).",
+              "tag": "Result"
+            },
+            {
+              "sent": "We performed additional experiments with fully connected layers instead of 1-by-1 convolutions but found these models to consistently perform 0.5% \u2212 1% worse than their fully convolutional counterparts.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This is in line with similar findings from prior work (Lin et al, 2014).",
+              "tag": "Result"
+            },
+            {
+              "sent": "We hence do not report these numbers here to avoid cluttering the experiments.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Second, it can be observed that model B from the table is a variant of the Network in Network architecture proposed by Lin et al (2014) in which only one 1-by-1 convolution is performed after each \"normal\" convolution layer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Third, model C replaces all 5 \u00d7 5 convolutions by simple 3 \u00d7 3 convolutions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This serves two purposes: 1) it unifies the architecture to consist only of layers operating on 3 \u00d7 3 spatial neighborhoods of the previous layer feature map (with occasional subsampling); 2) if max-pooling is replaced by a convolutional layer, then 3 \u00d7 3 is the minimum filter size to allow overlapping convolution with stride 2. We also highlight that model C resembles the very deep models used by  in this years ImageNet competition.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Table 2: Model description of the three networks derived from base model C used for evaluating the importance of pooling in case of classification on CIFAR-10 and CIFAR-100.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The derived models for base models A and B are built analogously.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The higher layers are the same as in Table 1 .",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "\u2022 A model in which max-pooling is removed and the stride of the convolution layers preceding the max-pool layers is increased by 1 (to ensure that the next layer covers the same spatial region of the input image as before).",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is column \"StridedCNNC\" in the table.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CIFAR-10",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Table 3: Comparison between the base and derived models on the CIFAR-10 dataset.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CIFAR-10 classification error Model Error (%) # parameters without data augmentation",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "The results for all models that we considered are given in Table 3.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Several trends can be observed from the table.",
+              "tag": "Result"
+            },
+            {
+              "sent": "First, confirming previous results from the literature (Srivastava et al, 2014) the simplest model (model A) already performs remarkably well, achieving 12.5% error.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Second, simply removing the max-pooling layer and just increasing the stride of the previous layer results in diminished performance in all settings.",
+              "tag": "Result"
+            },
+            {
+              "sent": "While this is to be expected we can already see that the drop in performance is not as dramatic as one might expect from such a drastic change to the network architecture.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Third, surprisingly, when pooling is replaced by an additional convolution layer with stride r = 2 performance stabilizes and even improves on the base model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To check that this is not only due to an increase in the number of trainable parameters we compare the results to the \"ConvPool\" versions of the respective base model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In all cases the performance of the model without any pooling and the model with pooling on top of the additional convolution perform about on par.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Surprisingly, this suggests that while pooling can help to regularize CNNs, and generally does not hurt performance, it is not strictly necessary to achieve state-of-the-art results (at least for current small scale object recognition datasets).",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition, our results confirm that small 3 \u00d7 3 convolutions stacked after each other seem to be enough to achieve the best performance.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "Perhaps even more interesting is the comparison between the simple all convolutional network derived from base model C and the state of the art on CIFAR-10 shown in Table 4 , both with and without data augmentation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In both cases the simple network performs better than the best previously reported result.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This suggests that in order to perform well on current benchmarks \"almost all you need\" is a stack of convolutional layers with occasional stride of 2 to perform subsampling.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CIFAR-100",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CIFAR-10 WITH ADDITIONAL DATA AUGMENTATION",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "After performing our experiments we became aware of recent results by Graham (2015) who report a new state of the art on CIFAR-10/100 with data augmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These results were achieved using very deep CNNs with 2 \u00d7 2 convolution layers in combination with aggressive data augmentation in which the 32 \u00d7 32 images are placed into large 126 \u00d7 126 pixel images and can hence be heavily scaled, rotated and color augmented.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We thus implemented the LargeAllCNN, which is the all convolutional version of this network (see Table 5 in the appendix for details) and report the results of this additional experiment in Table 4 (bottom right).",
+              "tag": "Method"
+            },
+            {
+              "sent": "As can be seen, LargeAllCNN achieves performance comparable to the network with max-pooling.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is only outperformed by the fractional max-pooling approach when performing multiple passes through the network.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that these networks have vastly more parameters (> 50 M) than the networks from our previous experiments.",
+              "tag": "Other"
+            },
+            {
+              "sent": "We are currently re-training the LargeAllCNN network on CIFAR-100, and will include the results in Table 4 once training is finished.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CLASSIFICATION OF IMAGENET",
+      "selected_sentences": [
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "This network achieves a Top-1 validation error of 41.2% on ILSVRC-2012, when only evaluating on the center 224 \u00d7 224 patch, -which is comparable to the 40.7%",
+              "tag": "Result"
+            },
+            {
+              "sent": "Top-1 error reported by Krizhevsky et al (2012) -while having less than 10 million parameters (6 times less than the network of Krizhevsky et al (2012)) and taking roughly 4 days to train on a Titan GPU.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This supports our intuition that max-pooling may not be necessary for training large-scale convolutional networks.",
+              "tag": "Other"
+            },
+            {
+              "sent": "However, a more thorough analysis is needed to precisely evaluate the effect of max-pooling on ImageNet-scale networks.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Such a complete quantitative analysis using multiple networks on Ima-geNet is extremely computation-time intensive and thus out of the scope of this paper.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In order to still gain some insight into the effects of getting rid of max-pooling layers, we will try to analyze the representation learned by the all convolutional network in the next section.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "DECONVOLUTION",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "In order to analyze the network that we trained on ImageNet -and get a first impression of how well the model without pooling lends itself to approximate inversion -we use a 'deconvolution' approach.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We start from the idea of using a deconvolutional network for visualizing the parts of an image that are most discriminative for a given unit in a network, an approach recently proposed by Zeiler & Fergus (2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Following this initial attempt -and observing that it does not always work well without max-pooling layers -we propose a new and efficient way of visualizing the concepts learned by higher network layers.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "An alternative way of visualizing the part of an image that most activates a given neuron is to use a simple backward pass of the activation of a single neuron after a forward pass through the network; thus computing the gradient of the activation w.r.t. the image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The backward pass is, by design, partially conditioned on an image through both the activation functions of the network and the maxpooling switches (if present).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The connections between the deconvolution and the backpropagation conv1 conv2 conv3",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "DISCUSSION",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "\u2022 With modern methods of training convolutional neural networks very simple architectures may perform very well: a network using nothing but convolutions and subsampling matches or even slightly outperforms the state of the art on CIFAR-10 and CIFAR-100.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A similar architecture shows competitive results on ImageNet.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "\u2022 We propose a new method of visualizing the representations learned by higher layers of a convolutional network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While being very simple, it produces sharper visualizations of descriptive image regions than the previously known methods, and can be used even in the absence of 'switches' -positions of maxima in max-pooling regions.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "APPENDIX A LARGE ALL-CNN MODEL FOR CIFAR-10",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B IMAGENET MODEL",
+      "selected_sentences": []
+    }
+  ],
+  "title": "Accepted as a workshop contribution at ICLR 2015 STRIVING FOR SIMPLICITY: THE ALL CONVOLUTIONAL NET"
+}

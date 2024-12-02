@@ -1,0 +1,777 @@
+{
+  "paper_id": "1804.01005",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Face alignment, which fits a face model to an image and extracts the semantic meanings of facial pixels, has been an important topic in the computer vision community.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, most algorithms are designed for faces in small to medium poses (yaw angle is smaller than 45 \u2022 ), which lack the ability to align faces in large poses up to 90 \u2022 .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Firstly, the commonly used landmark face model assumes that all the landmarks are visible and is therefore not suitable for large poses.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Secondly, the face appearance varies more drastically across large poses, from the frontal view to the profile view.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thirdly, labelling landmarks in large poses is extremely challenging since the invisible landmarks have to be guessed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose to tackle these three challenges in an new alignment framework termed 3D Dense Face Alignment (3DDFA), in which a dense 3D Morphable Model (3DMM) is fitted to the image via Cascaded Convolutional Neural Networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We also utilize 3D information to synthesize face images in profile views to provide abundant samples for training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments on the challenging AFLW database show that the proposed approach achieves significant improvements over the state-of-the-art methods.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Face alignment is the process of moving and deforming a face model to an image, so as to extract the semantic meanings of facial pixels.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is an essential preprocessing step for many face analysis tasks, eg recognition [1], animation [2], tracking [3], attributes classification [4] and image restoration [5].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Traditionally, face alignment is approached as a landmark detection problem that aims to locate a sparse set of facial fiducial points, some of which include \"eye corner\", \"nose tip\" and \"chin center\".",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the past two decades, a number of effective frameworks have been proposed such as ASM [6], AAM [7] and CLM [8].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, with the introduction of Cascaded Regression [9], [10], [11] and Convolutional Neural Networks [12], [13], face alignment has observed significant improvements in accuracy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, most of the existing methods are designed for medium poses, under the assumptions that the yaw angle is smaller than 45 \u2022 and all the landmarks are visible.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "When the range of yaw angle is extended up to 90 \u2022 , significant challenges emerge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These challenges can be differentiated in three main ways:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Modelling: Landmark shape model [6] implicitly assumes that each landmark can be robustly detected by its distinctive visual patterns.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, when faces deviate from the frontal view, some landmarks become invisible due to self-occlusion [14].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In medium poses, this problem can be addressed by changing the semantic positions of face contour landmarks to the silhouette, which is termed landmark marching [15].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, in large poses where half of face is occluded, some landmarks are inevitably invisible Figure 1.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Fitting results of 3DDFA (the blue/red points indicate visible/invisible landmarks).",
+              "tag": "Method"
+            },
+            {
+              "sent": "For each pair of the four results, on the left is the rendering of the fitted 3D face with the mean texture, which is made transparent to demonstrate the fitting accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "On the right is the landmarks overlayed on the fitted 3D face model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In turn, landmarks can lose their semantic meanings, which may cause the shape model to fail.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Fitting: Another challenge in full-pose face alignment is derived from the dramatic appearance variations from front to profile.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Cascaded Linear Regression [11] and traditional nonlinear models [16], [10] are not flexible enough to cover these complex variations in a unified way.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another framework demonstrates more flexibility by adopting different landmark and fitting models for differing view categories [14], [17], [18].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unfortunately, since the nature of this framework must test every view, computational cost is likely to significantly increase.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More recently, Convolutional Neural Network (CNN) based methods have demonstrated improved performance over traditional methods in many applications.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For effective large-pose face alignment, CNN should be combined with the Cascaded Regression framework.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, most existing methods adopt a single network to complete fitting [13], which limits its performance.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Training Data: Labelled data is the basis for any supervised learning based algorithms.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, manual labelling of land-marks on large-pose faces is very tedious since the occluded landmarks have to be \"guessed\" which is impossible for most of people.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a result, almost all the public face alignment databases such as AFW [18], LFPW [19], HELEN [20] and IBUG [21] are collected in medium poses.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Few large-pose databases such as AFLW [22] only contain visible landmarks, which could be ambiguous in invisible landmarks, makes it hard to train a unified face alignment model.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "In this paper, we aim to solve the problem of face alignment in full pose range, where the yaw angle is allowed to vary between \u00b190 \u2022 .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We believe that face alignment is not barely a 2D problem since self-occlusion and large appearance variations are caused by the face rotation in the 3D space, which can be conveniently addressed by incorporating 3D information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More specifically, we improve the face model from 2D sparse landmarks to a dense 3D Morphable Model (3DMM) [23] and consider face alignment as a 3DMM fitting task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The optimization concept therein will change accordingly from landmark positions to pose (scale, rotation and translation) and morphing (shape and expression) parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We call this novel face alignment framework 3D Dense Face Alignment (3DDFA).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To realize 3DDFA, we propose to combine two achievements in recent years, namely, Cascaded Regression and the Convolutional Neural Network (CNN).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This combination requires the introduction of a new input feature which fulfills the \"cascade manner\" and \"convolution manner\" simultaneously (see Sec. 3.2) and a new cost function which can model the priority of 3DMM parameters (see Sec. 3.4).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Besides to provide enough data for training, we find that given a face image and its corresponding 3D model, it is possible to rotate the image out of plane with high fidelity.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This rotation enables the synthesis of a large number of training samples in large poses.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RELATED WORKS",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Face Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model Fitting",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Regression based methods estimate model parameters by regressing image features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, Hou et al [32] and Saragih et al [33] perform regression between texture residuals and parameter updates to fit AAM.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Valstar et al [34] locate landmark positions by mapping the landmark related local patches with support vector regression.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, Cascaded Regression [9] has been proposed and becomes most popular in face alignment community [10], [11], [35], [36], which can be summarized in Eqn.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Large Pose Face Alignment",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Despite the great achievements in face alignment, most of the state-of-the-art methods lack the flexibility in large-pose scenarios, since they need to build the challenging relationship between the landmark displacement and landmark related image features, where the latter may be self-occluded.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In 2D methods, a common solution is the multi-view framework which uses different landmark configurations for different views.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It has been applied in AAM [39], DAM [40] and DPM [18], [17] to align faces with different shape models, among which the one having the highest possibility is chosen as the final result.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, since every view has to be tested, the computational cost is always high.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another method is explicitly estimating the visibility of landmarks and shrink the contribution of occluded features [14], [41], [42].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Nevertheless, occlusion estimation is itself a challenging task and handling varying dimensional feature is still an ill-posed problem.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Different from 2D methods, 3D face alignment [43] aims to fit a 3DMM [23] to a 2D image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By incorporating 3D information, 3DMM can inherently provide the visibility of each model point without any additional estimation, making it possible to deal with the self-occluded points.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The original 3DMM fitting method [23] fits the 3D model by minimizing the pixel-wise difference between image and rendered face model.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since only the visible model vertices are fitted, it is the first method to cover arbitrary poses [23], [44], but it suffers from the one-minute-per-image computational cost.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, regression based 3DMM fitting, which estimates the model parameters by regressing the features at projected 3D landmarks [17], [45], [46], [47], [38], [48], [49], has looked to improve the efficiency.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although these methods face two major challenges.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First the projected 3D landmarks may be self-occluded and lose their image patterns, making the features no longer pose invariant.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, parameters of 3DMM have different priorities during fitting, despite that existing regression based methods treat them equally [10].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a result, directly minimizing the parameter error may be sub-optimal, because smaller parameter errors are not necessarily equivalent to smaller alignment errors.",
+              "tag": "Other"
+            },
+            {
+              "sent": "This problem will be further discussed in Sec.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A relevant but distinct task is 3D face reconstruction [50], [15], [51], [52], which recovers a 3D face from given 2D landmarks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Interestingly, 2D/3D face alignment results can be mutually transformed, where 3D to 2D is made by sampling landmark vertices and 2D to 3D is made by 3D face reconstruction.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "In this work, we propose a framework to combine three major achievements-3DMM, Cascaded Regression and CNN-to solve the large-pose face alignment problem.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "3D DENSE FACE ALIGNMENT (3DDFA)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "3D Morphable Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Rotation Formulation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Feature Design",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Besides the three requirements, we find that the input features of face alignment can be divided into two categories.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The first category is the image-view feature, where the original image is directly sent to the regressor.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, [12], [13], [37] use the input image as the CNN input and [57], [58] stack the image with a landmark response map as the input.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These kind of features does not lose any information provided by the image but require the regressor to cover any face appearances.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The second category is the model-view feature, where image pixels are rearranged based on the model condition.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, AAM [7] warps the face image to the mean shape and SDM [11] extract SIFT features at landmark locations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This kind of features aligns the face appearance with current fitting, which simplifies the alignment task progressively during optimization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, they do not cover the pixels beyond the face model, leading to a bad description of context.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As such, fitting with model-view features is easily trapped in local minima [36].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose a model-view feature called Pose Adaptive Feature (PAF) and a image-view feature called Projected Normalized Coordinate Code (PNCC).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We further demonstrate that optimal results can be achieved by combining both features.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Pose Adaptive Convolution",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Projected Normalized Coordinate Code",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "The proposed image-view feature depends on a new type of vertex index, which is introduced as follows: we normalize the 3D mean face to 0 \u2212 1 in x, y, z axis as Eqn.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Network Structure",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Cost Function",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Parameter Distance Cost (PDC)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Vertex Distance Cost (VDC)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Weighted Parameter Distance Cost (WPDC)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Optimized Weighted Parameter Distance Cost (OW-PDC)",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "FACE PROFILING",
+      "selected_sentences": [
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "All the regression based methods rely on training data, especially for CNNs which have thousands of parameters to learn.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, massive labelled faces in large poses are crucial for 3DDFA.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, few of the released face alignment databases contain large-pose samples [18], [19], [20], [21] since labelling standardized landmarks on them is very challenging.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we demonstrate that profile faces can be well synthesized from existing training samples with the help of 3D information.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Inspired by the recent achievements in face frontalization [15], [62] which generates the frontal view of faces, we propose to invert this process to synthesize the profile view of faces from medium-pose samples, which is called face profiling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Different from the face synthesizing in recognition [63], face profiling is not required to keep the identity information but to make the synthesizing results realistic.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, current synthesizing methods do not keep the external face region [64], [63], which contains important context information for face alignment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section, we elucidate a novel face synthesizing method to generate the profile views of face image with out-of-plane rotation, providing abundant realistic training samples for 3DDFA.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "3D Image Meshing",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "3D Image Rotation",
+      "selected_sentences": [
+        {
+          "par_id": 58,
+          "sentences": [
+            {
+              "sent": "In this work, we enlarge the yaw angle of image at the step of 5 \u2022 until 90 \u2022 , see Figure 9. Different from face frontalization, with larger rotation angles the self-occluded region can only be expanded.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a result, we avoid the troubling invisible region filling which may produce large artifacts [15].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Through face profiling, we not only obtain face samples in large poses but also augment the dataset to a large scale.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "IMPLEMENTATION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": [
+        {
+          "par_id": 62,
+          "sentences": [
+            {
+              "sent": "Three databases are used in our experiments, ie 300WLP, AFLW [22] and a specifically constructed AFLW2000-3D.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 64,
+          "sentences": [
+            {
+              "sent": "AFLW: AFLW [22] contains 21, 080 in-the-wild faces with large pose variations (yaw from \u221290 \u2022 to 90 \u2022 ).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each image is annotated up to 21 visible landmarks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The database is very suitable for evaluating face alignment performance in large poses.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 65,
+          "sentences": [
+            {
+              "sent": "AFLW2000-3D: Evaluating 3D face alignment in the wild is difficult due to the lack of pairs of 2D image and 3D scan.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Considering the recent achievements in 3D face reconstruction which can construct a 3D face from 2D landmarks [50], [15], we assume that a 3D model can be accurately fitted if sufficient 2D landmarks are provided.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore the evaluation can be degraded to 2D landmark evaluation which also makes it possible to compare 3DDFA with other 2D face alignment methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While AFLW is not suitable for this task since only visible landmarks may lead to serious ambiguity in 3D shape, as reflected by the fake good alignment phenomenon in Figure 10.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we construct a database called AFLW2000-3D for 3D face alignment evaluation, which contains the ground truth 3D faces and the corresponding 68 landmarks of the first 2,000 AFLW samples.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More details about the construction of AFLW2000-3D are given in supplemental material.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In all the following experiments, we follow [36] and regard the 300WLP samples synthesized from the training part of LFPW, HELEN and the whole AFW as the training set (101, 144 images in total).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The testing are conducted on three databases: the 300W testing part for general face alignment, the AFLW for large-pose face alignment and the AFLW2000-3D for 3D face alignment.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The alignment accuracy is evaluated by the Normalized Mean Error (NME).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Performance with Different Input Features",
+      "selected_sentences": [
+        {
+          "par_id": 66,
+          "sentences": [
+            {
+              "sent": "3.2, the input features of face alignment methods can be divided into two categories, the image-view feature and the model-view feature, which correspond to PNCC and PAF in this paper.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To test their effectiveness respectively and evaluate their complementarity, we divide the network in Figure 2 into PNCC stream and PAF stream by removing the last fully connected layer and regress the 256-dimensional output of each stream to the parameter update respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The combined twostream network is also reported to demonstrate the improvements.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown in Figure 11, PNCC performs better than PAF when used individually and the improvement is enlarged as the pose becomes larger.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Besides, PNCC and PAF achieve better performance when combined, which may infer a complementary relationship.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This complementary relationship might be because PNCC covers the whole image and contains rich context information, enabling it to fit large scale facial components like the face contour.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "While PAF is more adept at fitting facial features due to the implicit frontalizion, which can well assist PNCC.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Analysis of Feature Properties",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Analysis of Cost Function",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Error Reduction in Cascade",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Comparison Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 73,
+          "sentences": [
+            {
+              "sent": "In this paper, we evaluate the performance of 3DDFA on three different tasks: the large-pose face alignment on AFLW, the 3D face alignment on AFLW2000-3D and the medium-pose face alignment on 300W. including RCPR [42], ESR [10], LBF [35], CFSS [36], SDM [71], MDM [29], RMFA [72] and TSPM [18].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among them RCPR is an occlusion-robust method with the potential to deal with selfocclusion and we train it with landmark visibility computed by 3D information [62].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "ESR, SDM, LBF and CFSS are popular Cascaded Regression based methods, among which SDM [71] is the winner of ICCV2013 300W face alignment challenge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "MDM is a deep learning base method which adopts CNNs to extract image features.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "TSPM and RMFA adopt the multi-view framework which can deal with large poses.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Besides the state-of-the-art methods, we introduce a Deep Convolutional Network (DCN) as a CNN based baseline.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DCN directly regresses raw image pixels to the landmark positions with a CNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The CNN has five convolutional layers, four pooling layers and two fully connected layers (the same as the PNCC stream) to estimate 68 landmarks from a 200 \u00d7 200 \u00d7 3 input image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Besides, we also compare with our previous work [24] but we do not adopt the SDM based landmark refinement here.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "3D Face Alignment in AFLW2000-3D",
+      "selected_sentences": [
+        {
+          "par_id": 76,
+          "sentences": [
+            {
+              "sent": "As described in Section 6.1, 3D face alignment evaluation can be degraded to full-landmarks evaluation considering both visible and invisible ones.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Using AFLW2000-3D as the testing set, this experiment follows the same protocol as AFLW, except all the 68 landmarks are used for evaluation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are 1, 306 samples in [0  2 and the CED curves are ploted in Figure 19.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We do not report the performance of TSPM models since they do not detect invisible landmarks.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 77,
+          "sentences": [
+            {
+              "sent": "Compared with the results in AFLW, we can see that the standard deviation is dramatically increased, meaning that it is more difficult to keep pose robustness when considering all the landmarks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Besides, the improvement of 3DDFA over the best 2D method DCN is increased from 26.49% in AFLW to 30.33% in AFLW2000-3D, which demonstrates the superiority of 3DDFA in 3D face alignment.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Medium Pose Face Alignment",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CONCLUSIONS",
+      "selected_sentences": [
+        {
+          "par_id": 79,
+          "sentences": [
+            {
+              "sent": "Most of face alignment methods tend to fail in profile view since the self-occluded landmarks cannot be detected.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead of the traditional landmark detection framework, this paper fits a dense 3D Morphable Model to achieve pose-free face alignment.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By proposing two input features of PNCC and PAF, we cascade a couple of CNNs as a strong regressor to estimate model parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A novel OWPDC cost function is also proposed to consider the priority of parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To provide abundant samples for training, we propose a face profiling method to synthesize face appearances in profile views.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments show the state-of-theart performance on AFLW, AFLW2000-3D and 300W.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Face Alignment in Full Pose Range: A 3D Total Solution"
+}

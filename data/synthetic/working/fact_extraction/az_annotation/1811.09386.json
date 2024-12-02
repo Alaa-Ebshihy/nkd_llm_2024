@@ -1,0 +1,565 @@
+{
+  "paper_id": "1811.09386",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Text classification is one of the fundamental tasks in natural language processing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, deep neural networks have achieved promising performance in the text classification task compared to shallow models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Despite of the significance of deep models, they ignore the fine-grained (matching signals between words and classes) classification clues since their classifications mainly rely on the text-level representations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To address this problem, we introduce the interaction mechanism to incorporate word-level matching signals into the text classification task.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, we design a novel framework, EXplicit interAction Model (dubbed as EXAM), equipped with the interaction mechanism.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We justified the proposed approach on several benchmark datasets including both multilabel and multi-class text classification tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Extensive experimental results demonstrate the superiority of the proposed method.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As a byproduct, we have released the codes and parameter settings to facilitate other researches.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Text classification is one of the fundamental tasks in natural language processing, targeting at classifying a piece of text content into one or multiple categories.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "According to the number of desired categories, text classification can be divided into two groups, namely, multi-label (multiple categories) and multi-class (unique category).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For instance, classifying an article into different topics (eg, machine learning or data mining) falls into the former one since an article could be under several topics simultaneously.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By contrast, classifying a comment of a movie into its corresponding rating level lies into the multi-class group.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Both multi-label and multi-class text classifications have been widely applied in many fields like sentimental analysis (Cambria, Olsher, and Rajagopal 2014), topic tagging (Grave et al 2017), and document classification (Yang et al 2016).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Feature engineering dominates the performance of traditional shallow text classification methods for a very long time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Various rule-based and statistical features like bag-of-words (Wallach 2006) and N-grams (Brown et al 1992) are designed to describe the text, and fed into the shallow machine learning models such as Linear Regression (Zhu and Hastie 2001) and Support Vector Machine (Cortes and Vapnik 1995) to make the judgment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Traditional solutions suffer from two defects: 1) High labor intensity for the manually crafted features, and 2) data sparsity (a N-grams could occur only several times in a given dataset).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Recently, owing to the ability of tackling the aforementioned problems, deep neural networks (Kim 2014 2017) have become the promising solutions for the text classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Deep neural networks typically learn a word-level representation for the input text, which is usually a matrix with each row/column as an embedding of a word in the text.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "They then compress the word-level representation into a text-level representation (vector) with aggregation operations (eg, pooling).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thereafter, a fullyconnected (FC) layer at the topmost of the network is appended to make the final decision.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that these solutions are also called encoding-based methods (Munkhdalai and , since they encode the textual content into a latent vector representation.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Although great success has been achieved, these deep neural network based solutions naturally ignore the finegrained classification clues (ie, matching signals between words and classes), since their classifications are based on text-level representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 1, the classification (ie, FC) layer of these solutions matches the text-level representation with class representations via a dotproduct operation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Mathematically, it interprets the parameter matrix of the FC layer as a set of class representations (each column is associated with a class) (Press and Wolf 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As such, the probability of the text belonging to a class is largely determined by their overall matching score regardless of word-level matching signals, which would provide explicit signals for classification (eg, missile strongly indicates the topic of military).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "To address the aforementioned problems, we introduce the interaction mechanism (Wang and Jiang 2016b), which is capable of incorporating the word-level matching signals for text classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The key idea behind the interaction mechanism is to explicitly calculate the matching scores between the words and classes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "From the word-level representation, it computes an interaction matrix, in which each entry is the matching score between a word and a class (dot-product between their representations), illustrating the word-level matching signals.",
+              "tag": "Method"
+            },
+            {
+              "sent": "By taking the interaction matrix as a text representation, the later classification layer could incorporate fine-grained word level signals for the finer classification rather than simply making the text-level matching.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Based upon the interaction mechanism, we devise an EXplicit interAction Model (dubbed as EXAM).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, the proposed framework consists of three main components: word-level encoder, interaction layer, and aggregation layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The word-level encoder projects the textual contents into the word-level representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hereafter, the interaction layer calculates the matching scores between the words and classes (ie, constructs the interaction matrix).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then, the last layer aggregates those matching scores into predictions over each class, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We justify our proposed EXAM model over both the multi-label and multi-class text classifications.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Extensive experiments on several benchmarks demonstrate the effectiveness of the proposed method, surpassing the corresponding state-of-the-art methods remarkably.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "In summary, the contributions of this work are threefold: \u2022 We present a novel framework, EXAM, which leverages the interaction mechanism to explicitly compute the wordlevel interaction signals for the text classification. notations in this paper, we use bold capital letters (eg, X) and bold lowercase letters (eg, x) to denote matrices and vectors, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We employ non-bold letters (eg, x) to represent scalars, and Greek letters (eg, \u03b1 ) as parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "X i,: is used to refer the i-th row of the matrix X, X :,j to represent the j-th column vector and X i,j to denote the element in the i-th row and j-th column.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Gated Recurrent Units",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "where M r and M z are trainable parameters in the GRU, and \u03c3 and tanh are sigmoid and tanh activation functions, respectively.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Region Embedding",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Although word embedding is a good representation for the word, it can only compute the feature vector for the single word.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Qiao et al (2018) proposed region embedding to learn and utilize task-specific distributed representations of Ngrams.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the region embedding layer, the representation of a word has two parts, the embedding of the word itself and a weighting matrix to interact with the local context.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the word w i , the first part e w i is learned by an embedding matrix E \u2208 R k\u00d7v and the second part",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "In this task, we should categorize each text instance to precisely one of c classes.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Suppose that we have a data set D = {d i , l i } N , where d i denotes the text and the one-hot vector l i \u2208 R c represents the label for d i , our goal is to learn a neural network N to classify the text.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this task, each text instance belongs to a set of c target labels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Formally, suppose that we have a dataset D = {d i , l i } N i=1 , where d i denotes the text and the multi-hot vector l i represents the label for the text d i .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our goal is to learn a neural network N to classify the text.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model Overview",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Motivated by the limitation of encoding-based models for text classification, which is lacking the fine-grained classification clue, we propose a novel framework, named EXplicit interAction Model (EXAM), leveraging the interaction mechanism to incorporate word-level matching signals.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As can be seen from Figure 2, EXAM mainly contains three components:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Considering that word-level encoders are well investigated in previous studies (as mentioned in the Section 2), and the target of this work is to learn the fine-grained classification signals, we only elaborate the interaction layer and aggregation layer in the following subsections.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Interaction Layer",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "Interaction mechanism is widely used in tasks of matching source and target textual contents, such as natural language inference (Wang and Jiang 2016b) and retrieve-based chatbot (Wu et al 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The key idea of interaction mechanism is to use the interaction features between the small units (eg, words in the textual contents) to infer fine-grained clues whether two contents are matching.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Inspired by the success of methods equipped with interaction mechanism over encodebased methods in matching the textual contents, we introduce the interaction mechanism into the task of matching textual contents with their classes (ie, text classification).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Aggregation Layer",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "where W 1 and W 2 are trainable parameters and b is the bias in the first layer.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Loss Function",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Similar to previous studies (Schwenk et al 2017), in the multi-class text classification, we use cross entorpy loss as our loss function:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Generalized Encoding-Based Model",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "where W \u2208 R k\u00d7c and b \u2208 R 1\u00d7c are the trainable parameters in the last FC layer, and n denotes the length of the text.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The Eqn.( 9) has an equivalent form as following:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "It is worth noting that H t,: W :,s is exactly the interaction feature between word t and class s.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Therefore, the FastText is a special case of EXAM with an average pooling as the aggregation layer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In EXAM, we use a non-linear MLP to be the aggregation layer, and it will generalize FastText to a non-linear setting which might be more expressive than the original one.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "MultiClass Classification \u2022 Models based on feature engineering get the worst results on all the five datasets compared to the other methods.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The main reason is that the feature engineering cannot take full advantage of the supervision from the training set and it also suffers from the data sparsity.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "\u2022 Word-based baselines exceed the other variants on three datasets and lose on the two Amazon datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The main reason is that the three tasks like news classification conduct categorization mainly via key words, and the wordbased models are able to directly use the word embedding without combining the characters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For the five baselines, W.C RegionEmb performs the best, because it learns the region embedding to utilize the N-grams feature from the text.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Component-wise Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "We studied the variant of our model to further investigate the effectiveness of the interaction layer and aggregation layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We built a model called EXAM Encoder to preserve only the Encoder component with a max pooling layer and FC layer to derive the final probabilities.",
+              "tag": "Method"
+            },
+            {
+              "sent": "EXAM Encoder does not consider the interaction features between the classes and words, so it will automatically be degenerated into the EncodingBased model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We reported the results of the two models on all the datasets at Table 3, and it is clear to see that EXAM Encoder is not a patch on the original EXAM, verifying the effectiveness of interaction mechanism.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also drew the convergence lines for EXAM and the EXAM Encoder for the datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "From the Figure 3, where the red lines represent EXAM and the blue is EXAM Encoder , we observed that EXAM converges faster than EXAM Encoder with respect to all the datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Therefore, the interaction brings not only performance improvement but also faster convergence.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The possible reason is that a non-linear aggregation layer introduces more parameters to fit the interaction features compared to the average pooling layer as mentioned in Section 4.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Multi-Label Classification",
+      "selected_sentences": [
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "Datasets We conducted experiments on two different multi-label text classification datasets, named KanShanCup dataset 2 (a benchmark) and Zhihu dataset 3 , respectively.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "This dataset is released by a competition of tagging topics for questions (multi-label classification) posted in the largest Chinese community question answering platform, Zhihu.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dataset contains 3,000,000 questions and 1,999 topics (classes), where one question may belong to one to five topics.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For questions with more than 30 words, we kept the last 30 words, otherwise, we padded zeros.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We separated the dataset into training, validation, and testing with 2,800,000, 20,000, and 180,000 questions, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Considering the user privacy and data security, KanShanCup does not provide the original texts of the questions and topics, but uses numbered codes and numbered segmented words to represent text messages.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, it is inconvenient for researchers to perform analyses like visualization and case study.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To solve this problem, we constructed a dataset named Zhihu dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We chose the top 1,999 frequent topics from Zhihu and crawled all the questions relevant to these topics.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we acquired 3,300,000 questions, with less than 5 topics for each question.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We adopted 3,000,000 samples as the training set, 30,000 samples as validation and 300,000 samples as testing.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "In this work, we present a novel framework named EXAM which employs the interaction mechanism to explicitly compute the word-level interaction signals for the text classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We apply the proposed EXAM on multi-class and multi-label text classifications.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments over several benchmark datasets verify the effectiveness of our proposed mechanism.",
+              "tag": "Other"
+            },
+            {
+              "sent": "In the future, we plan to investigate the effect of different interaction functions in the interaction mechanism.",
+              "tag": "Other"
+            },
+            {
+              "sent": "Besides, we are interested in extend EXAM by introducing more complex aggregation layers like ResNet or DenseNet.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Explicit Interaction Model towards Text Classification"
+}

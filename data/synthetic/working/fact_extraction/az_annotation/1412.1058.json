@@ -1,0 +1,447 @@
+{
+  "paper_id": "1412.1058",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Convolutional neural network (CNN) is a neural network that can make use of the internal structure of data such as the 2D structure of image data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper studies CNN on text categorization to exploit the 1D structure (namely, word order) of text data for accurate prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Instead of using low-dimensional word vectors as input as is often done, we directly apply CNN to high-dimensional text data, which leads to directly learning embedding of small text regions for use in classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition to a straightforward adaptation of CNN from image to text, a simple but new variation which employs bag-ofword conversion in the convolution layer is proposed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "An extension to combine multiple convolution layers is also explored for higher accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The experiments demonstrate the effectiveness of our approach in comparison with state-of-the-art methods.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Text categorization is the task of automatically assigning pre-defined categories to documents written in natural languages.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Several types of text categorization have been studied, each of which deals with different types of documents and categories, such as topic categorization to detect discussed topics (eg, sports, politics), spam detection (Sahami et al, 1998), and sentiment classification (Pang et al, 2002;Pang and Lee, 2008;Maas et al, 2011) to determine the sentiment typically in product or movie reviews.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A standard approach to text categorization is to represent documents by bag-of-word vectors, To appear in NAACL HLT 2015. namely, vectors that indicate which words appear in the documents but do not preserve word order, and use classification models such as SVM.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "To benefit from word order on text categorization, we take a different approach, which employs convolutional neural networks (CNN) (LeCun et al, 1986).",
+              "tag": "Method"
+            },
+            {
+              "sent": "CNN is a neural network that can make use of the internal structure of data such as the 2D structure of image data through convolution layers, where each computation unit responds to a small region of input data (eg, a small square of a large image).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We apply CNN to text categorization to make use of the 1D structure (word order) of document data so that each unit in the convolution layer responds to a small region of a document (a sequence of words).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "A question arises, however, whether word vector lookup in a purely supervised setting is really useful for text categorization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The essence of convolution layers is to convert text regions of a fixed size (eg, \"am so happy\" with size 3) to feature vectors, as described later.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In that sense, a word vector learning layer is a special (and unusual) case of convolution layer with region size one.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Why is size one appropriate if bi-grams are more discriminating than unigrams?",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, we take a different approach.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We directly apply CNN to high-dimensional one-hot vectors; ie, we directly learn embedding 1 of text regions without going through word embedding learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This approach is made possible by solving the computational issue 2 through efficient handling of high-dimensional sparse data on GPU, and it turned out to have the merits of improving accuracy with fast training/prediction and simplifying the system (fewer hyper-parameters to tune).",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Our CNN code for text is publicly available on the internet 3 .",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "We study the effectiveness of CNN on text categorization and explain why CNN is suitable for the task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Two types of CNN are tested: seqCNN is a straightforward adaptation of CNN from image to text, and bowCNN is a simple but new variation of CNN that employs bag-of-word conversion in the convolution layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The experiments show that seq-1 We use the term 'embedding' loosely to mean a structurepreserving function, in particular, a function that generates lowdimensional features that preserve the predictive structure.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "CNN outperforms bowCNN on sentiment classification, vice versa on topic classification, and the winner generally outperforms the conventional bagof-n-gram vector-based methods, as well as previous CNN models for text which are more complex.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In particular, to our knowledge, this is the first work that has successfully used word order to improve topic classification performance.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "A simple extension that combines multiple convolution layers (thus combining multiple types of text region embedding) leads to further improvement.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Through empirical analysis, we will show that CNN can make effective use of high-order n-grams when conventional methods fail.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CNN for document classification",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "We first review CNN applied to image data and then discuss the application of CNN to document classification tasks to introduce seqCNN and bowCNN.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Preliminary: CNN for image",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "CNN is a feed-forward neural network with convolution layers interleaved with pooling layers, as illustrated in Figure 1, where the top layer performs classification using the features generated by the layers below.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A convolution layer consists of several computation units, each of which takes as input a region vector that represents a small region of the input image and applies a non-linear function to it.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Typically, the region vector is a concatenation of pixels in the region, which would be, for example, 75-dimensional if the region is 5 \u00d7 5 and the number of channels is three (red, green, and blue).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Conceptually, computation units are placed over the input image so that the entire image is collectively covered, as illustrated in Figure 2. The region stride (distance between the region centers) is often set to a small value such as 1 so that regions overlap with each other, though the stride in Figure 2 is set larger than the region size for illustration.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "We regard the output of a convolution layer as an 'image' so that the output of each computation unit is considered to be a 'pixel' of m channels where m is the number of weight vectors (ie, the number of rows of W) or the number of neurons.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In other words, a convolution layer converts image regions to m-dim vectors, and the locations of the regions are inherited through this conversion.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "The output image of the convolution layer is passed to a pooling layer, which essentially shrinks the image by merging neighboring pixels, so that higher layers can deal with more abstract/global information.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A pooling layer consists of pooling units, each of which is associated with a small region of the image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Commonly-used merging methods are average-pooling and max-pooling, which respectively compute the channel-wise average/maximum of each region.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CNN for text",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Now we consider application of CNN to text data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Suppose that we are given a document D = (w 1 , w 2 , . .",
+              "tag": "Method"
+            },
+            {
+              "sent": "CNN requires vector representation of data that preserves internal locations (word order in this case) as input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "A straight-forward representation would be to treat each word as a pixel, treat D as if it were an image of |D| \u00d7 1 pixels with |V | channels, and to represent each pixel (ie, each word) as a |V |-dimensional one-hot vector 4 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a running toy example, suppose that vocabulary V = { \"don't\", \"hate\", \"I\", \"it\", \"love\" } and we associate the words with dimensions of vector in alphabetical order (as shown), and that document D=\"I love it\".",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then, we have a document vector:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "seq-CNN for text",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "The rest is the same as image; the text region vectors are converted to feature vectors, ie, the convolution layer learns to embed text regions into lowdimensional vector space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We call a neural net with a convolution layer with this region representation seqCNN ('seq' for keeping sequences of words) to distinguish it from bowCNN, described next.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "bow-CNN for text",
+      "selected_sentences": [
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "An alternative we provide is to perform bagof-word conversion to make region vectors |V |dimensional instead of p|V |-dimensional; eg, the example region vectors above would be converted to:",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Pooling for text",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "Whereas the size of images is fixed in image applications, documents are naturally variable-sized, and therefore, with a fixed stride, the output of a convolution layer is also variable-sized as shown in Figure 3.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given the variable-sized output of the convolution layer, standard pooling for image (which uses a fixed pooling region size and a fixed stride) would produce variable-sized output, which can be passed to another convolution layer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To produce fixed-sized output, which is required by the fully-connected top layer 5 , we fix the number of pooling units and dynamically determine the pooling region size on each data point so that the entire data is covered without overlapping.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CNN vs. bag-of-n-grams",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Extension: parallel CNN",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "We have described CNN with the simplest network architecture that has one pair of convolution and pooling layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While this can be extended in several ways (eg, with deeper layers), in our experiments, we explored parallel CNN, which has two or more convolution layers in parallel 6 , as illustrated in Figure 4.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The idea is to learn multiple types of embedding of small text regions so that they can complement each other to improve model accuracy.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this architecture, multiple convolution-pooling pairs with different region sizes (and possibly different region vector representations) are given one-hot vectors as input and produce feature vectors for each region; the top layer takes the concatenation of the produced feature vectors as input.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CNN",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "6 Similar architectures have been used for image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Kim (2014) used it for text, but it was on top of a word vector conversion layer.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Baseline methods",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "NB-LM",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model selection",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Performance results",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "Table 2 shows the error rates of CNN in comparison with the baseline methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The first thing to note is that on all the datasets, the best-performing CNN outperforms the baseline methods, which demonstrates the effectiveness of our approach.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Comparison with state-of-the-art results As shown in LYRL04.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We used the same thresholding strategy as LYRL04.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Table 4, bowCNN outperforms LYRL04's best results even though our data preprocessing is much simpler (no stemming and no tf-idf weighting).",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Why is CNN effective?",
+      "selected_sentences": [
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "In this section we explain the effectiveness of CNN through looking into what it learns from training.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "This paper showed that CNN provides an alternative mechanism for effective use of word order for text categorization through direct embedding of small text regions, different from the traditional bag-of-ngram approach or word-vector CNN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With the parallel CNN framework, several types of embedding can be learned and combined so that they can complement each other for higher accuracy.",
+              "tag": "Result"
+            },
+            {
+              "sent": "State-of-the-art performances on sentiment classification and topic classification were achieved using this approach.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Effective Use of Word Order for Text Categorization with Convolutional Neural Networks"
+}

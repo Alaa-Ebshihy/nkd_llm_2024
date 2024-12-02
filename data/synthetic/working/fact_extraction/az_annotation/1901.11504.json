@@ -1,0 +1,445 @@
+{
+  "paper_id": "1901.11504",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "In this paper, we present a MultiTask Deep Neural Network (MTDNN) for learning representations across multiple natural language understanding (NLU) tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "MTDNN not only leverages large amounts of cross-task data, but also benefits from a regularization effect that leads to more general representations to help adapt to new tasks and domains.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "MTDNN extends the model proposed in Liu et al ( 2015) by incorporating a pre-trained bidirectional transformer language model, known as BERT (Devlin et al, 2018).",
+              "tag": "Other"
+            },
+            {
+              "sent": "MTDNN obtains new state-of-the-art results on ten NLU tasks, including SNLI, SciTail, and eight out of nine GLUE tasks, pushing the GLUE benchmark to 82.7% (2.2% absolute improvement) 1 .",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also demonstrate using the SNLI and Sc-iTail datasets that the representations learned by MTDNN allow domain adaptation with substantially fewer in-domain labels than the pre-trained BERT representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The code and pre-trained models are publicly available at https://github.com/namisan/mt-dnn.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Learning vector-space representations of text, eg, words and sentences, is fundamental to many natural language understanding (NLU) tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Two popular approaches are multi-task learning and language model pre-training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper we combine the strengths of both approaches by proposing a new MultiTask Deep Neural Network (MTDNN).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "MultiTask Learning (MTL) is inspired by human learning activities where people often apply the knowledge learned from previous tasks to help learn a new task (Caruana, 1997;Zhang and Yang, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, it is easier for a person who knows how to ski to learn skating than the one who does not.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similarly, it is useful for multiple (related) tasks to be learned jointly so that the knowledge learned in one task can benefit other tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, there is a growing interest in applying MTL to representation learning using deep neural networks (DNNs) (Collobert et al, 2011;Liu et al, 2015;Luong et al, 2015;Xu et al, 2018;Guo et al, 2018;Ruder12 et al, 2019) for two reasons.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, supervised learning of DNNs requires large amounts of task-specific labeled data, which is not always available.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "MTL provides an effective way of leveraging supervised data from many related tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, the use of multi-task learning profits from a regularization effect via alleviating overfitting to a specific task, thus making the learned representations universal across tasks.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In contrast to MTL, language model pretraining has shown to be effective for learning universal language representations by leveraging large amounts of unlabeled data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A recent survey is included in .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Some of the most prominent examples are ELMo (Peters et al, 2018), GPT (Radford et al, 2018) and BERT (Devlin et al, 2018).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These are neural network language models trained on text data using unsupervised objectives.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For example, BERT is based on a multi-layer bidirectional Transformer, and is trained on plain text for masked word prediction and next sentence prediction tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To apply a pre-trained model to specific NLU tasks, we often need to fine-tune, for each task, the model with additional task-specific layers using task-specific training data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For example, Devlin et al (2018) shows that BERT can be fine-tuned this way to create state-of-the-art models for a range of NLU tasks, such as question answering and natural language inference.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "We argue that MTL and language model pretraining are complementary technologies, and can be combined to improve the learning of text rep-resentations to boost the performance of various NLU tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To this end, we extend the MTDNN model originally proposed in Liu et al (2015) by incorporating BERT as its shared text encoding layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 1, the lower layers (ie, text encoding layers) are shared across all tasks, while the top layers are task-specific, combining different types of NLU tasks such as single-sentence classification, pairwise text classification, text similarity, and relevance ranking.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similar to the BERT model, MTDNN can be adapted to a specific task via fine-tuning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Unlike BERT, MTDNN uses MTL, in addition to language model pre-training, for learning text representations.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "MTDNN obtains new state-of-the-art results on eight out of nine NLU tasks 2 used in the General Language Understanding Evaluation (GLUE) benchmark (Wang et al, 2018), pushing the GLUE benchmark score to 82.7%, amounting to 2.2% absolute improvement over BERT.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We further extend the superiority of MTDNN to the SNLI (Bowman et al, 2015a) and SciTail (Khot et al, 2018) tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The representations learned by MTDNN allow domain adaptation with substantially fewer in-domain labels than the pre-trained BERT representations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "For example, our adapted models achieve the accuracy of 91.6% on SNLI and 95.0% on SciTail, outperforming the previous state-ofthe-art performance by 1.5% and 6.7%, respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Even with only 0.1% or 1.0% of the original training data, the performance of MTDNN on both SNLI and SciTail datasets is better than many existing models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "All of these clearly demonstrate MTDNN's exceptional generalization capability via multi-task learning.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Tasks",
+      "selected_sentences": [
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Transformer Encoder (l 2 ): We use a multilayer bidirectional Transformer encoder (Vaswani et al, 2017) to map the input representation vectors (l 1 ) into a sequence of contextual embedding vectors C \u2208 R d\u00d7m .",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is the shared representation across different tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Unlike the BERT model (Devlin et al, 2018) that learns the representation via pre-training, MTDNN learns the representation using multi-task objectives, in addition to pre-training.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Below, we will describe the task specific lay-ers using the NLU tasks in GLUE as examples, although in practice we can incorporate arbitrary natural language tasks such as text generation where the output layers are implemented as a neural decoder.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "The Training Procedure",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "We evaluate the proposed MTDNN on three popular NLU benchmarks: GLUE (Wang et al, 2018), SNLI (Bowman et al, 2015b), and SciTail (Khot et al, 2018).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We compare MTDNN with existing state-of-the-art models including BERT and demonstrate the effectiveness of MTL with and without model fine-tuning using GLUE and domain adaptation using both SNLI and SciTail.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Implementation details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "GLUE Main Results",
+      "selected_sentences": [
+        {
+          "par_id": 45,
+          "sentences": [
+            {
+              "sent": "MTDNN This is the proposed model described in Section 3. We used the pre-trained BERT LARGE to initialize its shared layers, refined the model via MTL on all GLUE tasks, and fine-tuned the model for each GLUE task using task-specific data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The test results in Table 2 show that MTDNN outperforms all existing systems on all tasks, except WNLI, creating new state-of-the-art results on eight GLUE tasks and pushing the benchmark to 82.7%, which amounts to 2.2% absolution improvement over BERT LARGE .",
+              "tag": "Result"
+            },
+            {
+              "sent": "Since MTDNN uses BERT LARGE to initialize its shared layers, the gain is mainly attributed to the use of MTL in refining the shared layers.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "MTL is particularly useful for the tasks with little in-domain training data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As we observe in the table, on the same type of tasks, the improvements over BERT are much more substantial for the tasks with less in-domain training data than those with more in-domain labels, even though they belong to the same task type, eg, the two NLI tasks: RTE vs. MNLI, and the two paraphrase tasks: MRPC vs. QQP.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "MTDNN no-fine-tune Since the MTL of MTDNN uses all GLUE tasks, it is possible to directly apply MTDNN to each GLUE task without finetuning.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results in Table 2 show that MTDNN no-fine-tune still outperforms BERT LARGE consistently among all tasks but CoLA.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our analysis shows that CoLA is a challenge task with much smaller in-domain data than other tasks, and its task definition and dataset are unique among all GLUE tasks, making it difficult to benefit from the knowledge learned from other tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As a result, MTL tends to underfit the CoLA dataset.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "In such a case, fine-tuning is necessary to boost the performance.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown in Table 2, the accuracy improves from 58.9% to 62.5% after finetuning, even though only a very small amount of in-domain data is available for adaptation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This, together with the fact that the fine-tuned MTDNN significantly outperforms the fine-tuned BERT LARGE on CoLA (62.5% vs. 60.5%), reveals that the learned MTDNN representation allows much more effective domain adaptation than the pre-trained BERT representation.",
+              "tag": "Other"
+            },
+            {
+              "sent": "We will revisit this topic with more experiments in Section 4.4.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The gain of MTDNN is also attributed to its flexible modeling framework which allows us to incorporate the task-specific model structures and training methods which have been developed in the single-task setting, effectively leveraging the existing body of research.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Two such examples are the use of the SAN answer module for the pairwise text classification output module and the pairwise ranking loss for the QNLI task which by design is a binary classification problem in GLUE.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To investigate the relative contributions of these modeling design choices, we implement a variant of MTDNN as described below.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "STDNN STDNN stands for SingleTask DNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It uses the same model architecture as MTDNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "But its shared layers are the pre-trained BERT model without being refined via MTL.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then fine-tuned STDNN for each GLUE task using task-specific data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus, for pairwise text classification tasks, the only difference between their STDNNs and BERT models is the design of the task-specific output module.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results in Table 3 show that on all four tasks (MNLI, QQP, RTE and MRPC) STDNN outperforms BERT, justifying the effectiveness of the SAN answer module.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also compare the results of STDNN and BERT on QNLI.",
+              "tag": "Method"
+            },
+            {
+              "sent": "While STDNN is fine-tuned using the pairwise ranking loss, BERT views QNLI as binary classification and is fine-tuned using the cross entropy loss.",
+              "tag": "Result"
+            },
+            {
+              "sent": "STDNN significantly outperforms BERT demonstrates clearly the importance of problem formulation.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "One of the most important criteria of building practical systems is fast adaptation to new tasks and domains.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This is because it is prohibitively expensive to collect labeled training data for new domains or tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Very often, we only have very small training data or even no training data.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Domain Adaptation Results on SNLI and SciTail",
+      "selected_sentences": [
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "2. create for each new task (SNLI or SciTail) a task-specific model, by adapting the trained MTDNN using task-specific training data;",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "We perform random sampling five times and report the mean among all the runs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Results on different amounts of training data from SNLI and Sc-iTail are reported in Figure 2. We observe that MTDNN outperforms the BERT baseline consistently with more details provided in In Table 5, we compare our adapted models, using all in-domain training samples, against several strong baselines including the best results reported in the leaderboards.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We see that MTDNN LARGE generates new state-of-the-art results on both datasets, pushing the benchmarks to 91.6% on SNLI (1.5% absolute improvement) and 95.0% on SciTail (6.7% absolute improvement), respectively.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This results in the new state-of-theart for both SNLI and SciTail.",
+              "tag": "Result"
+            },
+            {
+              "sent": "All of these demonstrate the exceptional performance of MTDNN on domain adaptation.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "In this work we proposed a model called MTDNN to combine multi-task learning and language model pre-training for language representation learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "MTDNN obtains new state-ofthe-art results on ten NLU tasks across three popular benchmarks: SNLI, SciTail, and GLUE.",
+              "tag": "Result"
+            },
+            {
+              "sent": "MTDNN also demonstrates an exceptional generalization capability in domain adaptation experiments.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Multi-Task Deep Neural Networks for Natural Language Understanding"
+}

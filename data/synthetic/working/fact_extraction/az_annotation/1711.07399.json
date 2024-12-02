@@ -1,0 +1,673 @@
+{
+  "paper_id": "1711.07399",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Most of the existing deep learning-based methods for 3D hand and human pose estimation from a single depth map are based on a common framework that takes a 2D depth map and directly regresses the 3D coordinates of keypoints, such as hand or human body joints, via 2D convolutional neural networks (CNNs).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The first weakness of this approach is the presence of perspective distortion in the 2D depth map.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While the depth map is intrinsically 3D data, many previous methods treat depth maps as 2D images that can distort the shape of the actual object through projection from 3D to 2D space.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This compels the network to perform perspective distortion-invariant estimation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The second weakness of the conventional approach is that directly regressing 3D coordinates from a 2D image is a highly nonlinear mapping, which causes difficulty in the learning procedure.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To overcome these weaknesses, we firstly cast the 3D hand and human pose estimation problem from a single depth map into a voxel-to-voxel prediction that uses a 3D voxelized grid and estimates the per-voxel likelihood for each keypoint.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We design our model as a 3D CNN that provides accurate estimates while running in real-time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our system outperforms previous methods in almost all publicly available 3D hand and human pose estimation datasets and placed first in the HANDS 2017 frame-based 3D hand pose estimation challenge.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The code is available in 1 .",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Recently, powerful discriminative approaches based on convolutional neural networks (CNNs) are outperforming existing methods in various computer vision tasks including 3D hand and human pose estimation from a single depth map [3,11,14,16,29].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although these approaches achieved significant advancement in 3D hand and human pose estimation, they still suffer from inaccurate estimation because of severe self-occlusions, highly articulated shapes of target objects, and low quality of depth images.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Analyzing previ-ous deep learning-based methods for 3D hand and human pose estimation from a single depth image, most of these methods [1, 3, 7, 14-16, 24, 29-31, 47] are based on a common framework that takes a 2D depth image and directly regresses the 3D coordinates of keypoints, such as hand or human body joints.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, we argue that this approach has two serious drawbacks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The first one is perspective distortion in 2D depth image.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As the pixel values of a 2D depth map represent the physical distances of object points from the depth camera, the depth map is intrinsically 3D data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, most previous methods simply take depth maps as a 2D image form, which can distort the shape of an actual object in the 3D space by projecting it to the 2D image space.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hence, the network see a distorted object and is burdened to perform distortion-invariant estimation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We visualize the perspective distortions of the 2D depth image in Figure 1.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The second weakness is the highly non-linear mapping between the depth map and 3D coordinates.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This highly non-linear mapping hampers the learning procedure and prevents the network from precisely estimating the coordinates of keypoints as argued by Tompson et al [46].",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This high nonlinearity is attributed to the fact that only one 3D coordinate for each keypoint has to be regressed from the input.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "To cope with these limitations, we propose the voxelto-voxel prediction network for pose estimation (V2VPoseNet).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast to most of the previous methods, the V2VPoseNet takes a voxelized grid as input and estimates the per-voxel likelihood for each keypoint as shown in Figure 2.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "By converting the 2D depth image into a 3D voxelized form as input, our network can sees the actual appearance of objects without perspective distortion.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Also, estimating the per-voxel likelihood of each keypoint enables the network to learn the desired task more easily than the highly nonlinear mapping that estimates 3D coordinates directly from the input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We perform a thorough experiment to demonstrate the usefulness of the proposed volumetric representation of input and output in 3D hand and human pose estimation from a single depth map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The performance of the four combinations of input (ie, 2D depth map and voxelized grid) and output (ie, 3D coordinates and per-voxel likelihood) types are compared.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "The experimental results show that the proposed voxelto-voxel prediction allows our method to achieve the stateof-the-art performance in almost all of the publicly available datasets (ie, three 3D hand [39,41,45] and one 3D human [16] pose estimation datasets) while it runs in realtime.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We also placed first in the HANDS 2017 frame-based 3D hand pose estimation challenge [55].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We hope that the proposed system to become a milestone of 3D hand and human pose estimation problems from a single depth map.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Now, we assume that the term \"3D pose estimation\" refers to the localization of the hand or human body keypoints in 3D space.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "\u2022 We firstly cast the problem of estimating 3D pose from a single depth map into a voxel-to-voxel prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Unlike most of the previous methods that regress 3D coordinates directly from the 2D depth image, our proposed V2VPoseNet estimates the per-voxel likelihood from a voxelized grid input.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "\u2022 We empirically validate the usefulness of the volumetric input and output representations by comparing the performance of each input type (ie, 2D depth map and voxelized grid) and output type (ie, 3D coordinates and per-voxel likelihood).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "\u2022 We conduct extensive experiments using almost all of the existing 3D pose estimation datasets including three 3D hand and one 3D human pose estimation datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show that the proposed method produces significantly more accurate results than the state-ofthe-art methods.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The proposed method also placed first in the HANDS 2017 frame-based 3D hand pose estimation challenge.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related works",
+      "selected_sentences": [
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "Discriminative methods directly localize hand joints from an input depth map.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Random forest-based methods [21,23,39,[41][42][43]48] provide fast and accurate performance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, they utilize hand-crafted features and are overcome by recent CNN-based approaches [1,3,4,6,7,10,11,14,15,24,29,30,37,45,50,51] that can learn useful features by themselves.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Tompson et al [45] firstly utilized CNN to localize hand keypoints by estimating 2D heatmaps for each hand joint.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Ge et al [10] extended this method by exploiting multi-view CNN to estimate 2D heatmaps for each view.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Ge et al [11] transformed the 2D input depth map to the 3D form and estimated 3D coordinates directly via 3D CNN.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Guo et al [14,15] proposed a region ensemble network to accurately estimate the 3D coordinates of hand keypoints and Chen et al [3] improved this network by iteratively refining the estimated pose.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Oberweger et al [29] improved their preceding work [30] by utilizing recent network architecture, data augmentation, and better initial hand localization.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hybrid methods are proposed to combine the generative and discriminative approach.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Oberweger et al [31] trained discriminative and generative CNNs by a feedback loop.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Zhou et al [58] pre-defined a hand model and estimated the parameter of the model instead of regressing 3D coordinates directly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Ye et al [53] used spatial attention mechanism and hierarchical PSO.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Wan et al [47] used two deep generative models with a shared latent space and trained discriminator to estimate the posterior of the latent pose.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "Depth-based 3D human pose estimation methods also rely on generative and discriminative models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The generative models estimate the pose by finding the correspondences between the pre-defined body model and the input 3D point cloud.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ICP algorithm is commonly used for 3D body tracking [8,13,18,22].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another method such as template fitting with Gaussian mixture models [52] was also proposed.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "By contrast, the discriminative models do not require body templates and they directly estimate the positions of body joints.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Conventional discriminative methods are mostly based on random forests.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Shotton et al [36] classified each pixel into one of the body parts, while Girchick et al [12] and Jung et al [20] directly regressed the coordinates of body joints.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Jung et al [57] used a random tree walk algorithm (RTW), which reduced the running time significantly.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recently, Haque et al [16] proposed the viewpointinvariant pose estimation method using CNN and multiple rounds of a recurrent neural network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Their model learns viewpoint-invariant features, which makes the model robust to viewpoint variations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Overview of the proposed model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Refining target object localization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Generating input of the proposed system",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "To create the input of the proposed system, the 2D depth map should be converted to voxelized form.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To voxelize the 2D depth map, we first reproject each pixel of the depth map to the 3D space.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After reprojecting all depth pixels, the 3D space is discretized based on the pre-defined voxel size.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Then, the target object is extracted by drawing the cubic box around the reference point obtained in Section 4. We set the voxel value of the network's input V (i, j, k) as 1 if the voxel is occupied by any depth point and 0 otherwise.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Branch Split",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Building block design",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Network design",
+      "selected_sentences": [
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "In the encoder, the volumetric downsampling block reduces the spatial size of the feature map while the volu-  metric residual bock increases the number of channels.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is empirically confirmed that this increase in the number of channels helps improve the performance in our experiments.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On the other hand, in the decoder, the volumetric upsampling block enlarges the spatial size of the feature map.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When upsampling, the network decreases the number of channels to compress the extracted features.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The enlargement of the volumetric size in the decoder helps the network to densely localize keypoints because it reduces the stride between voxels in the feature map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The encoder and decoder are connected with the voxel-wise addition for each scale so that the decoder can upsample the feature map more stably.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After passing the input through the encoder and decoder, the network predicts the per-voxel likelihood for each keypoint through two 1\u00d71\u00d71 volumetric basic blocks and one 1\u00d71\u00d71 volumetric convolutional layer.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Network training",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "(1) where H * n is the ground-truth 3D heatmap of nth keypoint, (i n ,j n ,k n ) is the ground-truth voxel coordinate of nth keypoint, and \u03c3 = 1.7 is the standard deviation of the Gaussian peak.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Implementation details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Datasets",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "HANDS 2017 Frame-based 3D Hand Pose Estimation Challenge Dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The HANDS 2017 frame-based 3D hand pose estimation challenge dataset [55] consists of 957K training and 295K testing depth images that are sampled from BigHand2.2M",
+              "tag": "Method"
+            },
+            {
+              "sent": "[56] and FirstPerson Hand Action [9] datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "There are five subjects in the training set and ten subjects in the testing stage, including five unseen subjects.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ground-truth of this dataset is the 3D coordinates of 21",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Evaluation metrics",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Ablation study",
+      "selected_sentences": [
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "3D representation and per-voxel likelihood estimation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To demonstrate the validity of the 3D representation of the input and per-voxel likelihood estimation, we compared the performances of the four different combinations of the input and output forms in Table 1.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As the table shows, converting the input representation type from the 2D depth map to 3D voxelized form (also converting the model from 2D CNN to 3D CNN) substantially improves performance, regardless of output representation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This justifies the effectiveness of the proposed 3D input representation that is free from perspective distortion.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The results also show that converting the output representation from the 3D coordinates to the per-voxel likelihood increases the performance significantly, regardless of the input type.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Among the four combinations, voxel-to-voxel gives the best performance even with the smallest number of parameters.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Hence, the superiority of the voxel-to-voxel prediction scheme compared with other input and output combinations is clearly justified.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To fairly compare four combinations, we used the same network building blocks and design, which were introduced in Section 6.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The only difference is that the model for the per-voxel likelihood estimation is fully convolutional, whereas for the coordinate regression, we used fully connected layers at the end of the network.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Simply converting voxel-to-voxel to pixel-to-voxel decreases the number of parameters because the model is changed from the 3D CNN to the 2D CNN.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To compensate for this change, we doubled the number of channels of each feature map in the pixelto-voxel model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "If the number of channels is not doubled, then the performance was degraded.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For all four models, we used 48\u00d748 depth map or 48\u00d748\u00d748 voxelized grid as input because the original size (88\u00d788\u00d788) does not fit into GPU memory in the case of voxel-to-coordinates.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "To obtain more accurate and robust estimation, we applied a simple ensemble technique that we call epoch ensemble.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The epoch ensemble averages the estimations from several epochs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we save the trained model for each epoch in the training stage and then in the testing stage, we average all the estimated 3D coordinates from the trained models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As we trained our model by 10 epochs, we used 10 models to obtain the final estimation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Epoch ensemble has no influence in running time when each model is running in different GPUs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, in a singleGPU environment, epoch ensemble linearly increases running time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The effect of epoch ensemble is shown in Table 2.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Comparison with state-of-the-art methods",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "We compared the performance of the V2VPoseNet on the three 3D hand pose estimation datasets (ICVL [41], NYU [45], and MSRA [39]) with most of the stateof-the-art methods, which include latent random forest (LRF) [41], cascaded hand pose regression (Cascade) [39], DeepPrior with refinement (DeepPrior) [30], feedback loop training method (Feedback) [31], hand model based method (DeepModel) [58], hierarchical sampling optimization (HSO) [42], local surface normals (LSN) [48], multiview CNN (MultiView) [10], DISCO [1], Hand3D [6], DeepHand [37], lie-x group based method (LieX) [50], improved DeepPrior (DeepPrior++) [29], region ensemble network (REN-4\u00d76\u00d76 [15], REN-9\u00d76\u00d76 [14]), CrossingNets [47], pose-guided REN (PoseREN) [3], global-to-local prediction method (Global-toLocal) [24], classification-guided approach (ClsGuide) [51], 3DCNN based method (3DCNN) [11], occlusion aware based method (Occlusion) [25], and hallucinating heat distribution method (HeatDist) [4].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Some reported results of previous works [3, 14, 15, 29-31, 41, 50, 58] are calculated by prediction labels available online.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Other results [1,4,6,10,11,24,25,37,39,42,47,48,51] are calculated from the figures and tables of their papers.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown in Figure 7 and Table 3, our method outperforms all existing methods on the three 3D hand pose estimation datasets in standard evaluation metrics.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This shows the superiority of voxel-to-voxel prediction, which is firstly used in 3D hand pose estimation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The performance gap between ours and the previous works is largest on the NYU dataset that is very challenging and far from saturated.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We additionally measured the average 3D distance error distribution over various yaw and pitch angles on the MSRA dataset following the protocol of previous works [39] as in Figure 8.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As it demonstrates, our method provides superior results in almost all of yaw and pitch angles.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "Our method also placed first in the HANDS 2017 framebased 3D hand pose estimation challenge [55].",
+              "tag": "Result"
+            },
+            {
+              "sent": "The top-5 results comparisons are shown in Table 4.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As shown in the table, the proposed V2VPoseNet outperforms other participants.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A more detailed analysis of the challenge results is covered in [54].",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Computational complexity",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "We investigated the computational complexity of the proposed method.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The training time of the V2VPoseNet is two days for ICVL dataset, 12 hours for NYU and MSRA datasets, six days for HANDS 2017 challenge dataset, and three hours for ITOP dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The testing time is 3.5 fps when using 10 models for epoch ensemble, but can accelerate to 35 fps in a multiGPU environment, which shows the applicability of the proposed method to real-time applications.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The most time-consuming step is the input generation that includes reference point refinement and voxelizing the depth map.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This step takes 23 ms and most of the time is spent on voxelizing.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The next step is network forwarding, which takes 5 ms and takes 0.5 ms to extract 3D coordinates from the 3D heatmap.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that our model outperforms previous works by a large margin without epoch ensemble on the ICVL, NYU, MSRA, and ITOP datasets while running in real-time using a single GPU.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 43,
+          "sentences": [
+            {
+              "sent": "We proposed a novel and powerful network, V2VPoseNet, for 3D hand and human pose estimation from a single depth map.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To overcome the drawbacks of previous works, we converted 2D depth map into the 3D voxel representation and processed it using our 3D CNN model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Also, instead of directly regressing 3D coordinates of keypoints, we estimated the per-voxel likelihood for each keypoint.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Those two conversions boost the performance significantly and make the proposed V2VPoseNet outperform previous works on the three 3D hand and one 3D human pose estimation datasets by a large margin.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It also allows us to win the 3D hand pose estimation challenge.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "As voxel-tovoxel prediction is firstly tried in 3D hand and human pose estimation from a single depth map, we hope this work to provide a new way of accurate 3D pose estimation.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "V2V-PoseNet: Voxel-to-Voxel Prediction Network for Accurate 3D Hand and Human Pose Estimation from a Single Depth Map"
+}

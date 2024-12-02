@@ -1,0 +1,516 @@
+{
+  "paper_id": "1609.05284",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Teaching a computer to read and answer general questions pertaining to a document is a challenging yet unsolved problem.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we describe a novel neural network architecture called the Reasoning Network (ReasoNet) for machine comprehension tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "ReasoNets make use of multiple turns to e ectively exploit and then reason over the relation among queries, documents, and answers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Di erent from previous approaches using a xed number of turns during inference, ReasoNets introduce a termination state to relax this constraint on the reasoning depth.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With the use of reinforcement learning, ReasoNets can dynamically determine whether to continue the comprehension process after digesting intermediate results, or to terminate reading when it concludes that existing information is adequate to produce an answer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "ReasoNets achieve superior performance in machine comprehension datasets, including unstructured CNN and Daily Mail datasets, the Stanford SQuAD dataset, and a structured Graph Reachability dataset.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recently, with large-scale datasets available and the impressive advance of various statistical models, machine reading comprehension tasks have attracted much attention.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Here we mainly focus on the related work in cloze-style datasets [7,8].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Based on how they perform the inference, we can classify their models into two categories: single-turn and multi-turn reasoning.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Single-turn reasoning: Single turn reasoning models utilize an attention mechanism to emphasize some sections of a document which are relevant to a query.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This can be thought of as treating some parts unimportant while focusing on other important ones to nd the most probable answer.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hermann et al [7] propose the attentive reader and the impatient reader models using neural networks with an attention over passages to predict candidates.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Hill et al [8] use attention over window-based memory, which encodes a window of words around entity candidates, by leveraging an endto-end memory network [22].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Meanwhile, given the same entity candidate can appear multiple times in a passage, Kadlec et al [9] propose the attention-sum reader to sum up all the attention scores for the same entity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This score captures the relevance between a query and a candidate.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Chen et al [3] propose using a bilinear term similarity function to calculate attention scores with pretrained word embeddings.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Trischler et al [25] propose the EpiReader which uses two neural network structures: one extracts candidates using the attention-sum reader; the other reranks candidates based on a bilinear term similarity score calculated from query and passage representations.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Our proposed approach explores the idea of using both attentionsum to aggregate candidate attention scores and multiple turns to attain a better reasoning capability.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unlike previous approaches using a xed number of hops or iterations, motivated by [15,16], we propose a termination module in the inference.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The termination module can decide whether to continue to infer the next turn after digesting intermediate information, or to terminate the whole inference process when it concludes existing information is su cient to yield an answer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The number of turns in the inference is dynamically modeled by both a document and a query, and is generally related to the complexity of the document and the query.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "REASONING NETWORKS",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "ReasoNets are devised to mimic the inference process of human readers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "ReasoNets read a document repeatedly with attention on di erent parts each time until a satisfying answer is found.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As shown in Figure 1, a ReasoNet is composed of the following components:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "The action of answer module is triggered when the termination gate variable is true:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "In Algorithm 1, we describe the stochastic inference process of a ReasoNet.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The process can be considered as solving a Partially Observable Markov Decision Process (POMDP) [10] in the reinforcement learning (RL) literature.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The state sequence s 1:T is hidden and dynamic, controlled by an RNN sequence model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ReasoNet performs an answer action a T at the T -th step, which implies that the termination gate variables t 1:T = (t 1 = 0, t 2 = 0, ..., t T \u22121 = 0, t T = 1).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ReasoNet learns a stochastic policy \u03c0 ((t t , a t )|s t ; \u03b8 ) with parameters \u03b8 to get a distribution of termination actions, to continue reading or to stop, and of answer actions if the model decides to stop at the current step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The termination step T varies from instance to instance.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": ", and can be updated via an online moving average approach : b T = \u03bbb T + (1 \u2212 \u03bb)r T .",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, we empirically nd that the above approach leads to slow convergence in training ReasoNets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Intuitively, the average baselines {b T ;T = 1..T max } are global variables independent of instances.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is hard for these baselines to capture the dynamic termination behavior of ReasoNets.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Since ReasoNets may stop at di erent time steps for di erent instances, the adoption of a global variable without considering the dynamic variance in each instance is inappropriate.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To resolve this weakness in traditional methods and account for the dynamic characteristic of ReasoNets, we propose an instance-dependent baseline method to calculate \u2207 \u03b8 (\u03b8 ), as illustrated in Section 3.1.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Empirical results show that the proposed reward schema achieves better results compared to baseline approaches.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training Details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "EXPERIMENTS",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "In this section, we evaluate the performance of ReasoNets in machine comprehension datasets, including unstructured CNN and Daily Mail datasets, the Stanford SQuAD dataset, and a structured Graph Reachability dataset.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CNN and Daily Mail Datasets",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "We examine the performance of ReasoNets on CNN and Daily Mail datasets. 3",
+              "tag": "Method"
+            },
+            {
+              "sent": "The detailed settings of the ReasoNet model are as follows.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "Vocab Size: For training our ReasoNet, we keep the most frequent |V | = 101k words (not including 584 entities and 1 placeholder marker) in the CNN dataset, and |V | = 151k words (not including 530 entities and 1 placeholder marker) in the Daily Mail dataset.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "Answer Module: We apply a linear projection from GRU outputs and make predictions on the entity candidates.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Following the  settings in AS Reader [9], we sum up scores from the same candidate and make a prediction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, AS Reader can be viewed as a special case of ReasoNets with T max = 1. 4 Other Details: The maximum reasoning step, T max is set to 5 in experiments on both CNN and Daily Mail datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use ADAM optimizer [11] for parameter optimization with an initial learning rate of 0.0005, \u03b2 1 = 0.9 and \u03b2 2 = 0.999; The absolute value of gradient on each parameter is clipped within 0.001.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The batch size is 64 for both CNN and Daily Mail datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For each batch of the CNN and Daily Mail datasets, we randomly reshu e the assignment of named entities [7].",
+              "tag": "Method"
+            },
+            {
+              "sent": "This forces the model to treat the named entities as semantically meaningless labels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the prediction of test cases, we randomly reshu e named entities up to 4 times, and report the averaged answer.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Models are trained on GTX TitanX 12GB.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It takes 7 hours per epoch to train on the Daily Mail dataset and 3 hours per epoch to train on the CNN dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The models are usually converged within 6 epochs on both CNN and Daily Mail datasets. 4",
+              "tag": "Method"
+            },
+            {
+              "sent": "When ReasoNet is set with T max = 1 in CNN and Daily Mail, it directly applies s 0 to make predictions on the entity candidates, without performing attention on the memory module.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The prediction module in ReasoNets is the same as in AS Reader.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It sums up the scores from the same entity candidates, where the scores are calculated by the inner product between s t and m d oc e , where m d oc e is an embedding vector of one entity candidate in the passage.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Answer: @entity14",
+      "selected_sentences": [
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "Step 2 Results: Table 1 shows the performance of all the existing single model baselines and our proposed ReasoNet.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Among all the baselines, AS Reader could be viewed as a special case of ReasoNet with T max = 1.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Comparing with the AS Reader, ReasoNet shows the signi cant improvement by capturing multi-turn reasoning in the paragraph.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Iterative Attention Reader, EpiReader and GA Reader are the three multi-turn reasoning models with xed reasoning steps.",
+              "tag": "Result"
+            },
+            {
+              "sent": "ReasoNet also outperforms all of them by integrating termination gate in the model which allows di erent reasoning steps for di erent test cases.",
+              "tag": "Result"
+            },
+            {
+              "sent": "AoA Reader is another single-turn reasoning model, it captures the word alignment signals between query and passage, and shows a big improvement over AS Reader.",
+              "tag": "Result"
+            },
+            {
+              "sent": "ReasoNet obtains comparable results with AoA Reader on CNN test set.",
+              "tag": "Other"
+            },
+            {
+              "sent": "We expect that ReasoNet could be improved further by incorporating the word alignment information in the memory module as suggested in AoA Reader.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "We show the distribution of termination step distribution of ReasoNets in the CNN dataset in Figure 2. The distributions spread out across di erent steps.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Around 70% of the instances terminate in the last step.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 3 gives a test example on CNN dataset, which illustrates the inference process of the ReasoNet.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The model initially focuses on wrong entities with low termination probability.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the second and third steps, the model focuses on the right clue with higher termination probability.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Interestingly, we also nd its query attention focuses on the placeholder token throughout all the steps.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "SQuAD Dataset",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "In this section, we evaluate ReasoNet model on the task of question answering using the SQuAD dataset [18]. 5",
+              "tag": "Method"
+            },
+            {
+              "sent": "SQuAD is a machine comprehension dataset on 536 Wikipedia articles, with more than 100,000 questions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Two metrics are used to evaluate models: Exact Match (EM) and a softer metric, F1 score, which measures the weighted average of the precision and recall rate at the character level.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dataset consists of 90k/10k training/dev question-contextanswer tuples with a large hidden test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The model architecture used for this task is as follows: 5 SQuAD Competition Website is https://rajpurkar.github.io/SQuAD-explorer/",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "Answer Module: SQuAD task requires the model to nd a span in the passage to answer the query.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus the answer module requires to predict the start and end indices of the answer span in the passage.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The probability distribution of selecting the start index over the passage at state s t is computed by :",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Graph Reachability Task",
+      "selected_sentences": [
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "Recent analysis and results [3] on the cloze-style machine comprehension tasks have suggested some simple models without multiturn reasoning can achieve reasonable performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Based on these results, we construct a synthetic structured Graph Reachability dataset 8 to evaluate longer range machine inference and reasoning capability, since we anticipate ReasoNets to have the capability to handle long range relationships.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Internal State Controller:",
+      "selected_sentences": [
+        {
+          "par_id": 72,
+          "sentences": [
+            {
+              "sent": "Answer Module: The nal answer is either \"Yes\" or \"No\" and hence logistical regression is used as the answer module:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 81,
+          "sentences": [
+            {
+              "sent": "To better grasp when ReasoNets stop reasoning, we show the distribution of termination steps in ReasoNets on the test set.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The termination step is chosen with the maximum termination probability p(k) = t k k \u22121 i=1 (1 \u2212 t i ), where t i is the termination probability at step i. Figure 6 shows the termination step distribution of Rea-soNets in the graph reachability dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The distributions spread out across di erent steps.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Around 16% and 35% of the instances terminate in the last step for the small and large graph, respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We study the correlation between the termination steps and the complexity of test instances in Figure 7.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given the query, we use the BreadthFirst Search (BFS) algorithm over the target graph to analyze the complexity of test instances.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CONCLUSION",
+      "selected_sentences": [
+        {
+          "par_id": 82,
+          "sentences": [
+            {
+              "sent": "In this paper, we propose ReasoNets that dynamically decide whether to continue or to terminate the inference process in machine comprehension tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "With the use of the instance-dependent baseline method, our proposed model achieves superior results in machine comprehension datasets, including unstructured CNN and Daily Mail datasets, the Stanford SQuAD dataset, and a proposed structured Graph Reachability dataset.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "ReasoNet: Learning to Stop Reading in Machine Comprehension"
+}

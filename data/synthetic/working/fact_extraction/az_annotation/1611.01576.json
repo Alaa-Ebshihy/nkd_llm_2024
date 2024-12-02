@@ -1,0 +1,364 @@
+{
+  "paper_id": "1611.01576",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Recurrent neural networks are a powerful tool for modeling sequential data, but the dependence of each timestep's computation on the previous timestep's output limits parallelism and makes RNNs unwieldy for very long sequences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce quasi-recurrent neural networks (QRNNs), an approach to neural sequence modeling that alternates convolutional layers, which apply in parallel across timesteps, and a minimalist recurrent pooling function that applies in parallel across channels.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Despite lacking trainable recurrent layers, stacked QRNNs have better predictive accuracy than stacked LSTMs of the same hidden size.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Due to their increased parallelism, they are up to 16 times faster at train and test time.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Experiments on language modeling, sentiment classification, and character-level neural machine translation demonstrate these advantages and underline the viability of QRNNs as a basic building block for a variety of sequence tasks.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "INTRODUCTION",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Recurrent neural networks (RNNs), including gated variants such as the long short-term memory (LSTM) (Hochreiter & Schmidhuber, 1997) have become the standard model architecture for deep learning approaches to sequence modeling tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "RNNs repeatedly apply a function with trainable parameters to a hidden state.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Recurrent layers can also be stacked, increasing network depth, representational power and often accuracy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "RNN applications in the natural language domain range from sentence classification (Wang et al, 2015) to word-and character-level language modeling (Zaremba et al, 2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "RNNs are also commonly the basic building block for more complex models for tasks such as machine translation (Bahdanau et al, 2015;Luong et al, 2015; or question answering (Kumar et al, 2016;.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Unfortunately standard RNNs, including LSTMs, are limited in their capability to handle tasks involving very long sequences, such as document classification or character-level machine translation, as the computation of features or states for different parts of the document cannot occur in parallel.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Convolutional neural networks (CNNs) (Krizhevsky et al, 2012), though more popular on tasks involving image data, have also been applied to sequence encoding tasks (Zhang et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Such models apply time-invariant filter functions in parallel to windows along the input sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "CNNs possess several advantages over recurrent models, including increased parallelism and better scaling to long sequences such as those often seen with character-level language data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Convolutional models for sequence processing have been more successful when combined with RNN layers in a hybrid architecture (Lee et al, 2016), because traditional max-and average-pooling approaches to combining convolutional features across timesteps assume time invariance and hence cannot make full use of large-scale sequence order information.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "We present quasi-recurrent neural networks for neural sequence modeling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "QRNNs address both drawbacks of standard models: like CNNs, QRNNs allow for parallel computation across both timestep and minibatch dimensions, enabling high throughput and good scaling to long sequences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Like RNNs, QRNNs allow the output to depend on the overall order of elements in the sequence.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We describe QRNN variants tailored to several natural language tasks, including document-level sentiment classification, language modeling, and character-level machine translation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These models outperform strong LSTM baselines on all three tasks while dramatically reducing computation time.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MODEL",
+      "selected_sentences": [
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Each layer of a quasi-recurrent neural network consists of two kinds of subcomponents, analogous to convolution and pooling layers in CNNs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The convolutional component, like convolutional layers in CNNs, allows fully parallel computation across both minibatches and spatial dimensions, in this case the sequence dimension.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The pooling component, like pooling layers in CNNs, lacks trainable parameters and allows fully parallel computation across minibatch and feature dimensions.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "We term these three options f -pooling, fo-pooling, and ifo-pooling respectively; in each case we initialize h or c to zero.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Although the recurrent parts of these functions must be calculated for each timestep in sequence, their simplicity and parallelism along feature dimensions means that, in practice, evaluating them over even long sequences requires a negligible amount of computation time.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "A single QRNN layer thus performs an input-dependent pooling, followed by a gated linear combination of convolutional features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As with convolutional neural networks, two or more QRNN layers should be stacked to create a model with the capacity to approximate more complex functions.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "VARIANTS",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Motivated by several common natural language tasks, and the long history of work on related architectures, we introduce several extensions to the stacked QRNN described above.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Notably, many extensions to both recurrent and convolutional models can be applied directly to the QRNN as it combines elements of both model types.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Regularization An important extension to the stacked QRNN is a robust regularization scheme inspired by recent work in regularizing LSTMs.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "Variational inference-based dropout locks the dropout mask used for the recurrent connections across timesteps, so a single RNN pass uses a single stochastic subset of the recurrent weights.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Zoneout stochastically chooses a new subset of channels to \"zone out\" at each timestep; for these channels the network copies states from one timestep to the next without modification.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Densely-Connected Layers",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "While the first step of this attention procedure is quadratic in the sequence length, in practice it takes significantly less computation time than the model's linear and convolutional layers due to the simple and highly parallel dot-product scoring function.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "EXPERIMENTS",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "We evaluate the performance of the QRNN on three different natural language tasks: document-level sentiment classification, language modeling, and character-based neural machine translation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our QRNN models outperform LSTM-based models of equal hidden size on all three tasks while dramatically improving computation speed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments were implemented in Chainer (Tokui et al).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "SENTIMENT CLASSIFICATION",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "LANGUAGE MODELING",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CHARACTER-LEVEL NEURAL MACHINE TRANSLATION",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "We evaluate the sequence-to-sequence QRNN architecture described in 2.1 on a challenging neural machine translation task, IWSLT GermanEnglish spoken-domain translation, applying fully character-level segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset consists of 209,772 sentence pairs of parallel training data from transcribed TED and TEDx presentations, with a mean sentence length of 103 characters for German and 93 for English.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We remove training sentences with more than 300 characters in English or German, and use a unified vocabulary of 187 Unicode code points.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "Exploring alternatives to traditional RNNs for sequence tasks is a major area of current research.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Quasi-recurrent neural networks are related to several such recently described models, especially the strongly-typed recurrent neural networks (TRNN) introduced by Balduzzi & Ghifary (2016).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While the motivation and constraints described in that work are different, Balduzzi & Ghifary (2016)'s concepts of \"learnware\" and \"firmware\" parallel our discussion of convolution-like and pooling-like subcomponents.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As the use of a fully connected layer for recurrent connections violates the constraint of \"strong typing\", all strongly-typed RNN architectures (including the TRNN, TGRU, and TLSTM) are also quasi-recurrent.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, some QRNN models (including those with attention or skip-connections) are not \"strongly typed\".",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, a TRNN differs from a QRNN as described in this paper with filter size 1 and f -pooling only in the absence of an activation function on z.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Similarly, TGRUs and TLSTMs differ from QRNNs with filter size 2 and foor ifo-pooling respectively in that they lack tanh on z and use tanh rather than sigmoid on o.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "The QRNN encoder-decoder model shares the favorable parallelism and path-length properties exhibited by the ByteNet , an architecture for character-level machine translation based on residual convolutions over binary trees.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Their model was constructed to achieve three desired properties: parallelism, linear-time computational complexity, and short paths between any pair of words in order to better propagate gradient signals.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CONCLUSION",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "Intuitively, many aspects of the semantics of long sequences are context-invariant and can be computed in parallel (eg, convolutionally), but some aspects require long-distance context and must be computed recurrently.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Many existing neural network architectures either fail to take advantage of the contextual information or fail to take advantage of the parallelism.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "QRNNs exploit both parallelism and context, exhibiting advantages from both convolutional and recurrent neural networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "QRNNs have better predictive accuracy than LSTM-based models of equal hidden size, even though they use fewer parameters and run substantially faster.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our experiments show that the speed and accuracy advantages remain consistent across tasks and at both word and character levels.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "Extensions to both CNNs and RNNs are often directly applicable to the QRNN, while the model's hidden states are more interpretable than those of other recurrent architectures as its channels maintain their independence across timesteps.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We believe that QRNNs can serve as a building block for long-sequence tasks that were previously impractical with traditional RNNs.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Under review as a conference paper at ICLR 2017 QUASI-RECURRENT NEURAL NETWORKS"
+}

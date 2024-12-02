@@ -1,0 +1,333 @@
+{
+  "paper_id": "1301.3557",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We introduce a simple and effective method for regularizing large convolutional neural networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We replace the conventional deterministic pooling operations with a stochastic procedure, randomly picking the activation within each pooling region according to a multinomial distribution, given by the activities within the pooling region.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The approach is hyper-parameter free and can be combined with other regularization approaches, such as dropout and data augmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We achieve state-of-the-art performance on four image datasets, relative to other approaches that do not utilize data augmentation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Neural network models are prone to over-fitting due to their high capacity.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A range of regularization techniques are used to prevent this, such as weight decay, weight tying and the augmentation of the training set with transformed copies [9].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These allow the training of larger capacity models than would otherwise be possible, which yield superior test performance compared to smaller unregularized models.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Dropout, recently proposed by Hinton et al [2], is another regularization approach that stochastically sets half the activations within a layer to zero for each training sample during training.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It has been shown to deliver significant gains in performance across a wide range of problems, although the reasons for its efficacy are not yet fully understood.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "A drawback to dropout is that it does not seem to have the same benefits for convolutional layers, which are common in many networks designed for vision tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose a novel type of regularization for convolutional layers that enables the training of larger models without over-fitting, and produces superior performance on recognition tasks.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "The key idea is to make the pooling that occurs in each convolutional layer a stochastic process.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Conventional forms of pooling such as average and max are deterministic, the latter selecting the largest activation in each pooling region.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our stochastic pooling, the selected activation is drawn from a multinomial distribution formed by the activations within the pooling region.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "An alternate view of stochastic pooling is that it is equivalent to standard max pooling but with many copies of an input image, each having small local deformations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is similar to explicit elastic deformations of the input images [13], which delivers excellent MNIST performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Other types of data augmentation, such as flipping and cropping differ in that they are global image transformations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, using stochastic pooling in a multi-layer model gives an exponential number of deformations since the selections in higher layers are independent of those below.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Our stochastic pooling scheme is designed for use in a standard convolutional neural network architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We first review this model, along with conventional pooling schemes, before introducing our novel stochastic pooling approach.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "where R j is pooling region j in feature map c and i is the index of each element within it.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Stochastic Pooling",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "In stochastic pooling, we select the pooled map response by sampling from a multinomial distribution formed from the activations of each pooling region.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More precisely, we first compute the probabilities p for each region j by normalizing the activations within the region:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 20,
+          "sentences": [
+            {
+              "sent": "Max pooling only captures the strongest activation of the filter template with the input for each region.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, there may be additional activations in the same pooling region that should be taken into account when passing information up the network and stochastic pooling ensures that these non-maximal activations will also be utilized.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Probabilistic Weighting at Test Time",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "This differs from standard average pooling because each element has a potentially different weighting and the denominator is the sum of activations i\u2208Rj a i , rather than the pooling region size |R j |.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In practice, using conventional average (or sum) pooling results in a huge performance drop (see Section 4.7).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Overview",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "CIFAR-10",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Using the same network architecture described above, we trained three models using average, max and stochastic pooling respectively and compare their performance.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 3 shows the progression of train and test errors over 280 training epochs.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Stochastic pooling avoids over-fitting, unlike average and max pooling, and produces less test errors.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Table 1 compares the test performance of the three pooling approaches to the current state-of-the-art result on CIFAR-10 which uses no data augmentation but adds dropout on an additional locally connected layer [2].",
+              "tag": "Result"
+            },
+            {
+              "sent": "Stochastic pooling surpasses this result by 0.47% using the same architecture but without requiring the locally connected layer.",
+              "tag": "Result"
+            },
+            {
+              "sent": "1: CIFAR-10 Classification performance for various pooling methods in our model compared to the state-of-the-art performance [2] with and without dropout.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "MNIST",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "There are 60,000 training images with 10,000 test images in this benchmark.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The images are scaled to [0,1] and we do not perform any other pre-processing.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "CIFAR-100",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "The CIFAR-100 dataset is another subset of the tiny images dataset, but with 100 classes [5] Table 3: CIFAR-100 Classification performance for various pooling methods compared to the stateof-the-art method based on receptive field learning.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Street View House Numbers",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "Despite having significant amounts of training data, a large convolutional network can still overfit.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this dataset, we train an additional model for 500 epochs with 64, 64 and 128 feature maps in layers 1, 2 and 3 respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our stochastic pooling helps to prevent overfitting even in this large model (denoted 64-64-128 in Table 4), despite training for a long time.",
+              "tag": "Other"
+            },
+            {
+              "sent": "The existing state-of-theart on this dataset is the multi-stage convolutional network of Sermanet et al [12], but stochastic pooling beats this by 2.10% (relative gain of 43%).",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Reduced Training Set Size",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Importance of Model Averaging",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Visualizations",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "Some insight into the mechanism of stochastic pooling can be gained by using a deconvolutional network of Zeiler et al [15] to provide a novel visualization of our trained convolutional network.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "We propose a simple and effective stochastic pooling strategy that can be combined with any other forms of regularization such as weight decay, dropout, data augmentation, etc to prevent overfitting when training deep convolutional networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The method is also intuitive, selecting from information the network is already providing, as opposed to methods such as dropout which throw information away.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show state-of-the-art performance on numerous datasets, when comparing to other approaches that do not employ data augmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, our method has negligible computational overhead and no hyper-parameters to tune, thus can be swapped into to any existing convolutional network architecture.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Stochastic Pooling for Regularization of Deep Convolutional Neural Networks"
+}

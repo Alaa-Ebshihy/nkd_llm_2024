@@ -1,0 +1,688 @@
+{
+  "paper_id": "1506.03767",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Discrete Fourier transforms provide a significant speedup in the computation of convolutions in deep learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we demonstrate that, beyond its advantages for efficient computation, the spectral domain also provides a powerful representation in which to model and train convolutional neural networks (CNNs).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We employ spectral representations to introduce a number of innovations to CNN design.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, we propose spectral pooling, which performs dimensionality reduction by truncating the representation in the frequency domain.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This approach preserves considerably more information per parameter than other pooling strategies and enables flexibility in the choice of pooling output dimensionality.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This representation also enables a new form of stochastic regularization by randomized modification of resolution.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We show that these methods achieve competitive results on classification and approximation tasks, without using any dropout or max-pooling.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, we demonstrate the effectiveness of complex-coefficient spectral parameterization of convolutional filters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "While this leaves the underlying model unchanged, it results in a representation that greatly facilitates optimization.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe on a variety of popular CNN configurations that this leads to significantly faster convergence during training.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Convolutional neural networks (CNNs) (LeCun et al, 1989) have been used to achieve unparalleled results across a variety of benchmark machine learning problems, and have been applied successfully throughout science and industry for tasks such as large scale image and video classification (Krizhevsky et al, 2012;Karpathy et al, 2014).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One of the primary challenges of CNNs, however, is the computational expense necessary to train them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, the efficient implementation of convolutional kernels has been a key ingredient of any successful use of CNNs at scale.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Due to its efficiency and the potential for amortization of cost, the discrete Fourier transform has long been considered by the deep learning community to be a natural approach to fast convolution (Bengio & LeCun, 2007).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More recently, Mathieu et al (2013); Vasilache et al (2014) have demonstrated that convolution can be computed significantly faster using discrete Fourier transforms than directly in the spatial domain, even for tiny filters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This computational gain arises from the convenient property of operator duality between convolution in the spatial domain and element-wise multiplication in the frequency domain.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "In this work, we argue that the frequency domain offers more than a computational trick for convolution: it also provides a powerful representation for modeling and training CNNs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Frequency decomposition allows studying an input across its various length-scales of variation, and as such provides a natural framework for the analysis of data with spatial coherence.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce two applications of spectral representations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These contributions can be applied independently of each other.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Spectral parametrization",
+      "selected_sentences": [
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "We propose the idea of learning the filters of CNNs directly in the frequency domain.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Namely, we parametrize them as maps of complex numbers, whose discrete Fourier transforms correspond to the usual filter representations in the spatial domain.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Because this mapping corresponds to unitary transformations of the filters, this reparametrization does not alter the underlying model.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "However, we argue that the spectral representation provides an appropriate domain for parameter optimization, as the frequency basis captures typical filter structure well.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More specifically, we show that filters tend to be considerably sparser in their spectral representations, thereby reducing the redundancy that appears in spatial domain representations.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This provides the optimizer with more meaningful axis-aligned directions that can be taken advantage of with standard element-wise preconditioning.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "We demonstrate the effectiveness of this reparametrization on a number of CNN optimization tasks, converging 2-5 times faster than the standard spatial representation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Spectral pooling",
+      "selected_sentences": [
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "Pooling refers to dimensionality reduction used in CNNs to impose a capacity bottleneck and facilitate computation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce a new approach to pooling we refer to as spectral pooling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It performs dimensionality reduction by projecting onto the frequency basis set and then truncating the representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This approach alleviates a number of issues present in existing pooling strategies.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, while max pooling is featured in almost every CNN and has had great empirical success, one major criticism has been its poor preservation of information (Hinton, 2014b,a).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This weakness is exhibited in two ways.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, along with other stride-based pooling approaches, it implies a very sharp dimensionality reduction by at least a factor of 4 every time it is applied on two-dimensional inputs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, while it encourages translational invariance, it does not utilize its capacity well to reduce approximation loss: the maximum value in each window only reflects very local information, and often does not represent well the contents of the window.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "In contrast, we show that spectral pooling preserves considerably more information for the same number of parameters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It achieves this by exploiting the non-uniformity of typical inputs in their signal-to-noise ratio as a function of frequency.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For example, natural images are known to have an expected power spectrum that follows an inverse power law: power is heavily concentrated in the lower frequencies -while higher frequencies tend to encode noise (Torralba & Oliva, 2003).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As such, the elimination of higher frequencies in spectral pooling not only does minimal damage to the information in the input, but can even be viewed as a type of denoising.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "In addition, spectral pooling allows us to specify any arbitrary output map dimensionality.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This permits reduction of the map dimensionality in a slow and controlled manner as a function of network depth.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Also, since truncation of the frequency representation exactly corresponds to reduction in resolution, we can supplement spectral pooling with stochastic regularization in the form of randomized resolution.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "Information preservation We test the information retainment properties of spectral pooling on the validation set of ImageNet (Russakovsky et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the different pooling strategies we plot the average approximation loss resulting from pooling to different dimensionalities.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This can be seen in Figure 4. We observe the two aspects discussed in Subsection 3.1: first, spectral pooling permits significantly better reconstruction for the same number of parameters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Second, for max pooling, the only knob controlling the coarseness of approximation is the stride, which results in severe quantization and a constraining lower bound on preserved information (marked in the figure as a horizontal red line).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast, spectral pooling permits the selection of any output dimensionality, thereby producing a smooth curve over all frequency truncation choices.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Classification with convolutional neural networks We test spectral pooling on different classification tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We hyperparametrize and optimize the following CNN architecture:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 49,
+          "sentences": [
+            {
+              "sent": "Here, by C F S we denote a convolutional layer with F filters each of size S, by SP \u2193S a spectral pooling layer with output dimensionality S, and GA the global averaging layer described in Lin et al (2013).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We upper-bound the number of filters per layer as 288.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Every convolution and pooling layer is followed by a ReLU nonlinearity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We let H m be the height of the map of layer m.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, each spectral pooling layer reduces each output map dimension by factor \u03b3 \u2208 (0, 1).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We assign frequency dropout distribution p R (\u2022; m, \u03b1, \u03b2) = U [ cmHm ,Hm] (\u2022) for layer m, total layers M and with c m (\u03b1, \u03b2) = \u03b1 + m M (\u03b2 \u2212 \u03b1) for some constants \u03b1, \u03b2 \u2208 R.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This parametrization can be thought of as some linear parametrization of the dropout rate as a function of the layer.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "Perhaps unsurprisingly, the optimal hyperparameter configuration assigns the slowest possible layer map decay rate \u03b3 = 0.85.",
+              "tag": "Result"
+            },
+            {
+              "sent": "It selects randomized resolution reduction constants of about \u03b1 \u2248 0.30, \u03b2 \u2248 0.15, momentum of about 0.95 and initial learning rate 0.0088.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These settings allow us to attain classification rates of 8.6% on CIFAR-10 and 31.6% on CIFAR-100.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These are competitive results among approaches that do not employ data augmentation: a comparison to state-of-the-art approaches from the literature can be found in Table 4(b).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "The Discrete Fourier Transform",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "The discrete Fourier transform (DFT) is a powerful way to decompose a spatiotemporal signal.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this section, we provide an introduction to a number of components of the DFT drawn upon in this work.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We confine ourselves to the two-dimensional DFT, although all properties and results presented can be easily extended to other input dimensions.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given an input x \u2208 C M \u00d7N (we address the constraint of real inputs in Subsection 2.1), its 2D DFT F (x) \u2208 C M \u00d7N is given by",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Approximation error",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Conjugate symmetry constraints",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Differentiation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Spectral Pooling",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "The choice of a pooling technique boils down to the selection of an appropriate set of basis functions to project onto, and some truncation of this representation to establish a lower-dimensionality approximation to the original input.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The idea behind spectral pooling stems from the observation that the frequency domain provides an ideal basis for inputs with spatial structure.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We first discuss the technical details of this approach, and then its advantages.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Spectral pooling is straightforward to understand and to implement.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We assume we are given an input x \u2208 R M \u00d7N , and some desired output map dimensionality H \u00d7 W . First, we compute the discrete Fourier transform of the input into the frequency domain as y = F (x) \u2208 C M \u00d7N , and assume that the DC component has been shifted to the center of the domain as is standard practice.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then crop the frequency representation by maintaining only the central H \u00d7 W submatrix of frequencies, which we denote as \u0177 \u2208 C H\u00d7W .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we map this approximation back into the spatial domain by taking Algorithm 1: Spectral pooling",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "In practice, the DFTs are the computational bottlenecks of spectral pooling.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, we note that in convolutional neural networks that employ FFTs for convolution computation, spectral pooling can be implemented at a negligible additional computational cost, since the DFT is performed regardless.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Information preservation",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "Spectral pooling can significantly increase the amount of retained information relative to max-pooling in two distinct ways.",
+              "tag": "Result"
+            },
+            {
+              "sent": "First, its representation maintains more information for the same number of degrees of freedom.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Spectral pooling reduces the information capacity by tuning the resolution of the input precisely to match the desired output dimensionality.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This operation can also be viewed as linear low-pass filtering and it exploits the non-uniformity of the spectral density of the data with respect to frequency.",
+              "tag": "Method"
+            },
+            {
+              "sent": "That is, that the power spectra of inputs with spatial structure, such as natural images, carry most of their mass on lower frequencies.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As such, since the amplitudes of the higher frequencies tend to be small, Parseval's theorem from Section 2 informs us that their elimination will result in a representation that minimizes the 2 distortion after reconstruction.",
+              "tag": "Conclusion"
+            }
+          ]
+        },
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "Second, spectral pooling does not suffer from the sharp reduction in output dimensionality exhibited by other pooling techniques.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More specifically, for stride-based pooling strategies such as max pooling, the number of degrees of freedom of two-dimensional inputs is reduced by at least 75% as a function of stride.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In contrast, spectral pooling allows us to specify any arbitrary output dimensionality, and thus allows us to reduce the map size gradually as a function of layer.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Regularization via resolution corruption",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "We note that the low-pass filtering radii, say R H and R W , can be chosen to be smaller than the output map dimensionalities H, W . Namely, while we truncate our input frequency map to size H \u00d7 W , we can further zero-out all frequencies outside the central R H \u00d7 R W square.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While this maintains the output dimensionality H \u00d7 W of the input domain after applying the inverse DFT, it effectively reduces the resolution of the output.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This can be seen in Figure 2.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This allows us to introduce regularization in the form of random resolution reduction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We apply this stochastically by assigning a distribution p R (\u2022) on the frequency truncation radius (for simplicity we apply the same truncation on both axes), sampling from this a random radius at each iteration, and wiping out all frequencies outside the square of that size.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Note that this can be regarded as an application of nested dropout (Rippel et al, 2014) on both dimensions of the frequency decomposition of our input.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In practice, we have had success choosing p R (\u2022) = U [Hmin,H] (\u2022), ie, a uniform distribution stretching from some minimum value all the way up to the highest possible resolution.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Spectral Parametrization of CNNs",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "Here we demonstrate how to learn the filters of CNNs directly in their frequency domain representations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This offers significant advantages over the traditional spatial representation, which we show empirically in Section 5.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "Let us assume that for some layer of our convolutional neural network we seek to learn filters of size H \u00d7 W .",
+              "tag": "Method"
+            },
+            {
+              "sent": "To do this, we parametrize each filter f \u2208 C H\u00d7W in our network directly in the frequency domain.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To attain its spatial representation, we simply compute its inverse DFT as F \u22121 (f ) \u2208 R H\u00d7W .",
+              "tag": "Method"
+            },
+            {
+              "sent": "From this point on, we proceed as we would for any standard CNN by computing the convolution of the filter with inputs in our mini-batch, and so on.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "We emphasize that this approach does not change the underlying CNN model in any way -only the way in which it is parametrized.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Hence, this only affects the way the solution space is explored by the optimization procedure.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Leveraging filter structure",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "Empirically, in Section 5 we observe that spectral representations of filters leads to a convergence speedup by 2-5 times.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We remark that, had we trained our network with standard stochastic gradient descent, the linearity of differentiation and parameter update would have resulted in exactly the same filters regardless of whether they were represented in the spatial or frequency domain during training (this is true for any invertible linear transformation of the parameter space).",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "We demonstrate the effectiveness of spectral representations in a number of different experiments.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We ran all experiments on code optimized for the Xeon Phi coprocessor.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We used Spearmint (Snoek et al, 2015) for Bayesian optimization of hyperparameters with 5-20 concurrent evaluations.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Spectral parametrization of CNNs",
+      "selected_sentences": [
+        {
+          "par_id": 52,
+          "sentences": [
+            {
+              "sent": "We demonstrate the effectiveness of spectral parametrization on a number of CNN optimization tasks, for different architectures and for different filter sizes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use the notation MP T S to denote a max pooling layer with size S and stride T , and FC F is a fully-connected layer with F filters.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 55,
+          "sentences": [
+            {
+              "sent": "The third architecture considered is the spectral pooling network from Equation 5. To increase the difficulty of optimization and reflect real training conditions, we supplemented all networks with considerable data augmentation in the form of translations, horizontal reflections, HSV perturbations and dropout.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 56,
+          "sentences": [
+            {
+              "sent": "We initialized both spatial and spectral filters in the spatial domain as the same values; for the spectral parametrization experiments we then computed the Fourier transform of these to attain their frequency representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We optimized all networks using the Adam (Kingma & Ba, 2015) update rule, a variant of RMSprop that we find to be a fast and robust optimizer.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 57,
+          "sentences": [
+            {
+              "sent": "The training curves can be found in Figure 5(a) and the respective factors of convergence speedup in Table 5. Surprisingly, we observe non-negligible speedup even for tiny filters of size 3 \u00d7 3, where we did not expect the frequency representation to have much room to exploit spatial structure.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Discussion and remaining open problems",
+      "selected_sentences": [
+        {
+          "par_id": 58,
+          "sentences": [
+            {
+              "sent": "In this work, we demonstrated that spectral representations provide a rich spectrum of applications.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduced spectral pooling, which allows pooling to any desired output dimensionality while retaining significantly more information than other pooling approaches.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, we showed that the Fourier functions provide a suitable basis for filter parametrization, as demonstrated by faster convergence of the optimization procedure.",
+              "tag": "Other"
+            }
+          ]
+        },
+        {
+          "par_id": 59,
+          "sentences": [
+            {
+              "sent": "One possible future line of work is to embed the network in its entirety in the frequency domain.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In models that employ Fourier transforms to compute convolutions, at every convolutional layer the input is FFT-ed and the elementwise multiplication output is then inverse FFT-ed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These back-and-forth transformations are very computationally intensive, and as such it would be desirable to strictly remain in the frequency domain.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, the reason for these repeated transformations is the application of nonlinearities in the forward domain: if one were to propose a sensible nonlinearity in the frequency domain, this would spare us from the incessant domain switching.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Spectral Representations for Convolutional Neural Networks"
+}

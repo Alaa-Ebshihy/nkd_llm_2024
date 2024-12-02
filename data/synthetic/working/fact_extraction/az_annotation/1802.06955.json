@@ -1,0 +1,747 @@
+{
+  "paper_id": "1802.06955",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Deep learning (DL) based semantic segmentation methods have been providing state-of-the-art performance in the last few years.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "More specifically, these techniques have been successfully applied to medical image classification, segmentation, and detection tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "One deep learning technique, UNet, has become one of the most popular for these applications.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper, we propose a Recurrent Convolutional Neural Network (RCNN) based on UNet as well as a Recurrent Residual Convolutional Neural Network (RRCNN) based on UNet models, which are named RUNet and R2UNet respectively.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The proposed models utilize the power of UNet, Residual Network, as well as RCNN.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "There are several advantages of these proposed architectures for segmentation tasks.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "First, a residual unit helps when training deep architecture.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, feature accumulation with recurrent residual convolutional layers ensures better feature representation for segmentation tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Third, it allows us to design better UNet architecture with same number of network parameters with better performance for medical image segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The proposed models are tested on three benchmark datasets such as blood vessel segmentation in retina images, skin cancer segmentation, and lung lesion segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The experimental results show superior performance on segmentation tasks compared to equivalent models including UNet and residual UNet (ResUNet).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Recurrent Residual Convolutional Neural Network based on U-Net (R2U-Net) for Medical Image Segmentation",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Md Zahangir Alom 1* , Student Member, IEEE, Mahmudul Hasan 2 , Chris Yakopcic 1 , Member, IEEE, Tarek M. Taha 1 , Member, IEEE, and Vijayan K. Asari 1 , Senior Member, IEEE N manual segmentation approaches, there is a significant demand for computer algorithms that can do segmentation quickly and accurately without human interaction.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, there are some limitations of medical image segmentation including data scarcity and class imbalance.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most of the time the large number of labels (often in the thousands) for training is not available for several reasons [11].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Labeling the dataset requires an expert in this field which is expensive, and it requires a lot of effort and time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Sometimes, different data transformation or augmentation techniques (data whitening, rotation, translation, and scaling) are applied for increasing the number of labeled samples available [12, 13, and 14].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition, patch based approaches are used for solving class imbalance problems.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, we have evaluated the proposed approaches on both patch-based and entire image-based approaches.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, to switch from the patch-based approach to the pixel-based approach that works with the entire image, we must be aware of the class imbalance problem.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the case of semantic segmentation, the image backgrounds are assigned a label and the foreground regions are assigned a target class.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Therefore, the class imbalance problem is resolved without any trouble.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Two advanced techniques including cross-entropy loss and dice similarity are introduced for efficient training of classification and segmentation tasks in [13,14].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, in medical image processing, global localization and context modulation is very often applied for localization tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each pixel is assigned a class label with a desired boundary that is related to the contour of the target lesion in identification tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To define these target lesion boundaries, we must emphasize the related pixels.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Landmark detection in medical imaging [15,16] is one example of this.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "There were several traditional machine learning and image processing techniques available for medical image segmentation tasks before the DL revolution, including amplitude segmentation based on histogram features [17], the region based segmentation method [18], and the graph-cut approach [19].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, semantic segmentation approaches that utilize DL have become very popular in recent years in the field of medical image segmentation, lesion detection, and localization [20].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition, DL based approaches are known as universal learning approaches, where a single model can be utilized efficiently in different modalities of medical imaging such as MRI, CT, and X-ray.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "According to a recent survey, DL approaches are applied to almost all modalities of medical imagining [20,21].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, the highest number of papers have been published on segmentation tasks in different modalities of medical imaging [20,21].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A DCNN based brain tumor segmentation and detection method was proposed in [22].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "As opposed to classification tasks, the architecture of segmentation tasks requires both convolutional encoding and decoding units.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The encoding unit is used to encode input images into a larger number of maps with lower dimensionality.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The decoding unit is used to perform up-convolution (deconvolution) operations to produce segmentation maps with the same dimensionality as the original input image.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, the architecture for segmentation tasks generally requires almost double the number of network parameters when compared to the architecture of the classification tasks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus, it is important to design efficient DCNN architectures for segmentation tasks which can ensure better performance with less number of network parameters.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "This research demonstrates two modified and improved segmentation models, one using recurrent convolution networks, and another using recurrent residual convolutional networks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To accomplish our goals, the proposed models are Figure 2. UNet architecture consisted with convolutional encoding and decoding units that take image as input and produce the segmentation feature maps with respective pixel classes. evaluated on different modalities of medical imagining as shown in Figure 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The contributions of this work can be summarized as follows:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "2) The experiments are conducted on three different modalities of medical imaging including retina blood vessel segmentation, skin cancer segmentation, and lung segmentation.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 9,
+          "sentences": [
+            {
+              "sent": "3) Performance evaluation of the proposed models is conducted for the patch-based method for retina blood vessel segmentation tasks and the end-to-end image-based approach for skin lesion and lung segmentation tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "4) Comparison against recently proposed state-of-the-art methods that shows superior performance against equivalent models with same number of network parameters.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "II. RELATED WORK",
+      "selected_sentences": [
+        {
+          "par_id": 11,
+          "sentences": [
+            {
+              "sent": "Semantic segmentation is an active research area where DCNNs are used to classify each pixel in the image individually, which is fueled by different challenging datasets in the fields of computer vision and medical imaging [23, 24, and 25].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Before the deep learning revolution, the traditional machine learning approach mostly relied on hand engineered features that were used for classifying pixels independently.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In the last few years, a lot of models have been proposed that have proved that deeper networks are better for recognition and segmentation tasks [5].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, training very deep models is difficult due to the vanishing gradient problem, which is resolved by implementing modern activation functions such as Rectified Linear Units (ReLU) or Exponential Linear Units (ELU) [5,6].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Another solution to this problem is proposed by He et al, a deep residual model that overcomes the problem utilizing an identity mapping to facilitate the training process [26].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 12,
+          "sentences": [
+            {
+              "sent": "In addition, CNNs based segmentation methods based on FCN provide superior performance for natural image segmentation [2].",
+              "tag": "Method"
+            },
+            {
+              "sent": "One of the image patch-based architectures is called Random architecture, which is very computationally intensive and contains around 134.5M network parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The main drawback of this approach is that a large number of pixel overlap and the same convolutions are performed many times.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The performance of FCN has improved with recurrent neural networks (RNN), which are fine-tuned on very large datasets [27].",
+              "tag": "Result"
+            },
+            {
+              "sent": "Semantic image segmentation with DeepLab is one of the state-of-the-art performing methods [28].",
+              "tag": "Method"
+            },
+            {
+              "sent": "SegNet consists of two parts, one is the encoding network which is a 13-layer VGG16 network [5], and the corresponding decoding network uses pixel-wise classification layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The main contribution of this paper is the way in which the decoder upsamples its lower resolution input feature maps [10].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Later, an improved version of SegNet, which is called Bayesian SegNet was proposed in 2015 [29].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Most of these architectures are explored using computer vision applications.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, there are some deep learning models that have been proposed specifically for the medical image segmentation, as they consider data insufficiency and class imbalance problems.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "One of the very first and most popular approaches for semantic medical image segmentation is called \"UNet\" [12].",
+              "tag": "Method"
+            },
+            {
+              "sent": "A diagram of the basic UNet model is shown in Figure 2. According to the structure, the network consists of two main parts: the convolutional encoding and decoding units.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The basic convolution operations are performed followed by ReLU activation in both parts of the network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For down sampling in the encoding unit, 2\u00d72 max-pooling operations are performed.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the decoding phase, the convolution transpose (representing up-convolution, or de-convolution) operations are performed to up-sample the feature maps.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The very first version of UNet was used to crop and copy feature maps from the encoding unit to the decoding unit.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The UNet model provides several advantages for segmentation tasks: first, this model allows for the use of global location and context at the same time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, it works with very few training samples and provides better performance for segmentation tasks [12].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Third, an end-to-end pipeline process the entire image in the forward pass and directly produces segmentation maps.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This ensures that UNet preserves the full context of the input images, which is a major advantage when compared to patch-based segmentation approaches [12,14].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, UNet is not only limited to the applications in the domain of medical imaging, nowadays this model is massively applied for computer vision tasks as well [30,31].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Meanwhile, different variants of UNet models have been proposed, including a very simple variant of UNet for CNN-based segmentation of Medical Imaging data [32].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this model, two modifications are made to the original design of UNet: first, a combination of multiple segmentation maps and forward feature maps are summed (element-wise) from one part of the network to the other.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The feature maps are taken from different layers of encoding and decoding units and finally summation (element-wise) is performed outside of the encoding and decoding units.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The authors report promising performance improvement during training with better convergence compared to UNet, but no benefit was observed when using a summation of features during the testing phase [32].",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, this concept proved that feature summation impacts the performance of a network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The importance of skipped connections for biomedical image segmentation tasks have been empirically evaluated with UNet and residual networks [33].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A deep contour-aware network called Deep ContourAware Networks (DCAN) was proposed in 2016, which can extract multi-level contextual features using a hierarchical architecture for accurate gland segmentation of histology images and shows very good performance for segmentation [34].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, NablaNet: a deep dig-like convolutional architecture was proposed for segmentation in 2017 [35].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "Other deep learning approaches have been proposed based on UNet for 3D medical image segmentation tasks as well.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The 3DUnet architecture for volumetric segmentation learns from sparsely annotated volumetric images [13].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A powerful end-toend 3D medical image segmentation system based on volumetric images called V-net has been proposed, which consists of a FCN with residual connections [14].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This paper also introduces a dice loss layer [14].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, a 3D deeply supervised approach for automated segmentation of volumetric medical images was presented in [36].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "HighRes3DNet was proposed using residual networks for 3D segmentation tasks in 2016 [37].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In 2017, a CNN based brain tumor segmentation approach was proposed using a 3DCNN model with a fully connected CRF [38].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Pancreas segmentation was proposed in [39], and Voxresnet was proposed in 2016 where a deep voxel wise residual network is used for brain segmentation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This architecture utilizes residual networks and summation of feature maps from different layers [40].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 15,
+          "sentences": [
+            {
+              "sent": "Alternatively, we have proposed two models for semantic segmentation based on the architecture of UNet in this paper.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The proposed Recurrent Convolutional Neural Networks (RCNN) model based on UNet is named RUNet, which is shown in Figure 3. Additionally, we have proposed a residual RCNN based UNet model which is called R2UNet.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The following section provides the architectural details of both models.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "III. RU-NET AND R2U-NET ARCHITECTURES",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Inspired by the deep residual model [7], RCNN [41], and UNet [12], we propose two models for segmentation tasks which are named RUNet and R2UNet.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These two approaches utilize the strengths of all three recently developed deep learning models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "RCNN and its variants have already shown superior performance on object recognition tasks using different benchmarks [42,43].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The recurrent residual convolutional operations can be demonstrated mathematically according to the improved-residual networks in [43].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The operations of the Recurrent Convolutional Layers (RCL) are performed with respect to the discrete time steps that are expressed according to the RCNN [41].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Let's consider the \ud835\udc65 \ud835\udc59 input sample in the \ud835\udc59 \ud835\udc61\u210e layer of the residual RCNN (RRCNN) block and a pixel located at (\ud835\udc56, \ud835\udc57) in an input sample on the k th feature map in the RCL.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Additionally, let's assume the output of the network \ud835\udc42 \ud835\udc56\ud835\udc57\ud835\udc58 \ud835\udc59 (\ud835\udc61) is at the time step t.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The output can be expressed as follows as:",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "(b) and (d).",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "IV. EXPERIMENTAL SETUP AND RESULTS",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "To demonstrate the performance of the RUNet and R2UNet models, we have tested them on three different medical imaging datasets.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These include blood vessel segmentations from retina images (DRIVE, STARE, and CHASE_DB1 shown in Figure 6), skin cancer lesion segmentation, and lung segmentation from 2D images.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For this implementation, the Keras, and TensorFlow frameworks are used on a single GPU machine with 56G of RAM and an NIVIDIA GEFORCE GTX-980 Ti.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A. Database Summary 1) Blood Vessel Segmentation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "2) Skin Cancer Segmentation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "3) Lung Segmentation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B. Quantitative Analysis Approaches",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "However, the area under curve (AUC) and the receiver operating characteristics (ROC) curve are common evaluation measures for medical image segmentation tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this experiment, we utilized both analytical methods to evaluate the performance of the proposed approaches considering the mentioned criterions against existing state-of-the-art techniques.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "2) Retina blood vessel segmentation on the STARE dataset",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "R2UNet shows a better performance than all other models during training.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition, the validation accuracy in Figure 13 demonstrates that the RUNet and R2UNet models provide better validation accuracy when compared to the equivalent UNet and ResUNet models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Thus, the performance demonstrates the effectiveness of the proposed approaches for segmentation tasks.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "3) CHASE_DB1",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "4) Skin Cancer Lesion Segmentation",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "The training accuracy of the proposed models R2UNet and RUNet was compared with that of ResUNet and UNet for an end-to-end image based segmentation approach.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The result is shown in Figure 16.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The validation accuracy is shown in Figure 17.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In both cases, the proposed models show better performance when compared with the equivalent UNet and ResUNet models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This clearly demonstrates the robustness of the proposed models in end-to-end image-based segmentation tasks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The quantitative results of this experiment were compared against existing methods as shown in Table II.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Some of the example outputs from the testing phase are shown in Figure 18.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The first column shows the input images, the second column shows the ground truth, the network outputs are shown in the third column, and the fourth column demonstrates the final outputs after performing post processing with a threshold of 0.5.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Figure 18 shows promising segmentation results.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In most cases, the target lesions are segmented accurately with almost the same shape of ground truth.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, if we observe the second and third rows in Figure 18, it can be clearly seen that the input images contain two spots, one is a target lesion and the other bright spot which is not a target.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This result is obtained even though the non-target lesion is brighter than the target lesion shown in the third row in Figure 18.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The R2UNet model still segments the desired part accurately, which clearly shows the robustness of the proposed segmentation method.",
+              "tag": "Conclusion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "5) Lung Segmentation",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "Lung segmentation is very important for analyzing lung related diseases, and can be applied to lung cancer segmentation and lung pattern classification for identifying other problems.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this experiment, the ADAM optimizer is used with a learning rate of 2\u00d710 -4 .",
+              "tag": "Method"
+            },
+            {
+              "sent": "We used binary cross entropy loss, and also calculated MSE during training and validation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this case 10% of the samples were used for validation with a batch size of 16 and 150 epochs 150.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Table III shows the summary of how well the proposed models performed against equivalent UNet and ResUNet models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The experimental results show that the proposed models outperform the UNet and ResUNet models with same number of network parameters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Furthermore, many models struggle to define the class boundary properly during segmentation tasks [64].",
+              "tag": "Result"
+            },
+            {
+              "sent": "However, if we observe the experimental outputs shown in Figure 20, the outputs in the third column show different hit maps on the border, which can be used to define the boundary of the lung region, while the ground truth tends to have a smooth boundary.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "D. Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 38,
+          "sentences": [
+            {
+              "sent": "Most of the cases, the networks are evaluated for different segmentation tasks with following architectures: 1\uf0e064\uf0e0128\uf0e0256\uf0e0512\uf0e0256 \uf0e0 128\uf0e064\uf0e01 that require 4.2M network parameters and 1\uf0e064\uf0e0128\uf0e0256\uf0e0512\uf0e0256 \uf0e0 128\uf0e064\uf0e01, which require about 8.5M network parameters respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "However, we also experimented with UNet, ResUNet, RUNet, and R2UNet models with following structure: 1\uf0e016\uf0e032\uf0e064\uf0e0128\uf0e064 \uf0e0 32\uf0e016\uf0e01.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In this case we used a time-step of t=3, which refers to one forward convolution layer followed by three subsequent recurrent convolutional layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This network was tested on skin and lung lesion segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Though the number of network parameters increase little bit with respect to the time-step in the recurrent convolution layer, further improved performance can be clearly seen in the last rows of Table II and III.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, we have evaluated both of the proposed models for patch-based modeling on retina blood vessel segmentation and end-to-end image-based methods for skin and lung lesion segmentation.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "E. Computational time",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "The computational time for testing per sample is shown in Table V for blood vessel segmentation for retina images, skin cancer, and lung segmentation respectively.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "V. CONCLUSION AND FUTURE WORKS",
+      "selected_sentences": [
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "In this paper, we proposed an extension of the UNet architecture using Recurrent Convolutional Neural Networks and Recurrent Residual Convolutional Neural Networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The proposed models are called \"RUNet\" and \"R2UNet\" respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "These models were evaluated using three different applications in the field of medical imaging including retina blood vessel segmentation, skin cancer lesion segmentation, and lung segmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The experimental results demonstrate that the proposed RUNet, and R2UNet models show better performance in segmentation tasks with the same number of network parameters when compared to existing methods including the UNet and residual UNet (or ResUNet) models on all three datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In addition, results show that these proposed models not only ensure better performance during the training but also in testing phase.",
+              "tag": "Other"
+            },
+            {
+              "sent": "In future, we would like to explore the same architecture with a novel feature fusion strategy from encoding to the decoding units.",
+              "tag": "Other"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "OWADAYS DL provides state-of-the-art performance for image classification [1], segmentation [2], detection and tracking [3], and captioning [4]. Since 2012, several Deep Convolutional Neural Network (DCNN) models have been proposed such as AlexNet [1], VGG [5], GoogleNet [6], Residual Net [7], DenseNet [8], and CapsuleNet [9][65]. A DL based approach (CNN in particular) provides state-of-the-art performance for classification and segmentation tasks for several reasons: first, activation functions resolve training problems in DL approaches. Second, dropout helps regularize the networks. Third, several efficient optimization techniques"
+}

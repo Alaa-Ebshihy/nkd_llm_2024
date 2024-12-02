@@ -1,0 +1,374 @@
+{
+  "paper_id": "1606.02891",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We participated in the WMT 2016 shared news translation task by building neural translation systems for four language pairs, each trained in both directions:",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our systems are based on an attentional encoder-decoder, using BPE subword segmentation for open-vocabulary translation with a fixed vocabulary.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We experimented with using automatic back-translations of the monolingual News corpus as additional training data, pervasive dropout, and target-bidirectional models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "All reported methods give substantial improvements, and we see improvements of 4.3-11.2",
+              "tag": "Result"
+            },
+            {
+              "sent": "In the human evaluation, our systems were the (tied) best constrained system for 7 out of 8 translation directions in which we participated. 1 2",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "We participated in the WMT 2016 shared news translation task by building neural translation systems for four language pairs: English\u2194Czech, English\u2194German, English\u2194Romanian and English\u2194Russian.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Our systems are based on an attentional encoder-decoder (Bahdanau et al, 2015), using BPE subword segmentation for open-vocabulary translation with a fixed vocabulary (Sennrich et al, 2016b).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We experimented with using automatic backtranslations of the monolingual News corpus as 1 We have released the implementation that we used for the experiments as an open source toolkit: https://github.com/rsennrich/nematus 2 We have released scripts, sample configs, synthetic training data and trained models: https://github.com/rsennrich/wmt16-scripts additional training data (Sennrich et al, 2016a), pervasive dropout (Gal, 2015), and targetbidirectional models.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Baseline System",
+      "selected_sentences": [
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Our systems are attentional encoder-decoder networks (Bahdanau et al, 2015).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We base our implementation on the dl4mt-tutorial 3 , which we enhanced with new features such as ensemble decoding and pervasive dropout.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Byte-pair encoding (BPE)",
+      "selected_sentences": [
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "To enable open-vocabulary translation, we segment words via byte-pair encoding (BPE) 5 (Sennrich et al, 2016b).",
+              "tag": "Method"
+            },
+            {
+              "sent": "BPE, originally devised as a compression algorithm (Gage, 1994), is adapted to word segmentation as follows:",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "BPE starts from a character-level segmentation, but as we increase the number of merge operations, it becomes more and more different from a pure character-level model in that frequent character sequences, and even full words, are encoded as a single symbol.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This allows for a trade-off between the size of the model vocabulary and the length of training sequences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The ordered list of merge operations, learned on the training set, can be applied to any text to segment words into subword units that are in-vocabulary in respect to the training set (except for unseen characters).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Synthetic Training Data",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "We exploit this monolingual data for training as described in (Sennrich et al, 2016a).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Specifically, we sample a subset of the available target-side monolingual corpora, translate it automatically into the source side of the respective language pair, and then use this synthetic parallel data for training.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For example, for EN\u2192RO, the back-translation is performed with a RO\u2192EN system, and vice-versa.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Sennrich et al (2016a) motivate the use of monolingual data with domain adaptation, reducing overfitting, and better modelling of fluency.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We sample monolingual data from the News Crawl corpora 6 , which is in-domain with respect type DE CS RO RU parallel 4.2 52.0 0.6 2.1 synthetic ( * \u2192EN) 4.2 10.0 2.0 2.0 synthetic (EN\u2192 * ) 3.6 8.2 2.3 2.0",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "The amount of monolingual data backtranslated for each translation direction ranges from 2 million to 10 million sentences.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Statistics about the amount of parallel and synthetic training data are shown in Table 1.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With dl4mt, we observed a translation speed of about 200 000 sentences per day (on a single Titan X GPU).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Pervasive Dropout",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Target-bidirectional Translation",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "English\u2194German",
+      "selected_sentences": [
+        {
+          "par_id": 25,
+          "sentences": [
+            {
+              "sent": "Table 2 shows results for English\u2194German.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We observe improvements of 3.4-5.7 BLEU from training with a mix of parallel and synthetic data, compared to the baseline that is only trained on parallel data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using an ensemble of the last 4 checkpoints gives further improvements (1.3-1.7 BLEU).",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our submitted system includes reranking of the 50-best output of the left-to-right model with a right-to-left model -again an ensemble of the last 4 checkpoints -with uniform weights.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This yields an improvements of 0.6-1.1 BLEU.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "English\u2194Czech",
+      "selected_sentences": [
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "The right-left model was trained using a similar process, but with the target side of the parallel corpus reversed prior to training.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The resulting model had a slightly lower BLEU score on the dev data than the standard left-right model.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can see in Table 3 that back-translation improves performance by 2.2-2.8",
+              "tag": "Result"
+            },
+            {
+              "sent": "BLEU, and that the final system (+r2l reranking) improves by 0.7-1.0",
+              "tag": "Result"
+            },
+            {
+              "sent": "BLEU on the ensemble of 4, and 4.3-4.9 on the baseline.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "For Czech\u2192English the training process was similar to the above, except that we created the synthetic training data (back-translated from samples of news2015 monolingual English) in batches of 2.5M, and so were able to observe the effect of increasing the amount of synthetic data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After training a baseline model on all the WMT16 parallel set, we continued training with a parallel corpus consisting of 2 copies of the 2.5M sentences of back-translated data, 5 copies of newscommentary v11, and a matching quantity of data sampled from Czeng 1.6pre.",
+              "tag": "Method"
+            },
+            {
+              "sent": "After training this to convergence, we restarted training from the baseline model using 5M sentences of back-translated data, 5 copies of news-commentary v11, and a matching quantity of data sampled from Czeng 1.6pre.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We repeated this with 7.5M sentences from news2015 monolingual, and then with 10M sentences of news2015.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The back-translations were, as for English\u2192Czech, created with an earlier NMT model trained on WMT15 data.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our final Czech\u2192English was an ensemble of 8 systems -the last 4 save-points of the 10M synthetic data run, and the last 4 save-points of the 7.5M run.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We show this as ensemble8 in Table 3, and the +synthetic results are on the last (ie comes with the first batch, but increasing the amount of back-translated data does gradually improve performance.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "English\u2194Romanian",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "The results of our English\u2194Romanian experiments are shown in Table 5.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This language pair has the smallest amount of parallel training data, and we found dropout to be very effective, yielding improvements of 4-5 BLEU. 7 e found that the use of diacritics was inconsistent in the Romanian training (and development) data, so for Romanian\u2192English we removed diacritics from the Romanian source side, obtaining improvements of 1.3-1.4",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "Synthetic training data gives improvements of 4.1-5.1 BLEU. for English\u2192Romanian, we found that the best single system outperformed the ensemble of the last 4 checkpoints on dev, and we thus submitted the best single system as primary system.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "English\u2194Russian",
+      "selected_sentences": [
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "For English\u2194Russian, we cannot effectively learn BPE on the joint vocabulary because alphabets differ.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We thus follow the approach described in (Sennrich et al, 2016b), first mapping the Russian text into Latin characters via ISO-9 transliteration, then learning the BPE operations on the concatenation of the English and latinized Russian training data, then mapping the BPE operations back into Cyrillic alphabet.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We apply the Latin BPE operations to the English data (training data and input), and both the Cyrillic and Latin BPE operations to the Russian data.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "Translation results are shown in Table 6.",
+              "tag": "Result"
+            },
+            {
+              "sent": "As for the other language pairs, we observe strong improvements from synthetic training data (4-4.4",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Shared Task Results",
+      "selected_sentences": [
+        {
+          "par_id": 33,
+          "sentences": [
+            {
+              "sent": "Table 7 shows the ranking of our submitted systems at the WMT16 shared news translation task.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our submissions are ranked (tied) first for 5 out of 8 translation directions in which we participated: EN\u2194CS, EN\u2194DE, and EN\u2192RO.",
+              "tag": "Result"
+            },
+            {
+              "sent": "They are also the (tied) best constrained system for EN\u2192RU and RO\u2192EN, or 7 out of 8 translation directions in total.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "We describe Edinburgh's neural machine translation systems for the WMT16 shared news translation task.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For all translation directions, we observe large improvements in translation quality from using synthetic parallel training data, obtained by back-translating in-domain monolingual target-side data.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Pervasive dropout on all layers was used for English\u2194Romanian, and gave substantial improvements.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For English\u2194German and English\u2192Czech, we trained a right-to-left model with reversed target side, and we found reranking the system output with these reversed models helpful.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Edinburgh Neural Machine Translation Systems for WMT 16"
+}

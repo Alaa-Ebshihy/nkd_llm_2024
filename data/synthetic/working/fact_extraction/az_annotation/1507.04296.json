@@ -1,0 +1,434 @@
+{
+  "paper_id": "1507.04296",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We present the first massively distributed architecture for deep reinforcement learning.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This architecture uses four main components: parallel actors that generate new behaviour; parallel learners that are trained from stored experience; a distributed neural network to represent the value function or behaviour policy; and a distributed store of experience.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We used our architecture to implement the Deep QNetwork algorithm (DQN) (Mnih et al, 2013).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our distributed algorithm was applied to 49 games from Atari 2600 games from the Arcade Learning Environment, using identical hyperparameters.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our performance surpassed non-distributed DQN in 41 of the 49 games and also reduced the wall-time required to achieve these results by an order of magnitude on most games.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Deep learning methods have recently achieved state-ofthe-art results in vision and speech domains (Krizhevsky et al, 2012;Simonyan & Zisserman, 2014;Szegedy et al, 2014;Graves et al, 2013;Dahl et al, 2012), mainly due to their ability to automatically learn high-level features from a supervised signal.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Recent advances in reinforcement learning (RL) have successfully combined deep learning with value function approximation, by using a deep convolutional neural network to represent the action-value (Q) function (Mnih et al, 2013).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, a new method for training such deep Q-networks, known as DQN, has enabled RL to learn control policies in complex environments with high dimensional images as inputs (Mnih et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This method outperformed a human professional in many Presented at the Deep Learning Workshop, International Conference on Machine Learning, Lille, France, 2015. games on the Atari 2600 platform, using the same network architecture and hyper-parameters.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, DQN has only previously been applied to single-machine architectures, in practice leading to long training times.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, it took 12-14 days on a GPU to train the DQN algorithm on a single Atari game (Mnih et al, 2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this work, our goal is to build a distributed architecture that enables us to scale up deep reinforcement learning algorithms such as DQN by exploiting massive computational resources.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "One of the main advantages of deep learning is that computation can be easily parallelized.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In order to exploit this scalability, deep learning algorithms have made extensive use of hardware advances such as GPUs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, recent approaches have focused on massively distributed architectures that can learn from more data in parallel and therefore outperform training on a single machine (Coates et al, 2013;Dean et al, 2012).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, the DistBelief framework (Dean et al, 2012) distributes the neural network parameters across many machines, and parallelizes the training by using asynchronous stochastic gradient descent (ASGD).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "DistBelief has been used to achieve stateof-the-art results in several domains (Szegedy et al, 2014) and has been shown to be much faster than single GPU training (Dean et al, 2012).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Existing work on distributed deep learning has focused exclusively on supervised and unsupervised learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this paper we develop a new architecture for the reinforcement learning paradigm.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This architecture consists of four main components: parallel actors that generate new behaviour; parallel learners that are trained from stored experience; a distributed neural network to represent the value function or behaviour policy; and a distributed experience replay memory.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "A unique property of RL is that an agent influences the training data distribution by interacting with its environment.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In order to generate more data, we deploy multiple agents running in parallel that interact with multiple",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each such actor can store its own record of past experience, effectively providing a distributed experience replay memory with vastly increased capacity compared to a single machine implementation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Alternatively this experience can be explicitly aggregated into a distributed database.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition to generating more data, distributed actors can explore the state space more effectively, as each actor behaves according to a slightly different policy.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "A conceptually distinct set of distributed learners reads samples of stored experience from the experience replay memory, and updates the value function or policy according to a given RL algorithm.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Specifically, we focus in this paper on a variant of the DQN algorithm, which applies ASGD updates to the parameters of the Q-network.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As in DistBelief, the parameters of the Q-network may also be distributed over many machines.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "We applied our distributed framework for RL, known as Gorila (General Reinforcement Learning Architecture), to create a massively distributed version of the DQN algorithm.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We applied Gorila DQN to 49 games on the Atari 2600 platform.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We outperformed single GPU DQN on 41 games and outperformed human professional on 25 games.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Gorila DQN also trained much faster than the nondistributed version in terms of wall-time, reaching the performance of single GPU DQN roughly ten times faster for most games.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "DistBelief",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Replay Memory",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Deep Q-Networks",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "Recently, a new RL algorithm has been developed which is in practice much more stable when combined with deep Qnetworks (Mnih et al, 2013;2015).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Like Q-learning, it iteratively solves the Bellman equation by adjusting the parameters of the Q-network towards the Bellman target.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, DQN, as shown in Figure 1 differs from Q-learning in two ways.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, DQN uses experience replay (Lin, 1993).",
+              "tag": "Method"
+            },
+            {
+              "sent": "At each time-step t during an agent's interaction with the environment it stores the experience tuple e t = (s t , a t , r t , s t+1 ) into a replay memory D t = {e 1 , ..., e t }.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Distributed Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "We now introduce Gorila (General Reinforcement Learning Architecture), a framework for massively distributed reinforcement learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The Gorila architecture, shown in Figure 2 contains the following components:",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "The experience tuples e i t = (s i t , a i t , r i t , s i t+1 ) generated by the actors are stored in a replay memory D. We consider two forms of experience replay memory.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, a local replay memory stores each actor's experience D i t = {e i 1 , ..., e i t } locally on that actor's machine.",
+              "tag": "Method"
+            },
+            {
+              "sent": "If a single machine has sufficient memory to store M experience tuples, then the overall memory capacity becomes M N act .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Second, a global replay memory aggregates the experience into a distributed database.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In this approach the overall memory capacity is independent of N act and may be scaled as desired, at the cost of additional communication overhead.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "Gorila contains N learn learner processes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each learner contains a replica of the Q-network and its job is to compute desired changes to the parameters of the Qnetwork.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For each learner update k, a minibatch of experience tuples e = (s, a, r, s ) is sampled from either a local or global experience replay memory D (see above).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The learner applies an off-policy RL algorithm such as DQN (Mnih et al, 2013) to this minibatch of experience, in order to generate a gradient vector g i . 1 The gradients g i are communicated to the parameter server; and the parameters 1 The experience in the replay memory is generated by old behavior policies which are most likely different to the current behavior of the agent; therefore all updates must be performed offpolicy (Sutton & Barto, 1998).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "The Gorila architecture provides considerable flexibility in the number of ways an RL agent may be parallelized.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It is possible to have parallel acting to generate large quantities of data into a global replay database, and then process that data with a single serial learner.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In contrast, it is possible to have a single actor generating data into a local replay memory, and then have multiple learners process this data in parallel to learn as effectively as possible from this experience.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, to avoid any individual component from becoming a bottleneck, the Gorila architecture in general allows for arbitrary numbers of actors, learners, and parameter servers to both generate data, learn from that data, and update the model in a scalable and fully distributed fashion.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Gorila DQN",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Stability",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experimental Set Up",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "We evaluated Gorila by conducting experiments on 49 Atari 2600 games using the Arcade Learning Environment (Bellemare et al, 2012).",
+              "tag": "Method"
+            },
+            {
+              "sent": "Atari games provide a challenging and diverse set of reinforcement learning problems where an agent must learn to play the games directly from 210 \u00d7 160 RGB video input with only the changes in the score provided as rewards.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We closely followed the experimental setup of DQN (Mnih et al, 2015) using the same preprocessing and network architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We preprocessed the 210 \u00d7 160 RGB images by downsampling them to 84 \u00d7 84 and extracting the luminance channel.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Evaluation",
+      "selected_sentences": [
+        {
+          "par_id": 44,
+          "sentences": [
+            {
+              "sent": "In order to make it easier to compare results on 49 games with a greatly varying range of scores we present the results on a scale where 0 is the score obtained by a random agent and 100 is the score obtained by a professional human game player.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The random agent selected actions uniformly at random at 10Hz and it was evaluated using the same starting states as the agents for both kinds of evaluations (null op starts and human starts).",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": [
+        {
+          "par_id": 46,
+          "sentences": [
+            {
+              "sent": "Figure 3 shows the normalized scores under the human starts evaluation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Using human starts Gorila DQN outperformed single GPU DQN on 41 out of 49 games given roughly one half of the training time of single GPU DQN.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On 22 of the games Gorila DQN obtained double the score of single GPU DQN, and on 11 games Gorila DQN's score was 5 times higher.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Similarly, using the original null op starts evaluation Gorila DQN outperformed the single GPU DQN on 31 out of 49 games.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results show that parallel training significantly improved performance in less training time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Also, better results on human starts compared to null op starts suggest that Gorila DQN is especially good at generalizing to potentially unseen states compared to single GPU DQN. scores from null op starts (gray bars).",
+              "tag": "Result"
+            },
+            {
+              "sent": "In fact, Gorila DQN performs at a level similar or superior to a human professional (75% of the human score or above) in 25 games despite starting from states sampled from human play.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "One possible reason for the improved generalization is the significant increase in the number of states Gorila DQN sees by using 100 parallel actors.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 48,
+          "sentences": [
+            {
+              "sent": "In this paper we have introduced the first massively distributed architecture for deep reinforcement learning.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The Gorila architecture acts and learns in parallel, using a distributed replay memory and distributed neural network.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We applied Gorila to an asynchronous variant of the state-of-the-art DQN algorithm.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A single machine had previously achieved state-of-the-art results in the challenging suite of Atari 2600 games, but it was not previously known whether the good performance of DQN would continue to scale with additional computation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "By leveraging massive parallelism, Gorila DQN significantly outperformed singleGPU DQN on 41 out of 49 games; achieving by far the best results in this domain to date.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Gorila takes a further step towards fulfilling the promise of deep learning in RL: a scalable architecture that performs better and better with increased computation and memory.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Massively Parallel Methods for Deep Reinforcement Learning"
+}

@@ -1,0 +1,529 @@
+{
+  "paper_id": "1509.01626",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "This article offers an empirical exploration on the use of character-level convolutional networks (ConvNets) for text classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We constructed several largescale datasets to show that character-level convolutional networks could achieve state-of-the-art or competitive results.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Comparisons are offered against traditional models such as bag of words, n-grams and their TFIDF variants, and deep learning models such as word-based ConvNets and recurrent neural networks.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "* An early version of this work entitled \"Text Understanding from Scratch\" was posted in Feb 2015 as .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The present paper has considerably more experimental results and a rewritten introduction.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "On the other hand, many researchers have found convolutional networks (ConvNets) [17] [18] are useful in extracting information from raw signals, ranging from computer vision applications to speech recognition and others.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, time-delay networks used in the early days of deep learning research are essentially convolutional networks that model sequential data [1] [31].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this article we explore treating text as a kind of raw signal at character level, and applying temporal (one-dimensional) ConvNets to it.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For this article we only used a classification task as a way to exemplify ConvNets' ability to understand texts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Historically we know that ConvNets usually require large-scale datasets to work, therefore we also build several of them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "An extensive set of comparisons is offered with traditional models and other deep learning models.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Applying convolutional networks to text classification or natural language processing at large was explored in literature.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It has been shown that ConvNets can be directly applied to distributed [6] [16] or discrete [13] embedding of words, without any knowledge on the syntactic or semantic structures of a language.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These approaches have been proven to be competitive to traditional models.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "There are also related works that use character-level features for language processing.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "These include using character-level n-grams with linear classifiers [15], and incorporating character-level features to ConvNets [28] [29].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In particular, these ConvNet approaches use words as a basis, in which character-level features extracted at word [28] or word n-gram [29] level form a distributed representation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Improvements for part-of-speech tagging and information retrieval were observed.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This article is the first to apply ConvNets only on characters.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We show that when trained on largescale datasets, deep ConvNets do not require the knowledge of words, in addition to the conclusion from previous research that ConvNets do not require the knowledge about the syntactic or semantic structure of a language.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This simplification of engineering could be crucial for a single system that can work for different languages, since characters always constitute a necessary construct regardless of whether segmentation into words is possible.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Working on only characters also has the advantage that abnormal character combinations such as misspellings and emoticons may be naturally learnt.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Character-level Convolutional Networks",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In this section, we introduce the design of character-level ConvNets for text classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The design is modular, where the gradients are obtained by back-propagation [27] to perform optimization.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Key Modules",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "One key module that helped us to train deeper models is temporal max-pooling.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is the 1D version of the max-pooling module used in computer vision [2].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Given a discrete input function g",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Character quantization",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model Design",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Data Augmentation using Thesaurus",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Comparison Models",
+      "selected_sentences": [
+        {
+          "par_id": 22,
+          "sentences": [
+            {
+              "sent": "To offer fair comparisons to competitive models, we conducted a series of experiments with both traditional and deep learning methods.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We tried our best to choose models that can provide comparable and competitive results, and the results are reported faithfully without any model selection.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Traditional Methods",
+      "selected_sentences": [
+        {
+          "par_id": 24,
+          "sentences": [
+            {
+              "sent": "For each dataset, the bag-of-words model is constructed by selecting 50,000 most frequent words from the training subset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the normal bag-of-words, we use the counts of each word as the features.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the TFIDF (term-frequency inverse-document-frequency) [14] version, we use the counts as the term-frequency.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The inverse document frequency is the logarithm of the division between total number of samples and number of samples with the word in the training subset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The features are normalized by dividing the largest feature value.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "We also have an experimental model that uses k-means on word2vec [23] learnt from the training subset of each dataset, and then use these learnt means as representatives of the clustered words.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We take into consideration all the words that appeared more than 5 times in the training subset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The dimension of the embedding is 300.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The bag-of-means features are computed the same way as in the bag-of-words model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The number of means is 5000.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Deep Learning Methods",
+      "selected_sentences": [
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "Recently deep learning methods have started to be applied to text classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We choose two simple and representative models for comparison, in which one is word-based ConvNet and the other a simple long-short term memory (LSTM) [11] recurrent neural network model.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Among the large number of recent works on word-based ConvNets for text classification, one of the differences is the choice of using pretrained or end-to-end learned word representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We offer comparisons with both using the pretrained word2vec [23] embedding [16] and using lookup tables [5].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The embedding size is 300 in both cases, in the same way as our bagof-means model.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To ensure fair comparison, the models for each case are of the same size as our character-level ConvNets, in terms of both the number of layers and each layer's output size.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments using a thesaurus for data augmentation are also conducted.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also offer a comparison with a recurrent neural network model, namely long-short term memory (LSTM) [11].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The LSTM model used in our case is word-based, using pretrained word2vec embedding of size 300 as in previous models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The model is formed by taking mean of the outputs of all LSTM cells to form a feature vector, and then using multinomial logistic regression on this feature vector.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The variant of LSTM we used is the common \"vanilla\" architecture [8] [9].",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also used gradient clipping [25] in which the gradient norm is limited to 5. Figure 2 gives an illustration.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Choice of Alphabet",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Large-scale Datasets and Results",
+      "selected_sentences": [
+        {
+          "par_id": 30,
+          "sentences": [
+            {
+              "sent": "Previous research on ConvNets in different areas has shown that they usually work well with largescale datasets, especially when the model takes in low-level raw features like characters in our case.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, most open datasets for text classification are quite small, and large-scale datasets are splitted with a significantly smaller training set than testing [21].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, instead of confusing our community more by using them, we built several large-scale datasets for our experiments, ranging from hundreds of thousands to several millions of samples.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset is a combination of the SogouCA and SogouCS news corpora [32], containing in total 2,909,551 news articles in various topic channels.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We then labeled each piece of news using its URL, by manually classifying the their domain names.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This gives us a large corpus of news articles labeled with their categories.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "There are a large number categories but most of them contain only few articles.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We choose 5 categories -\"sports\", \"finance\", \"entertainment\", \"automobile\" and \"technology\".",
+              "tag": "Method"
+            },
+            {
+              "sent": "The number of training samples selected for each class is 90,000 and testing 12,000.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Although this is a dataset in Chinese, we used pypinyin package combined with jieba Chinese segmentation system to produce Pinyin -a phonetic romanization of Chinese.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The models for English can then be applied to this dataset without change.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The fields used are title and content.",
+              "tag": "Method"
+            },
+            {
+              "sent": "DBpedia is a crowd-sourced community effort to extract structured information from Wikipedia [19].",
+              "tag": "Method"
+            },
+            {
+              "sent": "The DBpedia ontology dataset is constructed by picking 14 nonoverlapping classes from DBpedia 2014.",
+              "tag": "Method"
+            },
+            {
+              "sent": "From each of these 14 ontology classes, we randomly choose 40,000 training samples and 5,000 testing samples.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The fields we used for this dataset contain title and abstract of each Wikipedia article.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 31,
+          "sentences": [
+            {
+              "sent": "The Yelp reviews dataset is obtained from the Yelp Dataset Challenge in 2015.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This dataset contains 1,569,264 samples that have review texts.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Two classification tasks are constructed from this dataset -one predicting full number of stars the user has given, and the other predicting a polarity label by considering stars 1 and 2 negative, and 3 and 4 positive.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The full dataset has 130,000 training samples and 10,000 testing samples in each star, and the polarity dataset has 280,000 training samples and 19,000 test samples in each polarity.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "Answers Comprehensive Questions and Answers version 1.0 dataset through the Yahoo!",
+              "tag": "Method"
+            },
+            {
+              "sent": "The corpus contains 4,483,032 questions and their answers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We constructed a topic classification dataset from this corpus using 10 largest main categories.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Each class contains 140,000 training samples and 5,000 testing samples.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The fields we used include question title, question content and best answer.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "Table 4 lists all the testing errors we obtained from these datasets for all the applicable models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Note that since we do not have a Chinese thesaurus, the Sogou News dataset does not have any results using thesaurus augmentation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We labeled the best result in blue and worse result in red.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To understand the results in table 4 further, we offer some empirical analysis in this section.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To facilitate our analysis, we present the relative errors in figure 3 with respect to comparison models. of these plots is computed by taking the difference between errors on comparison model and our character-level ConvNet model, then divided by the comparison model error.",
+              "tag": "Method"
+            },
+            {
+              "sent": "All ConvNets in the figure are the large models with thesaurus augmentation respectively.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 35,
+          "sentences": [
+            {
+              "sent": "Character-level ConvNet is an effective method.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "The most important conclusion from our experiments is that character-level ConvNets could work for text classification without the need for words.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This is a strong indication that language could also be thought of as a signal no different from any other kind.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 4 shows 12 random first-layer patches learnt by one of our character-level ConvNets for DBPedia dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Dataset size forms a dichotomy between traditional and ConvNets models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The most obvious trend coming from all the plots in figure 3 is that the larger datasets tend to perform better.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Traditional methods like n-grams TFIDF remain strong candidates for dataset of size up to several hundreds of thousands, and only until the dataset goes to the scale of several millions do we observe that character-level ConvNets start to do better.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion and Outlook",
+      "selected_sentences": [
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "This article offers an empirical study on character-level convolutional networks for text classification.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We compared with a large number of traditional and deep learning models using several largescale datasets.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On one hand, analysis shows that character-level ConvNet is an effective method.",
+              "tag": "Result"
+            },
+            {
+              "sent": "On the other hand, how well our model performs in comparisons depends on many factors, such as dataset size, whether the texts are curated and choice of alphabet.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Character-level Convolutional Networks for Text Classification *"
+}

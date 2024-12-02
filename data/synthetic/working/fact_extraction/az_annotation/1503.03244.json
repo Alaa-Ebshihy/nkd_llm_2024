@@ -1,0 +1,412 @@
+{
+  "paper_id": "1503.03244",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Semantic matching is of central importance to many natural language tasks [2,28].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A successful matching algorithm needs to adequately model the internal structures of language objects and the interaction between them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a step toward this goal, we propose convolutional neural network models for matching two sentences, by adapting the convolutional strategy in vision and speech.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The proposed models not only nicely represent the hierarchical structures of sentences with their layerby-layer composition and pooling, but also capture the rich matching patterns at different levels.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Our models are rather generic, requiring no prior knowledge on language, and can hence be applied to matching tasks of different nature and in different languages.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The empirical study on a variety of matching tasks demonstrates the efficacy of the proposed model on a variety of matching tasks and its superiority to competitor models.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Matching two potentially heterogenous language objects is central to many natural language applications [28,2].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It generalizes the conventional notion of similarity (eg, in paraphrase identification [19]) or relevance (eg, in information retrieval [27]), since it aims to model the correspondence between \"linguistic objects\" of different nature at different levels of abstractions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Examples include top-k re-ranking in machine translation (eg, comparing the meanings of a French sentence and an English sentence [5]) and dialogue (eg, evaluating the appropriateness of a response to a given utterance [26]).",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Natural language sentences have complicated structures, both sequential and hierarchical, that are essential for understanding them.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A successful sentence-matching algorithm therefore needs to capture not only the internal structures of sentences but also the rich patterns in their interactions.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Towards this end, we propose deep neural network models, which adapt the convolutional strategy (proven successful on image [11] and speech [1]) to natural language.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "To further explore the relation between representing sentences and matching them, we devise a novel model that can naturally host both the hierarchical composition for sentences and the simple-to-comprehensive fusion of matching patterns with the same convolutional architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our model is generic, requiring no prior knowledge of natural language (eg, parse tree) and putting essentially no constraints on the matching tasks.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This is part of our continuing effort 1 in understanding natural language objects and the matching between them [13,26].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "Our main contributions can be summarized as follows.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, we devise novel deep convolutional network architectures that can naturally combine 1) the hierarchical sentence modeling through layer-by-layer composition and pooling, and 2) the capturing of the rich matching patterns at different levels of abstraction; Second, we perform extensive empirical study on tasks with different scales and characteristics, and demonstrate the superior power of the proposed architectures over competitor methods.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "Roadmap We start by introducing a convolution network in Section 2 as the basic architecture for sentence modeling, and how it is related to existing sentence models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Based on that, in Section 3, we propose two architectures for sentence matching, with a detailed discussion of their relation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In Section 4, we briefly discuss the learning of the proposed architectures.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Then in Section 5, we report our empirical study, followed by a brief discussion of related work in Section 6.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Convolutional Sentence Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Some Analysis on the Convolutional Architecture",
+      "selected_sentences": [
+        {
+          "par_id": 16,
+          "sentences": [
+            {
+              "sent": "Relation to Recursive Models Our convolutional model differs from Recurrent Neural Network (RNN, [15]) and Recursive AutoEncoder (RAE, [21]) in several important ways.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, unlike RAE, it does not take a single path of word/phrase composition determined either by a separate gating function [21], an external parser [19], or just natural sequential order [20].",
+              "tag": "Method"
+            },
+            {
+              "sent": "Instead, it takes multiple choices of composition via a large feature map (encoded in w ( ,f ) for different f ), and leaves the choices to the pooling afterwards to pick the more appropriate segments(in every adjacent two) for each composition.",
+              "tag": "Method"
+            },
+            {
+              "sent": "With any window width k \u2265 3, the type of composition would be much richer than that of RAE.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, our convolutional model can take supervised training and tune the parameters for a specific task, a property vital to our supervised learning-to-match framework.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, unlike recursive models [20,21], the convolutional architecture has a fixed depth, which bounds the level of composition it could do.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For tasks like matching, this limitation can be largely compensated with a network afterwards that can take a \"global\" synthesis on the learned sentence representation.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Relation to \"Shallow\" Convolutional Models",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Convolutional Matching Models",
+      "selected_sentences": [
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Based on the discussion in Section 2, we propose two related convolutional architectures, namely ARCI and ARCII), for matching two sentences.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Architecture-I (ARC-I)",
+      "selected_sentences": [
+        {
+          "par_id": 19,
+          "sentences": [
+            {
+              "sent": "ArchitectureI (ARCI), as illustrated in Figure 3, takes a conventional approach: It first finds the representation of each sentence, and then compares the representation for the two sentences with a multi-layer perceptron (MLP) [3].",
+              "tag": "Method"
+            },
+            {
+              "sent": "It is essentially the Siamese architecture introduced in [2,11], which has been applied to different tasks as a nonlinear similarity function [23].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Although ARCI enjoys the flexibility brought by the convolutional sentence model, it suffers from a drawback inherited from the Siamese architecture: it defers the interaction between two sentences (in the final MLP) to until their individual representation matures (in the convolution model), therefore runs at the risk of losing details (eg, a city name) important for the matching task in representing the sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In other words, in the forward phase (prediction), the representation of each sentence is formed without knowledge of each other.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This cannot be adequately circumvented in backward phase (learning), when the convolutional model learns to extract structures informative for matching on a population level.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Architecture-II (ARC-II)",
+      "selected_sentences": [
+        {
+          "par_id": 27,
+          "sentences": [
+            {
+              "sent": "concatenates the corresponding vectors from its 2D receptive field in Layer-\u22121.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This pooling has different mechanism as in the 1D case, for it selects not only among compositions on different segments but also among different local matchings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "This pooling strategy resembles the dynamic pooling in [19] in a similarity learning context, but with two distinctions: 1) it happens on a fixed architecture and 2) it has much richer structure than just similarity.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The orders is however retained in a \"conditional\" sense.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our experiments show that when ARCII is trained on the (S X , S Y , SY ) triples where SY randomly shuffles the words in S Y , it consistently gains some ability of finding the correct S Y in the usual contrastive negative sampling setting, which however does not happen with ARCI.",
+              "tag": "Result"
+            }
+          ]
+        },
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Model Generality It is not hard to show that ARCII actually subsumes ARCI as a special case.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Indeed, in ARCII if we choose (by turning off some parameters in W ( ,\u2022) ) to keep the representations of the two sentences separated until the final MLP, ARCII can actually act fully like ARCI, as illustrated in Figure 6.",
+              "tag": "Method"
+            },
+            {
+              "sent": "More specifically, if we let the feature maps in the first convolution layer to be either devoted to S X or devoted to S Y (instead of taking both as in general case), the output of each segment-pair is naturally divided into two corresponding groups.",
+              "tag": "Method"
+            },
+            {
+              "sent": "As a result, the output for each filter f , denoted z (1,f ) 1:n,1:n (n is the number of sliding windows), will be of rank-one, possessing essentially the same information as the result of the first convolution layer in ARCI.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Clearly the 2D pooling that follows will reduce to 1D pooling, with this separateness preserved.",
+              "tag": "Method"
+            },
+            {
+              "sent": "If we further limit the parameters in the second convolution units (more specifically w (2,f ) ) to those for S X and S Y , we can ensure the individual development of different levels of abstraction on each side, and fully recover the functionality of ARCI.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "As suggested by the order-preserving property and the generality of ARCII, this architecture offers not only the capability but also the inductive bias for the individual development of internal abstraction on each sentence, despite the fact that it is built on the interaction between two sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a result, ARCII can naturally blend two seemingly diverging processes: 1) the successive composition within each sentence, and 2) the extraction and fusion of matching patterns between them, hence is powerful for matching linguistic objects with rich structures.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This intuition is verified by the superior performance of ARCII in experiments (Section 5) on different matching tasks.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Training",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "We report the performance of the proposed models on three matching tasks of different nature, and compare it with that of other competitor models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Among them, the first two tasks (namely, Sentence Completion and TweetResponse Matching) are about matching of language objects of heterogenous natures, while the third one (paraphrase identification) is a natural example of matching homogeneous objects.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Moreover, the three tasks involve two languages, different types of matching, and distinctive writing styles, proving the broad applicability of the proposed models.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Competitor Methods",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiment I: Sentence Completion",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Experiment II: Matching",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "As another important observation, convolutional models (ARCI & II, SENNA+MLP) perform favorably over bag-of-words models, indicating the importance of utilizing sequential structures in understanding and matching sentences.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Quite interestingly, as shown by our other experiments, ARCI and ARCII trained purely with random negatives automatically gain some ability in telling whether the words in a given sentence are in right sequential order (with around 60% accuracy for both).",
+              "tag": "Result"
+            },
+            {
+              "sent": "It is therefore a bit surprising that an auxiliary task on identifying the correctness of word order in the response does not enhance the ability of the model on the original matching tasks.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 39,
+          "sentences": [
+            {
+              "sent": "Matching structured objects rarely goes beyond estimating the similarity of objects in the same domain [23,24,19], with few exceptions like [2,18].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "When dealing with language objects, most methods still focus on seeking vectorial representations in a common latent space, and calculating the matching score with inner product [18,25].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Few work has been done on building a deep architecture on the interaction space for texts-pairs, but it is largely based on a bag-of-words representation of text [13].",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 40,
+          "sentences": [
+            {
+              "sent": "Our models are related to the long thread of work on sentence representation.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Aside from the models with recursive nature [15,21,19] (as discussed in Section 2.1), it is fairly common practice to use the sum of word-embedding to represent a short-text, mostly for classification [22].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "There is very little work on convolutional modeling of language.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In addition to [6,18], there is a very recent model on sentence representation with dynamic convolutional neural network [9].",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This work relies heavily on a carefully designed pooling strategy to handle the variable length of sentence with a relatively small feature map, tailored for classification problems with modest sizes.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 41,
+          "sentences": [
+            {
+              "sent": "We propose deep convolutional architectures for matching natural language sentences, which can nicely combine the hierarchical modeling of individual sentences and the patterns of their matching.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 42,
+          "sentences": [
+            {
+              "sent": "Empirical study shows our models can outperform competitors on a variety of matching tasks.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Convolutional Neural Network Architectures for Matching Natural Language Sentences"
+}

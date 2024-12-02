@@ -1,0 +1,449 @@
+{
+  "paper_id": "1809.02279",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "We propose a method of stacking multiple long short-term memory (LSTM) layers for modeling sentences.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In contrast to the conventional stacked LSTMs where only hidden states are fed as input to the next layer, the suggested architecture accepts both hidden and memory cell states of the preceding layer and fuses information from the left and the lower context using the soft gating mechanism of LSTMs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Thus the architecture modulates the amount of information to be delivered not only in horizontal recurrence but also in vertical connections, from which useful features extracted from lower layers are effectively conveyed to upper layers.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We dub this architecture Cellaware Stacked LSTM (CASLSTM) and show from experiments that our models bring significant performance gain over the standard LSTMs on benchmark datasets for natural language inference, paraphrase detection, sentiment classification, and machine translation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also conduct extensive qualitative analysis to understand the internal behavior of the suggested approach.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "Among several variants of the original RNN (Elman, 1990), gated recurrent architectures such as long short-term memory (LSTM) (Hochreiter and Schmidhuber, 1997) and gated recurrent unit (GRU)  have been accepted as de-facto standard choices for RNNs due to their capability of addressing the vanishing and exploding gradient problem and considering long-term dependencies.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Gated RNNs achieve these properties by introducing additional gating units that learn to control the amount of information to be transferred or forgotten (Goodfellow et al, 2016), and are proven to work well without relying on complex optimization algorithms or careful initialization (Sutskever, 2013).",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 6,
+          "sentences": [
+            {
+              "sent": "their ability to capture hierarchical time series (Hermans and Schrauwen, 2013) which are inherent to the nature of the problem being modeled.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However this setting of stacking RNNs might hinder the possibility of more sophisticated structures since the information from lower layers is simply treated as input to the next layer, rather than as another class of state that participates in core RNN computations.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Especially for gated RNNs such as LSTMs and GRUs, this means that the vertical layer-to-layer connections cannot fully benefit from the carefully constructed gating mechanism used in temporal transitions.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "In this paper, we study a method of constructing multi-layer LSTMs where memory cell states from the previous layer are used in controlling the vertical information flow.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "This system utilizes states from the left and the lower context equally in computation of the new state, thus the information from lower layers is elaborately filtered and reflected through a soft gating mechanism.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our method is easy-to-implement, effective, and can replace conventional stacked LSTMs without much modification of the overall architecture.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 8,
+          "sentences": [
+            {
+              "sent": "We call this architecture Cell-aware Stacked LSTM, or CASLSTM, and evaluate our method on multiple benchmark tasks: natural language inference, paraphrase identification, sentiment classification, and machine translation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "From experiments we show that the CASLSTMs consistently outperform typical stacked LSTMs, opening the possibility of performance improvement of architectures based on stacked LSTMs.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "Secondly, we conduct extensive evaluation of the proposed method and empirically prove its effectiveness.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The CASLSTM architecture provides consistent performance gains over the stacked LSTM in all benchmark tasks: natural language inference, paraphrase identification, sentiment classification, and machine translation.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Especially in SNLI, SST-2, and Quora Question Pairs datasets, our models outperform or at least are on par with the state-of-the-art models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We also conduct thorough qualitative analysis to understand the dynamics of the suggested approach.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 13,
+          "sentences": [
+            {
+              "sent": "There is some prior work on methods of stacking RNNs beyond the plain stacked RNNs (Schmidhuber, 1992;El Hihi and Bengio, 1996).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Residual LSTMs (Kim et al, 2017;Tran et al, 2017) add residual connections between the hidden states computed at each LSTM layer, and shortcut-stacked LSTMs (Nie and Bansal, 2017) concatenate hidden states from all previous layers to make the backpropagation path short.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In our method, the lower context is aggregated via a gating mechanism, and we believe it modulates the amount of information to be transmitted in a more efficient and effective way than vector addition or concatenation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Also, compared to concatenation, our method does not significantly increase the number of parameters. 1 Highway LSTMs  and depth-gated LSTMs (Yao et al, 2015) are similar to our proposed models in that they use cell states from the previous layer, and they are successfully applied to the field of automatic speech recognition and language modeling.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However in contrast to CASLSTM, where the additional forget gate aggregates the previous layer states and thus contexts from the left and below participate in computation equitably, in Highway LSTMs and depth-gated LSTMs the states from the previous time step are not considered in computing vertical gates.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The comparison of our method and this architecture is presented in \u00a74.6.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 14,
+          "sentences": [
+            {
+              "sent": "There is another line of research that aims to extend RNNs to operate with multidimensional inputs.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Grid LSTMs (Kalchbrenner et al, 2016) are a general n-dimensional LSTM architecture that accepts n sets of hidden and cell states as input and yields n sets of states as output, in contrast to our architecture, which emits a single set of states.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In their work, the authors utilize 2D and 3D Grid LSTMs in character-level language modeling and machine translation respectively and achieve performance improvement.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Multidimensional RNNs (Graves et al, 2007;Graves and Schmidhuber, 2009) have similar formulation to ours, except that they reflect cell states via simple summation and weights for all columns (vertical layers in our case) are tied.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However they are only employed to model multidimensional data such as images of handwritten text with RNNs, rather than stacking RNN layers for modeling sequential data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "From this view, CASLSTM could be interpreted as an extension of two-dimensional LSTM architecture that accepts a 2D input {h l t } T,L t=1,l=0 where h l t represents the hidden state at time t and layer l.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "The idea of having multiple states is also related to tree-structured RNNs (Goller and Kuchler, 1996;Socher et al, 2011).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Among them, tree-structured LSTMs (treeLSTMs) (Tai et al, 2015;Zhu et al, 2015;Le and Zuidema, 2015) are similar to ours in that they use both hidden and cell states of children nodes.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In treeLSTMs, states of children nodes are regarded as input, and they participate in computing the states of a parent node equally through weight-shared or weight-unshared projection.",
+              "tag": "Method"
+            },
+            {
+              "sent": "From this perspective, each CASLSTM layer can be seen as a binary treeLSTM where the structures it operates on are fixed to right-branching trees.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model Description",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Stacked LSTMs",
+      "selected_sentences": [
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "are trainable parameters, and \u03c3(\u2022) and tanh(\u2022) are the sigmoid and the hyperbolic tangent function respectively.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Also we assume that h 0 t = x t \u2208 R d 0 where x t is the t-th element of an input sequence.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The input gate i l t and the forget gate f l t control the amount of information transmitted from cl t and c l t\u22121 , the candidate cell state and the previous cell state, to the new cell state c l t .",
+              "tag": "Method"
+            },
+            {
+              "sent": "Similarly the output gate o l t soft-selects which portion of the cell state c l t is to be used in the final hidden state.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We can clearly see that the cell states c l t\u22121 , cl t , c l t play a crucial role in forming horizontal recurrence.",
+              "tag": "Result"
+            },
+            {
+              "sent": "However the current formulation does not consider the cell state from (l \u2212 1)-th layer (c l\u22121 t ) in computation and thus the lower context is reflected only through the rudimentary way, hindering the possibility of controlling vertical information flow.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Cell-aware Stacked LSTMs",
+      "selected_sentences": [
+        {
+          "par_id": 26,
+          "sentences": [
+            {
+              "sent": "where l > 1 and d l = d l\u22121 .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "\u03bb can either be a vector of constants or parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "When l = 1, the equations defined in the previous subsection are used.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Therefore, it can be said that each non-bottom layer of CASLSTM accepts two sets of hidden and cell states-one from the left context and the other from the below context.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The left and the below context participate in computation with the equivalent procedure so that the information from lower layers can be efficiently propagated.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 1 compares CASLSTM to the conventional stacked LSTM architecture, and Figure 2 depicts the computation flow of the CASLSTM.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We argue that considering c l\u22121 t in computation is beneficial for the following reasons.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, contrary to h l\u22121 t , c l\u22121 t contains information which is not filtered by o l\u22121 t .",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Thus a model that directly uses c l\u22121 t does not rely solely on o l\u22121 t for extracting information, due to the fact that it has access to the raw information c l\u22121 t , as in temporal connections.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In other words, o l\u22121 t no longer has to take all responsibility for selecting useful features for both horizontal and vertical transitions, and the burden of selecting information is shared with g l t .",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "Another advantage of using the c l\u22121 t lies in the fact that it directly connects c l\u22121 t and c l t .",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "This direct connection could help and stabilize training, since the terminal error signals can be easily backpropagated to the model parameters by the shortened propagation path.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Figure 3 illustrates paths between the two cell states.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Sentence Encoders",
+      "selected_sentences": [
+        {
+          "par_id": 32,
+          "sentences": [
+            {
+              "sent": "For better modeling of semantics, a bidirectional CASLSTM network may also be used.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the bidirectional case, the representations obtained by left-to-right reading",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experiments",
+      "selected_sentences": [
+        {
+          "par_id": 36,
+          "sentences": [
+            {
+              "sent": "We evaluate our method on three benchmark tasks on sentence encoding: natural language inference (NLI), paraphrase identification (PI), and sentiment classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To further demonstrate the general applicability of our method on text generation, we also evaluate the proposed method on machine translation.",
+              "tag": "Method"
+            },
+            {
+              "sent": "In addition, we conduct analysis on gate values model variations for the understanding of the architecture.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We refer readers to the supplemental material for detailed experimental settings.",
+              "tag": "Method"
+            },
+            {
+              "sent": "The code will be made public for reproduction.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Model",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Natural Language Inference",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Paraphrase Identification",
+      "selected_sentences": [
+        {
+          "par_id": 47,
+          "sentences": [
+            {
+              "sent": "The results on the Quora Question Pairs dataset are summarized in Table 3. Again we can see that our models outperform other models, especially compared to conventional LSTM-based models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Also note that MultiPerspective LSTM , LSTM + ElBiS (Choi et al, 2018a), and REGMAPR (BASE+REG) (Brahma, 2018) in Table 3 are approaches that focus on designing a more sophisticated function for aggregating two sentence vectors, and their aggregation functions could be also applied to our work for further improvement.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Sentiment Classification",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Machine Translation",
+      "selected_sentences": [
+        {
+          "par_id": 54,
+          "sentences": [
+            {
+              "sent": "From Table 5, we can see that the CASLSTM models bring significant performance gains over the baseline model.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Forget Gate Analysis",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Model Variations",
+      "selected_sentences": [
+        {
+          "par_id": 64,
+          "sentences": [
+            {
+              "sent": "Table 6 summarizes the results of model variants.",
+              "tag": "Result"
+            },
+            {
+              "sent": "From the results of baseline and (i), we validate that the selection of \u03bb does not significantly affect performance but introducing \u03bb is beneficial (baseline vs. (ii)) possibly due to its effect on normalizing information from multiple sources, as mentioned in \u00a73.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Also, from the comparison between baseline and (iii), we show that the proposed way of combining the left and the lower contexts leads to better modeling of sentence representations than that of .",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 65,
+          "sentences": [
+            {
+              "sent": "In this paper, we proposed a method of stacking multiple LSTM layers for modeling sentences, dubbed CASLSTM.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It uses not only hidden states but also cell states from the previous layer, for the purpose of controlling the vertical information flow in a more elaborate way.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We evaluated the proposed method on various benchmark tasks: natural language inference, paraphrase identification, and sentiment classification.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Our models outperformed plain LSTM-based models in all experiments and were competitive other state-of-the-art models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "The proposed architecture can replace any stacked LSTM only under one weak restriction-the size of states should be identical across all layers.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Cell-aware Stacked LSTMs for Modeling Sentences"
+}

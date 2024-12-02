@@ -1,0 +1,496 @@
+{
+  "paper_id": "1706.02596",
+  "sections": [
+    {
+      "section_name": "Abstract",
+      "selected_sentences": [
+        {
+          "par_id": 0,
+          "sentences": [
+            {
+              "sent": "Common-sense and background knowledge is required to understand natural language, but in most neural natural language understanding (NLU) systems, this knowledge must be acquired from training corpora during learning, and then it is static at test time.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "We introduce a new architecture for the dynamic integration of explicit background knowledge in NLU models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "A general-purpose reading module reads background knowledge in the form of freetext statements (together with task-specific text inputs) and yields refined word representations to a task-specific NLU architecture that reprocesses the task inputs with these representations.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Experiments on document question answering (DQA) and recognizing textual entailment (RTE) demonstrate the effectiveness and flexibility of the approach.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Analysis shows that our model learns to exploit knowledge in a semantically appropriate way.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Introduction",
+      "selected_sentences": [
+        {
+          "par_id": 2,
+          "sentences": [
+            {
+              "sent": "Understanding natural language depends crucially on common-sense and background knowledge, for example, knowledge about what concepts are expressed by the words being read (lexical knowledge), and what relations hold between these concepts (relational knowledge).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "As a simple illustration, if an agent needs to understand that the statement \"King Farouk signed his abdication\" is entailed by \"King Farouk was exiled to France in 1952, after signing his resignation\", it must know (among other things) that abdication means resignation of a king.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 3,
+          "sentences": [
+            {
+              "sent": "In most neural natural language understanding (NLU) systems, the requisite background knowl-edge is implicitly encoded in the models' parameters.",
+              "tag": "Method"
+            },
+            {
+              "sent": "That is, what background knowledge is present has been learned from task supervision and also by pre-training word embeddings (where distributional properties correlate with certain kinds of useful background knowledge, such as semantic relatedness).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "However, acquisition of background knowledge from static training corpora is limiting for two reasons.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "First, it is unreasonable to expect that all background knowledge that could be important for solving an NLU task can be extracted from a limited amount of training data.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Second, as the world changes, the facts that may influence how a text is understood will likewise change.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In short: building suitably large corpora to capture all relevant information, and keeping the corpus and derived models up to date with changes to the world would be impractical.",
+              "tag": "Claim"
+            }
+          ]
+        },
+        {
+          "par_id": 4,
+          "sentences": [
+            {
+              "sent": "In this paper, we develop a new architecture for dynamically incorporating external background knowledge in NLU models.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Rather than relying only on static knowledge implicitly present in the training data, supplementary knowledge is retrieved from external knowledge sources (in this paper, ConceptNet and Wikipedia) to assist with understanding text inputs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Since NLU systems must already read and understand text inputs, we assume that background knowledge will likewise be provided in text form ( \u00a72).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The retrieved supplementary texts are read together with the task inputs by an initial reading module whose outputs are contextually refined word embeddings ( \u00a73).",
+              "tag": "Method"
+            },
+            {
+              "sent": "These refined embeddings are then used as input to a task-specific NLU architecture (any architecture that reads text as a sequence of word embeddings can be used here).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The initial reading module and the task module are learnt jointly, end-to-end.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 5,
+          "sentences": [
+            {
+              "sent": "We experiment with several different datasets on the tasks of document question answering (DQA) and recognizing textual entailment (RTE) evaluating the impact of our proposed solution with both basic task architectures and a sophisticated task architecture for RTE ( \u00a74).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We find that our embedding refinement strategy is effective ( \u00a75).",
+              "tag": "Result"
+            },
+            {
+              "sent": "On four competitive benchmarks, we show that refinement helps.",
+              "tag": "Result"
+            },
+            {
+              "sent": "First, simply refining the embeddings just using the context (and no additional background information) can improve performance significantly, but adding background knowledge helps further.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our results are competitive with the best systems, achieving a new state of the art on the recent TriviaQA benchmarks.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our success on this task is especially noteworthy because the task-specific architecture is a simple reading architecture, in particular a single layer BiLSTM with a feed-forward neural network for span prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Finally, we provide an analysis demonstrating that our systems are able to exploit background knowledge in a semantically appropriate manner ( \u00a75.3).",
+              "tag": "Method"
+            },
+            {
+              "sent": "It includes, for instance, an experiment showing that our system is capable of making appropriate counterfactual inferences when provided with \"alternative facts\".",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "External Knowledge as Supplementary",
+      "selected_sentences": [
+        {
+          "par_id": 7,
+          "sentences": [
+            {
+              "sent": "Knowledge resources make information that could potentially be useful for improving NLU available in a variety different formats, such as natural language text, (subject, predicate, object)triples, relational databases, and other structured formats.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Rather than tailoring our solution to a particular structured representation, we assume that all supplementary information either already exists in natural language statements (eg, encyclopedias) or can easily be recoded as natural language.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Furthermore, while mapping from unstructured to structured representations is hard, the inverse problem is easy.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "For example, given a triple (abdication, ISA, resignation) we can construct the free-text assertion \"Abdication is a resignation.\"",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Finally, the freetext format means that knowledge that exists only in unstructured text form such as encyclopedic knowledge (eg, Wikipedia) is usable by our system.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Refining Word Embeddings by Reading",
+      "selected_sentences": [
+        {
+          "par_id": 10,
+          "sentences": [
+            {
+              "sent": "Virtually every NLU task-from document classification to translation to question answeringshould in theory be able to benefit from supplementary knowledge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "While one could develop custom architectures for each task so as to read supplementary inputs, we would like ours to augment any existing NLU task architectures with the ability to read relevant information with minimal effort.",
+              "tag": "Method"
+            },
+            {
+              "sent": "To realize this goal, we adopt the strategy of refining word embeddings; that is, we replace static word embeddings with embeddings that are functions of the task inputs and any supplementary inputs.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Word embeddings can be considered a simple form of key-value memory stores that, in our case, not only contain general-purpose knowledge (as in typical neural NLU systems) but also contextual information (including background knowledge).",
+              "tag": "Method"
+            },
+            {
+              "sent": "The use of word-embeddings as memory has the advantage that it is transparent to the task-architecture which kinds of embeddings (refined or unrefined) are used.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Experimental Setup",
+      "selected_sentences": [
+        {
+          "par_id": 17,
+          "sentences": [
+            {
+              "sent": "We run experiments on four benchmarks for two standard NLU tasks: recognizing textual entailment (RTE) and document question answering (DQA).",
+              "tag": "Method"
+            },
+            {
+              "sent": "In the following we describe our experimental setup.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 18,
+          "sentences": [
+            {
+              "sent": "Task-specific Models Since we wish to assess the value of the proposed embedding refinement strategy, we focus on relatively simple task architectures.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We use single-layer bidirectional LSTMs (BiLSTMs) as encoders of the inputs represented by the refined or unrefined embeddings with a task-specific, feed-forward network for the final prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Such models are general reading architectures (Bowman et al, 2015;Rockt\u00e4schel et al, 2015;Weissenborn et al, 2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "To demonstrate that our reading module can be integrated into arbitrary task architectures, we also add our refinement module to a reimplementation of a state of the art architecture for RTE called ESIM (Chen et al, 2017).",
+              "tag": "Method"
+            },
+            {
+              "sent": "We refer the interested reader to the ESIM paper for details of the model.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 21,
+          "sentences": [
+            {
+              "sent": "Recognizing Textual Entailment We test on both the SNLI dataset (Bowman et al, 2015), a collection of 570k sentence pairs, and the more recent MultiNLI dataset (433k sentence pairs) (Williams et al, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Given two sentences, a premise p and a hypothesis q, the task is to determine whether p either entails, contradicts or is neutral to q. See Appendix A.2 for implementation details of the RTE system.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Supplementary Knowledge Sources We use ConceptNet 3 (Speer and Havasi, 2012), a freelyavailable, multi-lingual semantic network that originated from the Open Mind Common Sense project and incorporates selected knowledge from various other knowledge sources, such as Wiktionary, Open Multilingual WordNet, OpenCyc and DBpedia.",
+              "tag": "Method"
+            },
+            {
+              "sent": "It presents information in the form of relational triples. 4",
+              "tag": "Method"
+            },
+            {
+              "sent": "Additionally, we exploit Wikipedia abstracts in our DQA experiments as described below.",
+              "tag": "Method"
+            }
+          ]
+        },
+        {
+          "par_id": 23,
+          "sentences": [
+            {
+              "sent": "Refinement Order When employing our embedding-refinement strategy, we first read the document (p) followed by the question (q) in case of DQA, and the premise (p) followed by the hypothesis (q) for RTE, that is, X 1 = {p} and X 2 = {q}.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Additional knowledge in the form of a set of assertions A is integrated after reading the task-specific input for both DQA and RTE, that is, X 3 = A. Finally, for DQA we additionally add Wikipedia abstracts as background knowledge as described previously, that is, X 4 = W.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In preliminary experiments we found that the final performance is not significantly sensitive to the order of presentation so we decided to fix our order as defined above.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Results",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Question Answering",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "Recognizing Textual Entailment",
+      "selected_sentences": [
+        {
+          "par_id": 28,
+          "sentences": [
+            {
+              "sent": "Table 3 shows the results of our RTE experiments.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In general, the introduction of our refinement strategy almost always helps, both with and without external knowledge.",
+              "tag": "Result"
+            },
+            {
+              "sent": "When providing additional background knowledge from ConceptNet, our BiLSTM based models improve substantially, while the ESIM-based models improve only on the more difficult MultiNLI dataset.",
+              "tag": "Method"
+            },
+            {
+              "sent": "Compared to previously published state of the art systems, our models acquit themselves quite well on the MultiNLI benchmark, and competitively on the SNLI benchmark.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "In parallel to this work, Gong et al (2017) developed a novel task-specific architecture for RTE that achieves slightly better performance on MultiNLI than our ESIM + p + q + A based models. 9",
+              "tag": "Claim"
+            },
+            {
+              "sent": "It draws attention to the fact that when using our knowledge-enhanced embed-ding module, on the MultiNLI, the basic BiLSTM task model outperforms the task-specific ESIM model, which is architecturally much more complex and designed specifically for the RTE task.",
+              "tag": "Result"
+            },
+            {
+              "sent": "We do find that there is little impact of using external knowledge on the RTE task with ESIM, although the refinement strategy helps using just p + q.",
+              "tag": "Result"
+            },
+            {
+              "sent": "A more detailed set of experiments reported in Appendix B shows that by impoverishing the amount of training data and information present in the GloVe embeddings, the positive impact of supplemental information becomes much more pronounced.",
+              "tag": "Result"
+            },
+            {
+              "sent": "These results suggest that ESIM is able to learn important background information from the large-scale datasets and from pretrained embeddings, but this can be supplemented when necessary.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Nevertheless, both ESIM and our BiLSTM models when trained with knowledge from ConceptNet are sensitive to the semantics of the provided assertions as demonstrated in our analysis in \u00a75.3.",
+              "tag": "Conclusion"
+            },
+            {
+              "sent": "We argue that this is a desirable side effect because it makes the predictions of our model more interpretable than those not trained with knowledge.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Furthermore, increasing the coverage of assertions in ConceptNet would most likely yield improved performance even without retraining our models.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Finally, we remark that despite careful tuning, our re-implementation of ESIM fails to match the 88% reported in Chen et al ( 2017) by 0.8%; however, with MultiNLI, we find that our implementation of ESIM performs considerably better (by approximately 5%).",
+              "tag": "Result"
+            },
+            {
+              "sent": "The instability of the results suggests, as well as the failure of a custom RTEarchitecture to consistently perform well suggests that current SotA RTE models may be overfit to the SNLI dataset.",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Qualitative Analysis",
+      "selected_sentences": [
+        {
+          "par_id": 29,
+          "sentences": [
+            {
+              "sent": "Although our empirical results show our knowledge-incorporation approach improves performance, in this section we attempt to assess whether we are learning to use the provided knowledge in a semantically appropriate way.",
+              "tag": "Method"
+            },
+            {
+              "sent": "RTE To test our models sensitivity towards the semantics of the assertions for recognizing textual entailment, we run an experiment in which we swap the synonym with the antonym predicate in the provided assertions during test time.",
+              "tag": "Method"
+            },
+            {
+              "sent": "We hypothesize that in many cases these two predicates are very important for predicting either contradic-tion or entailment.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Indeed, there is a strong performance drop of about 10% on MultiNLI examples for both the BiLSTM and the ESIM model for which either a synonym or an antonym-assertion is present.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This very large drop clearly shows that our models are sensitive to the semantics of the provided knowledge.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Examples of prediction changes are presented in Table 4.",
+              "tag": "Result"
+            },
+            {
+              "sent": "They demonstrate that the system has learned to trust the presented assertions to the point that it will make appropriate counterfactual inferences-that is, the change in knowledge has caused the change in prediction.",
+              "tag": "Method"
+            },
+            {
+              "sent": "For the interested reader we provide additional RTE analysis results in Appendix C DQA The following is an example question from the TriviaQA dataset: Answer candidates (ie, Denmark, Corfu, Greece, Vanuata) were obtained from the top predicted answer spans computed by our model excluding Wikipedia (ie, BiLSTM + p + q + A).",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Related Work",
+      "selected_sentences": [
+        {
+          "par_id": 34,
+          "sentences": [
+            {
+              "sent": "The role of background knowledge in natural language understanding has long been remarked on, especially in the context of classical models of AI (Schank and Abelson, 1977;Minsky, 2000); however, it has only recently begun to play a role in neural network models of NLU (Ahn et al, 2016;Xu et al, 2016;Long et al, 2017;Dhingra et al, 2017).",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Previous efforts have focused on specific tasks or certain kinds of knowledge, whereas we take a step towards a more generalpurpose solution for the integration of heterogeneous knowledge for NLU systems by providing a simple, general-purpose reading architecture that can read background knowledge encoded in simple natural language statements, eg, \"abdication is a type of resignation\".",
+              "tag": "Claim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "Conclusion",
+      "selected_sentences": [
+        {
+          "par_id": 37,
+          "sentences": [
+            {
+              "sent": "We have presented a novel reading architecture that allows for the dynamic integration of background knowledge into neural NLU models.",
+              "tag": "Claim"
+            },
+            {
+              "sent": "Our solution, which is based on the incremental refinement of word representations by reading supplementary inputs, is flexible and can be used with virtually any existing NLU architecture that rely on word embeddings as input.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our results show that embedding refinement using both the system's text inputs, as well as supplementary text from external background knowledge can yield large improvements.",
+              "tag": "Result"
+            },
+            {
+              "sent": "In particular, we have shown that relatively simple task architectures (eg, based on simple BiLSTM readers) can become competitive with state of the art, task-specific architectures when augmented with our reading architecture.",
+              "tag": "Result"
+            },
+            {
+              "sent": "Our analysis demonstrates that our model learns to exploit provided background knowledge in a semantically appropriate way.",
+              "tag": "Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_name": "A Implementation Details",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "A.2 Recognizing Textual Entailment",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "B Reducing Training Data & Dimensionality of Pre-trained Word Embeddings",
+      "selected_sentences": []
+    },
+    {
+      "section_name": "C Further Analysis of Knowledge Utilization in RTE",
+      "selected_sentences": [
+        {
+          "par_id": 51,
+          "sentences": [
+            {
+              "sent": "To verify whether and how our models make use of additional knowledge, we conducted several experiments.",
+              "tag": "Method"
+            },
+            {
+              "sent": "First, we evaluated models trained with knowledge on our tasks while not providing any knowledge at test time.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This ablation drops performance by 3.7-3.9% accuracy on MultiNLI, and by 4% F1 on SQuAD.",
+              "tag": "Result"
+            },
+            {
+              "sent": "This indicates the model is refining the representations using the provided assertions in a useful way.",
+              "tag": "Result"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Dynamic Integration of Background Knowledge in Neural NLU Systems"
+}
