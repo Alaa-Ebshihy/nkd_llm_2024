@@ -21,7 +21,7 @@ def get_llm_response(api_type, prompt, llm_model, api_key):
     :return:
     """
     if api_type == 'together':
-        get_together_response(prompt, LLM_NAME_MAP[llm_model], api_key)
+        return get_together_response(prompt, LLM_NAME_MAP[llm_model], api_key)
     return get_open_ai_response(prompt, LLM_NAME_MAP[llm_model], api_key)
 
 
