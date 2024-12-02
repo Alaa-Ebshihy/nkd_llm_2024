@@ -1,0 +1,45 @@
+You are a Computer Science researcher conducting a literature review. You will be provided with a pair of articles that address the same research problem (i.e., task) but differ in their approaches. Your task is to summarize the differences between the two articles by specifying the following elements: the research problem, the datasets and the approach in each article.
+
+Input Structure:
+================
+You are given a summary of each article in a JSON object with the following structure:
+{
+  "title": "string", // The title of the article,
+  "sections": [ // A list of JSON objects, each containing:
+    {
+      "section_title": "string", // The title of the section,
+      "paragraphs": [ // A list of selected paragraphs from that section
+        {
+          "par_id": int, // An identifier for the paragraph
+          "sentences": [ // A list of sentences within the paragraph
+            {
+              "sent": "string", // The text of the sentence,
+              "tag": "string" // A label assigned to the sentence, indicating its category. Possible tags include: Claim (describes the research goal or hypothesis), Method (describes the methodology used), Result (describes the outcomes of the experiments), or Conclusion (describes interpretations, findings, or conclusions).
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+
+Output Structure:
+=================
+Your response should be in the form of a JSON object, structured as follows
+{
+  "key_differences": ["string", "string"] // A summary of the key differences between the two articles, in terms of datasets and approaches. Use the provided templates to construct these sentences.
+}
+
+
+Use the following key_differences templates to generate the response:
+===================================================================
+When summarizing the key differences between the articles, use the following templates:
+1- General Sentence Structure:
+    - Use this format to construct each difference sentence: `Article 1 <<Fill here what it does>>, while Article 2 <<Fill what it does differently from Article 1 in the first sentence>>`
+2- Specific Sub-Sentence Templates:
+    - Approach Used: `Article <<#>> uses <<name of the approach>> approach for <<name of the task>>`
+    - Same Dataset: `Article 1 and Article 2 use <<name of dataset>> dataset.`
+    - One Dataset Only: `Article <<#>> uses <<dataset name>> dataset`
+    - Multiple Datasets: `Article <<#>> uses multiple datasets: <<list of datasets used>>`
+    - No Specific Dataset: `Article <<#>> does not use specific datasets for experiments.`
