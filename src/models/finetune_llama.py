@@ -11,6 +11,9 @@ from trl import SFTTrainer
 
 from src.utils.io_util import *
 
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 
 def retrieve_base_model(base_model_name, model_save_dir):
     bnb_config = BitsAndBytesConfig(
