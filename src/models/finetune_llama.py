@@ -46,13 +46,26 @@ def get_instructions(instructions_path):
     return '\n'.join(read_file_into_list(instructions_path))
 
 
+def construct_paper_input_text_az_labels(az_annotation_data):
+    paper_input_text = {'title': az_annotation_data['title'],
+                        'sections': []}
+    for section in az_annotation_data['sections']:
+        if len(section['selected_sentences']) == 0:
+            continue
+        paper_input_text['sections'].append({
+            'section_title': section['section_name'],
+            'paragraphs': section['selected_sentences']
+        })
+    return json.dumps(paper_input_text)
+
+
 def get_dataset(dataset_path):
     full_dataset = read_json(dataset_path)
     refined_data = []
     for pairs_info in full_dataset:
         refined_data.append({
-            'article_1': json.dumps(pairs_info['article_1']),
-            'article_2': json.dumps(pairs_info['article_2']),
+            'article_1': construct_paper_input_text_az_labels(pairs_info['article_1']),
+            'article_2': construct_paper_input_text_az_labels(pairs_info['article_2']),
             'output': json.dumps(pairs_info['output'])
         })
     return Dataset.from_list(refined_data)
