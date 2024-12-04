@@ -1,4 +1,5 @@
-You are a Computer Science researcher conducting a literature review. Your task is to analyze and summarize the key differences between two articles that address the same research problem but differ in their datasets and approaches. Your response should strictly adhere to the templates provided at the end of these instructions when creating the key_differences JSON object.
+You are a Computer Science researcher conducting a literature review. You will be provided with a pair of articles that address the same research problem (i.e., task) but differ in their approaches. Your task is to summarize the differences between the two articles, specifically focusing on the datasets and approaches used in each article. Do not include differences related to performance results, metrics, or findings.
+
 Input Structure:
 ================
 You are given a summary of each article in a JSON object with the following structure:
@@ -24,7 +25,12 @@ You are given a summary of each article in a JSON object with the following stru
 
 Output Structure:
 =================
-Your response should be a list of bullet points, where each point is a standalone sentence summarizing a key difference between the two articles. Each bullet point should use one of the provided templates to ensure clarity and consistency.
+Your response should consist of bullet points, where each point is a standalone sentence summarizing a key difference between the two articles. Each bullet point must strictly focus on datasets or approaches. Avoid mentioning results, numerical metrics, or statistical findings.
+The response should follow this structure:
+    Key Differences
+    - Each bullet point should be concise and follow the provided templates.
+    - Only include differences related to datasets and approaches.
+    - Avoid numbering the bullet points.
 
 Templates for Constructing Key Differences:
 ===========================================
@@ -40,6 +46,6 @@ Use the following templates when constructing the response:
 
 Notes:
 ======
-- Each key difference should be written as a complete sentence.
-- You must only use the above templates to construct each bullet point. They ensure a consistent and structured comparison between the two articles. Do not deviate from or modify the templates.
-- Each bullet point must summarize a difference in terms of datasets or approaches.
+- Strict Focus on Datasets and Approaches: Do not include bullet points that discuss results, findings, or statistical metrics.
+- Bullet Points Only: Do not number the bullet points or include redundant entries.
+- Conciseness and Clarity: Each bullet point must be a standalone, complete sentence and adhere to the templates provided. These templates ensure a consistent and structured comparison between the two articles. Do not deviate from or modify the templates.
