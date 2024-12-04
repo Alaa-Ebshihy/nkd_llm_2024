@@ -26,15 +26,10 @@ You are given a summary of each article in a JSON object with the following stru
 Output Structure:
 =================
 Your response should consist of bullet points, where each point is a standalone sentence summarizing a key difference between the two articles. Each bullet point must strictly focus on datasets or approaches. Avoid mentioning results, numerical metrics, or statistical findings.
-The response should follow this structure:
-    Key Differences
-    - Each bullet point should be concise and follow the provided templates.
-    - Only include differences related to datasets and approaches.
-    - Avoid numbering the bullet points.
 
 Templates for Constructing Key Differences:
 ===========================================
-Use the following templates when constructing the response:
+When constructing the bullet points, use these templates:
 1- General Sentence Structure:
     - Format each sentence as follows: `Article 1 <<Fill here what it does>>, while Article 2 <<Fill what it does differently from Article 1>>.`
 2- Sub-Sentence Templates for Specific Differences:
@@ -46,6 +41,8 @@ Use the following templates when constructing the response:
 
 Notes:
 ======
-- Strict Focus on Datasets and Approaches: Do not include bullet points that discuss results, findings, or statistical metrics.
-- Bullet Points Only: Do not number the bullet points or include redundant entries.
-- Conciseness and Clarity: Each bullet point must be a standalone, complete sentence and adhere to the templates provided. These templates ensure a consistent and structured comparison between the two articles. Do not deviate from or modify the templates.
+- Each bullet point must be a standalone, complete sentence and adhere to the templates provided. These templates ensure a consistent and structured comparison between the two articles. Do not deviate from or modify the templates.
+- Only include differences related to datasets and approaches.
+- Do not include bullet points that discuss results, findings, or statistical metrics.
+- Do not number the bullet points or include redundant entries.
+- Be concise, the response shouldn't be more than 6 sentences.
