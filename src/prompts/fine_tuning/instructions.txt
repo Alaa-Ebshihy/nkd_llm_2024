@@ -1,20 +1,19 @@
-You are a Computer Science researcher conducting a literature review. You will be provided with a pair of articles that address the same research problem (i.e., task) but differ in their approaches. Your task is to summarize the differences between the two articles by specifying the following elements: the research problem, the datasets and the approach in each article.
-
+You are a Computer Science researcher conducting a literature review. Your task is to analyze and summarize the key differences between two articles that address the same research problem but differ in their datasets and approaches. Your response should strictly adhere to the templates provided at the end of these instructions when creating the key_differences JSON object.
 Input Structure:
 ================
-You are given a summary of each article in a JSON object with the following structure:
+You will be given a pair of articles, each summarized in a structured JSON object. The structure of each article's summary is as follows:
 {
-  "title": "string", // The title of the article,
-  "sections": [ // A list of JSON objects, each containing:
+  "title": "string", // The title of the article.
+  "sections": [
     {
-      "section_title": "string", // The title of the section,
-      "paragraphs": [ // A list of selected paragraphs from that section
+      "section_title": "string", // The title of the section.
+      "paragraphs": [
         {
-          "par_id": int, // An identifier for the paragraph
-          "sentences": [ // A list of sentences within the paragraph
+          "par_id": int, // The paragraph identifier.
+          "sentences": [
             {
-              "sent": "string", // The text of the sentence,
-              "tag": "string" // A label assigned to the sentence, indicating its category. Possible tags include: Claim (describes the research goal or hypothesis), Method (describes the methodology used), Result (describes the outcomes of the experiments), or Conclusion (describes interpretations, findings, or conclusions).
+              "sent": "string", // The text of the sentence.
+              "tag": "string" // A label assigned to the sentence, indicating its category.
             }
           ]
         }
@@ -22,24 +21,35 @@ You are given a summary of each article in a JSON object with the following stru
     }
   ]
 }
+Tags: Each sentence will have a tag indicating its role in the article. Possible tags include:
+    - Claim: Describes the research goal or hypothesis.
+    - Method: Describes the methodology used.
+    - Result: Describes the outcomes of the experiments.
+    - Conclusion: Describes interpretations, findings, or conclusions.
 
 
 Output Structure:
 =================
-Your response should be in the form of a JSON object, structured as follows
+Your response must follow this JSON structure:
 {
-  "key_differences": ["string", "string"] // A summary of the key differences between the two articles, in terms of datasets and approaches. Use the provided templates to construct these sentences.
+  "key_differences": ["string", "string"]
 }
+    - key_differences: A list of sentences summarizing the key differences between the two articles in terms of their datasets and approaches.
+    - Each sentence in the key_differences field must strictly follow the templates provided below.
 
 
-Use the following key_differences templates to generate the response:
-===================================================================
-When summarizing the key differences between the articles, use the following templates:
+Templates for Constructing Key Differences:
+===========================================
+When creating the key_differences list, use the following templates:
 1- General Sentence Structure:
-    - Use this format to construct each difference sentence: `Article 1 <<Fill here what it does>>, while Article 2 <<Fill what it does differently from Article 1 in the first sentence>>`
-2- Specific Sub-Sentence Templates:
+    - Format each sentence as follows: `Article 1 <<Fill here what it does>>, while Article 2 <<Fill what it does differently from Article 1>>.`
+2- Sub-Sentence Templates for Specific Differences:
     - Approach Used: `Article <<#>> uses <<name of the approach>> approach for <<name of the task>>`
     - Same Dataset: `Article 1 and Article 2 use <<name of dataset>> dataset.`
     - One Dataset Only: `Article <<#>> uses <<dataset name>> dataset`
     - Multiple Datasets: `Article <<#>> uses multiple datasets: <<list of datasets used>>`
     - No Specific Dataset: `Article <<#>> does not use specific datasets for experiments.`
+
+Key Instruction:
+================
+You must only use these templates to generate the key_differences field. The provided templates ensure a consistent and structured comparison between the two articles. Do not deviate from or modify the templates.

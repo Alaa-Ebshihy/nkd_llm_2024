@@ -73,7 +73,7 @@ def get_dataset(dataset_path):
 
 def preprocess_function(example, instructions, tokenizer):
     # Create the input prompt
-    prompt = f"### Instruction:\n{instructions}\n### Input:\narticle 1 information:\n======================\n{example['article_1']}\n\narticle 2 information:\n======================\n{example['article_2']}### Response:\n"
+    prompt = f"### Instruction:\n{instructions}\n### Input:\narticle 1 information:\n======================\n{example['article_1']}\n\narticle 2 information:\n======================\n{example['article_2']}\n### Response:\n"
     target = example["output"]
 
     # Tokenize
