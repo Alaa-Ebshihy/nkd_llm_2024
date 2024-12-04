@@ -1,19 +1,19 @@
 You are a Computer Science researcher conducting a literature review. Your task is to analyze and summarize the key differences between two articles that address the same research problem but differ in their datasets and approaches. Your response should strictly adhere to the templates provided at the end of these instructions when creating the key_differences JSON object.
 Input Structure:
 ================
-You will be given a pair of articles, each summarized in a structured JSON object. The structure of each article's summary is as follows:
+You are given a summary of each article in a JSON object with the following structure:
 {
-  "title": "string", // The title of the article.
-  "sections": [
+  "title": "string", // The title of the article
+  "sections": [ // A list of JSON objects, each containing:
     {
-      "section_title": "string", // The title of the section.
-      "paragraphs": [
+      "section_title": "string", // The title of the section
+      "paragraphs": [ // A list of selected paragraphs from that section
         {
-          "par_id": int, // The paragraph identifier.
-          "sentences": [
+          "par_id": int, // An identifier for the paragraph
+          "sentences": [ // A list of sentences within the paragraph
             {
-              "sent": "string", // The text of the sentence.
-              "tag": "string" // A label assigned to the sentence, indicating its category.
+              "sent": "string", // The text of the sentence
+              "tag": "string" // A label assigned to the sentence, indicating its category. Possible tags include: Claim (describes the research goal or hypothesis), Method (describes the methodology used), Result (describes the outcomes of the experiments), or Conclusion (describes interpretations, findings, or conclusions).
             }
           ]
         }
@@ -21,26 +21,14 @@ You will be given a pair of articles, each summarized in a structured JSON objec
     }
   ]
 }
-Tags: Each sentence will have a tag indicating its role in the article. Possible tags include:
-    - Claim: Describes the research goal or hypothesis.
-    - Method: Describes the methodology used.
-    - Result: Describes the outcomes of the experiments.
-    - Conclusion: Describes interpretations, findings, or conclusions.
-
 
 Output Structure:
 =================
-Your response must follow this JSON structure:
-{
-  "key_differences": ["string", "string"]
-}
-    - key_differences: A list of sentences summarizing the key differences between the two articles in terms of their datasets and approaches.
-    - Each sentence in the key_differences field must strictly follow the templates provided below.
-
+Your response should be a list of bullet points, where each point is a standalone sentence summarizing a key difference between the two articles. Each bullet point should use one of the provided templates to ensure clarity and consistency.
 
 Templates for Constructing Key Differences:
 ===========================================
-When creating the key_differences list, use the following templates:
+Use the following templates when constructing the response:
 1- General Sentence Structure:
     - Format each sentence as follows: `Article 1 <<Fill here what it does>>, while Article 2 <<Fill what it does differently from Article 1>>.`
 2- Sub-Sentence Templates for Specific Differences:
@@ -50,6 +38,8 @@ When creating the key_differences list, use the following templates:
     - Multiple Datasets: `Article <<#>> uses multiple datasets: <<list of datasets used>>`
     - No Specific Dataset: `Article <<#>> does not use specific datasets for experiments.`
 
-Key Instruction:
-================
-You must only use these templates to generate the key_differences field. The provided templates ensure a consistent and structured comparison between the two articles. Do not deviate from or modify the templates.
+Notes:
+======
+- Each key difference should be written as a complete sentence.
+- You must only use the above templates to construct each bullet point. They ensure a consistent and structured comparison between the two articles. Do not deviate from or modify the templates.
+- Each bullet point must summarize a difference in terms of datasets or approaches.

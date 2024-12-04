@@ -1,3 +1,6 @@
+import os
+
+import wandb
 from datasets import Dataset
 from huggingface_hub import login
 from peft import LoraConfig
@@ -11,7 +14,6 @@ from trl import SFTTrainer
 
 from src.utils.io_util import *
 
-import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
@@ -63,17 +65,18 @@ def get_dataset(dataset_path):
     full_dataset = read_json(dataset_path)
     refined_data = []
     for pairs_info in full_dataset:
+        output = [f'- {sent}' for sent in pairs_info['output']['key_differences']]
         refined_data.append({
             'article_1': construct_paper_input_text_az_labels(pairs_info['article_1']),
             'article_2': construct_paper_input_text_az_labels(pairs_info['article_2']),
-            'output': json.dumps(pairs_info['output'])
+            'output': '\n'.join(output)
         })
     return Dataset.from_list(refined_data)
 
 
 def preprocess_function(example, instructions, tokenizer):
     # Create the input prompt
-    prompt = f"### Instruction:\n{instructions}\n### Input:\narticle 1 information:\n======================\n{example['article_1']}\n\narticle 2 information:\n======================\n{example['article_2']}\n### Response:\n"
+    prompt = f"### Instruction:\n{instructions}\n### Input:\narticle 1 information:\n======================\n{example['article_1']}\n\narticle 2 information:\n======================\n{example['article_2']}\n### Key Differences:\n"
     target = example["output"]
 
     # Tokenize
@@ -86,8 +89,10 @@ def preprocess_function(example, instructions, tokenizer):
     return inputs
 
 
-def train_llama(hg_token, base_model_name, model_save_dir, output_model_name, instructions_path, dataset_path):
+def train_llama(hg_token, wandb_token, base_model_name, model_save_dir, output_model_name, instructions_path, dataset_path):
     login(token=hg_token)
+
+    wandb.login(key=wandb_token)
 
     model = retrieve_base_model(base_model_name, model_save_dir)
     print("Model device:", next(model.parameters()).device)
