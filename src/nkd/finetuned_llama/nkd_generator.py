@@ -3,10 +3,30 @@ import torch
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
+    BitsAndBytesConfig,
 )
 
 from src.nkd.llm.input_paper_text_constructor import construct_paper_input_text
 from src.utils.io_util import *
+
+
+def retrieve_model(base_model_name):
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype="float16",
+        bnb_4bit_use_double_quant=True,
+    )
+
+    model = AutoModelForCausalLM.from_pretrained(
+        base_model_name,
+        quantization_config=bnb_config,
+        device_map="auto",
+        torch_dtype="auto",
+    )
+    model.config.use_cache = False
+
+    return model
 
 
 def get_annotation_path(annotation_dir, row, pair_no):
@@ -94,7 +114,7 @@ def construct_claims(papers_pairs_info, input_text_type, annotation_dir, instruc
 def generate_claims(papers_pairs_info, claims_base_path, experiment_name, annotation_dir,
                     instructions_path, model_path, llm_model, run_start=1, run_end=2):
     tokenizer = AutoTokenizer.from_pretrained(model_path)
-    model = AutoModelForCausalLM.from_pretrained(model_path)
+    model = retrieve_model(model_path)
     for run in range(run_start, run_end):
         raw_keydifferences_claims, raw_output = construct_claims(papers_pairs_info, 'az', annotation_dir,
                                                                  instructions_path, model, tokenizer)
@@ -105,4 +125,3 @@ def generate_claims(papers_pairs_info, claims_base_path, experiment_name, annota
                            [json.dumps(line) for line in raw_keydifferences_claims])
         write_list_to_file(join(run_claims_dir, 'raw.jsonl'),
                            [json.dumps(line) for line in raw_output])
-       
